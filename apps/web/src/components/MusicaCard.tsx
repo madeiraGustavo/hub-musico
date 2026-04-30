@@ -1,10 +1,10 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import type { Musica } from '@/types'
+import type { Track } from '@hub-musico/types'
 
 interface Props {
-  musica: Musica
+  musica: Track
   isPlaying: boolean
   isActive: boolean
   onPlay: (id: number) => void

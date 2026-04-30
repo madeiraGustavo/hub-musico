@@ -1,18 +1,17 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { MUSICAS } from '@/lib/data'
-import type { FilterGenre } from '@/types'
+import type { Track, TrackGenre } from '@hub-musico/types'
 
-export function useFilter() {
-  const [active, setActive] = useState<FilterGenre>('all')
+export function useFilter(tracks: Track[]) {
+  const [active, setActive] = useState<TrackGenre>('all')
 
-  const visibleMusicas = useMemo(
-    () => MUSICAS.filter(m => active === 'all' || m.genre === active),
-    [active],
+  const visibleTracks = useMemo(
+    () => (active === 'all' ? tracks : tracks.filter(t => t.genre === active)),
+    [active, tracks],
   )
 
-  const visibleIds = useMemo(() => visibleMusicas.map(m => m.id), [visibleMusicas])
+  const visibleIds = useMemo(() => visibleTracks.map(t => t.id), [visibleTracks])
 
-  return { active, setActive, visibleMusicas, visibleIds }
+  return { active, setActive, visibleTracks, visibleIds }
 }

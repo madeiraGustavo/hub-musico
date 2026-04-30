@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-import { PROJETOS } from '@/lib/data'
-import type { Projeto } from '@/types'
+import { useEffect, useRef, useState } from 'react'
+import { getProjects } from '@/services/projectService'
+import type { Project } from '@hub-musico/types'
 
 function SpotifyIcon() {
   return (
@@ -13,7 +13,7 @@ function SpotifyIcon() {
 }
 
 interface ProjetoCardProps {
-  projeto: Projeto
+  projeto: Project
 }
 
 function ProjetoCard({ projeto }: ProjetoCardProps) {
@@ -57,7 +57,7 @@ function ProjetoCard({ projeto }: ProjetoCardProps) {
         rel="noopener noreferrer"
         style={bgStyle}
         className={`block relative overflow-hidden cursor-pointer w-full h-full
-          ${projeto.featured ? 'aspect-[4/3]' : 'aspect-video'}`}
+          ${projeto.featured ? 'aspect-[16/10]' : 'aspect-[16/9]'}`}
       >
         {/* Overlay base */}
         <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(108,99,255,0.35),rgba(0,0,0,0.35))]
@@ -97,6 +97,14 @@ function ProjetoCard({ projeto }: ProjetoCardProps) {
 }
 
 export function Projetos() {
+  const [projects, setProjects] = useState<Project[]>([])
+
+  useEffect(() => {
+    getProjects()
+      .then(setProjects)
+      .catch(err => console.error('Projetos: erro ao carregar projetos', err))
+  }, [])
+
   return (
     <section id="projetos" className="py-[120px] bg-bg-surface">
       <div className="max-w-[1200px] mx-auto px-6">
@@ -110,9 +118,8 @@ export function Projetos() {
           </h2>
         </div>
 
-        {/* Grid: coluna esquerda = featured (row-span-2), coluna direita = 2 cards empilhados */}
-        <div className="grid grid-cols-2 grid-rows-2 gap-5 max-md:grid-cols-1 max-md:grid-rows-none">
-          {PROJETOS.map(projeto => (
+        <div className="grid grid-cols-2 grid-rows-2 gap-4 max-w-[900px] mx-auto max-md:grid-cols-1 max-md:grid-rows-none">
+          {projects.map(projeto => (
             <ProjetoCard key={projeto.id} projeto={projeto} />
           ))}
         </div>

@@ -1,12 +1,14 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { usePlayer } from '@/hooks/usePlayer'
 import { useFilter } from '@/hooks/useFilter'
+import { getTracks } from '@/services/trackService'
 import { MusicaCard } from './MusicaCard'
 import { Player } from './Player'
-import type { FilterGenre } from '@/types'
+import type { Track, TrackGenre } from '@hub-musico/types'
 
-const FILTERS: { value: FilterGenre; label: string }[] = [
+const FILTERS: { value: TrackGenre; label: string }[] = [
   { value: 'all',        label: 'Todas' },
   { value: 'piano',      label: 'Piano' },
   { value: 'jazz',       label: 'Jazz' },
@@ -17,14 +19,21 @@ const FILTERS: { value: FilterGenre; label: string }[] = [
 ]
 
 export function Musicas() {
-  const [playerState, playerControls] = usePlayer()
-  const { active, setActive, visibleMusicas, visibleIds } = useFilter()
+  const [tracks, setTracks] = useState<Track[]>([])
+
+  useEffect(() => {
+    getTracks()
+      .then(setTracks)
+      .catch(err => console.error('Musicas: erro ao carregar faixas', err))
+  }, [])
+
+  const [playerState, playerControls] = usePlayer(tracks)
+  const { active, setActive, visibleTracks, visibleIds } = useFilter(tracks)
 
   return (
     <section id="musicas" className="pt-[120px] bg-bg-base">
       <div className="max-w-[1200px] mx-auto px-6">
 
-        {/* Header */}
         <div className="text-center mb-14">
           <p className="inline-block text-xs font-semibold tracking-[0.12em] uppercase text-accent mb-3">
             Portfólio
@@ -37,7 +46,6 @@ export function Musicas() {
           </p>
         </div>
 
-        {/* Filters */}
         <div className="flex gap-2 flex-wrap mb-8">
           {FILTERS.map(f => (
             <button
@@ -54,20 +62,22 @@ export function Musicas() {
           ))}
         </div>
 
-        {/* Cards */}
         <div className="flex flex-col gap-0.5">
-          {visibleMusicas.map(musica => (
-            <MusicaCard
-              key={musica.id}
-              musica={musica}
-              isActive={playerState.currentId === musica.id}
-              isPlaying={playerState.isPlaying && playerState.currentId === musica.id}
-              onPlay={id => playerControls.play(id)}
-            />
-          ))}
+          {tracks.length === 0 ? (
+            <p className="text-text-muted text-sm text-center py-8">Carregando...</p>
+          ) : (
+            visibleTracks.map(track => (
+              <MusicaCard
+                key={track.id}
+                musica={track}
+                isActive={playerState.currentId === track.id}
+                isPlaying={playerState.isPlaying && playerState.currentId === track.id}
+                onPlay={id => playerControls.play(id)}
+              />
+            ))
+          )}
         </div>
 
-        {/* Player */}
         <Player state={playerState} controls={playerControls} visibleIds={visibleIds} />
       </div>
     </section>

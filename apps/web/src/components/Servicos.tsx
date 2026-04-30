@@ -1,7 +1,10 @@
-import { SERVICOS } from '@/lib/data'
-import type { Servico } from '@/types'
+'use client'
 
-const ICONS: Record<Servico['icon'], React.ReactNode> = {
+import { useEffect, useState } from 'react'
+import { getArtistServices } from '@/services/artistService'
+import type { ArtistService } from '@hub-musico/types'
+
+const ICONS: Record<ArtistService['icon'], React.ReactNode> = {
   drum: (
     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -41,6 +44,14 @@ const ICONS: Record<Servico['icon'], React.ReactNode> = {
 }
 
 export function Servicos() {
+  const [servicos, setServicos] = useState<ArtistService[]>([])
+
+  useEffect(() => {
+    getArtistServices()
+      .then(setServicos)
+      .catch(err => console.error('Servicos: erro ao carregar serviços', err))
+  }, [])
+
   return (
     <section id="servicos" className="py-[120px] bg-bg-base">
       <div className="max-w-[1200px] mx-auto px-6">
@@ -55,7 +66,7 @@ export function Servicos() {
         </div>
 
         <div className="grid grid-cols-4 gap-5 max-lg:grid-cols-2 max-sm:grid-cols-1">
-          {SERVICOS.map(servico => (
+          {servicos.map(servico => (
             <div key={servico.id}
               className={`relative rounded-lg p-8 border transition-all hover:translate-y-[-4px]
                 ${servico.highlight
@@ -69,17 +80,13 @@ export function Servicos() {
                   Popular
                 </div>
               )}
-
               <div className="w-[52px] h-[52px] flex items-center justify-center bg-accent-dim
-                border border-[rgba(108,99,255,0.35)] rounded-md mb-5 text-accent
-                hover:bg-[linear-gradient(135deg,rgba(108,99,255,0.25),rgba(224,64,251,0.15))]
-                hover:shadow-[0_0_20px_rgba(108,99,255,0.2)] transition-all">
+                border border-[rgba(108,99,255,0.35)] rounded-md mb-5 text-accent transition-all
+                hover:bg-[linear-gradient(135deg,rgba(108,99,255,0.25),rgba(224,64,251,0.15))]">
                 {ICONS[servico.icon]}
               </div>
-
               <h3 className="font-head text-[1.1rem] font-bold mb-3">{servico.title}</h3>
               <p className="text-[0.875rem] text-text-secondary leading-[1.65] mb-4">{servico.description}</p>
-
               <ul className="mb-5 space-y-1">
                 {servico.items.map(item => (
                   <li key={item} className="text-[0.8rem] text-text-secondary pl-4 relative
@@ -88,7 +95,6 @@ export function Servicos() {
                   </li>
                 ))}
               </ul>
-
               <div className="text-[0.85rem] text-text-secondary border-t border-[rgba(255,255,255,0.07)] pt-4">
                 {servico.price}
               </div>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { MUSICAS } from '@/lib/data'
+import type { Track } from '@hub-musico/types'
 
 const DURATION_SIM = 30
 
@@ -30,10 +30,10 @@ export interface PlayerControls {
   setVolume: (vol: number) => void
 }
 
-export function usePlayer(): [PlayerState, PlayerControls] {
-  const audioRef    = useRef<HTMLAudioElement | null>(null)
-  const timerRef    = useRef<ReturnType<typeof setInterval> | null>(null)
-  const elapsedRef  = useRef(0)
+export function usePlayer(tracks: Track[]): [PlayerState, PlayerControls] {
+  const audioRef   = useRef<HTMLAudioElement | null>(null)
+  const timerRef   = useRef<ReturnType<typeof setInterval> | null>(null)
+  const elapsedRef = useRef(0)
 
   const [state, setState] = useState<PlayerState>({
     currentId:   -1,
@@ -45,7 +45,6 @@ export function usePlayer(): [PlayerState, PlayerControls] {
     genre:       '—',
   })
 
-  // Inicializa o elemento de áudio uma única vez
   useEffect(() => {
     audioRef.current = new Audio()
     audioRef.current.volume = 0.8
@@ -100,8 +99,8 @@ export function usePlayer(): [PlayerState, PlayerControls] {
   }, [stopTimer])
 
   const play = useCallback((id: number) => {
-    const musica = MUSICAS.find(m => m.id === id)
-    if (!musica) return
+    const track = tracks.find(t => t.id === id)
+    if (!track) return
 
     audioRef.current?.pause()
     stopTimer()
@@ -114,27 +113,27 @@ export function usePlayer(): [PlayerState, PlayerControls] {
       progress:    0,
       currentTime: '0:00',
       totalTime:   '0:00',
-      title:       musica.title,
-      genre:       musica.genreLabel,
+      title:       track.title,
+      genre:       track.genreLabel,
     }))
 
-    if (musica.src && audioRef.current) {
-      audioRef.current.src = musica.src
+    if (track.src && audioRef.current) {
+      audioRef.current.src = track.src
       audioRef.current.load()
-      audioRef.current.play().catch(() => {/* autoplay bloqueado */})
+      audioRef.current.play().catch(() => {})
       startRealProgress()
     } else {
-      // Simula progresso para faixas sem src
-      startSimProgress(() => {/* next é chamado externamente via onEnd */})
+      startSimProgress(() => {})
     }
-  }, [stopTimer, startRealProgress, startSimProgress])
+  }, [tracks, stopTimer, startRealProgress, startSimProgress])
 
   const togglePlay = useCallback(() => {
     setState(prev => {
       if (prev.currentId === -1) return prev
       const next = !prev.isPlaying
       if (next) {
-        if (audioRef.current?.src) {
+        const track = tracks.find(t => t.id === prev.currentId)
+        if (track?.src && audioRef.current) {
           audioRef.current.play().catch(() => {})
           startRealProgress()
         } else {
@@ -146,12 +145,12 @@ export function usePlayer(): [PlayerState, PlayerControls] {
       }
       return { ...prev, isPlaying: next }
     })
-  }, [startRealProgress, startSimProgress, stopTimer])
+  }, [tracks, startRealProgress, startSimProgress, stopTimer])
 
   const next = useCallback((visibleIds: number[]) => {
     setState(prev => {
       if (!visibleIds.length) return prev
-      const idx = visibleIds.indexOf(prev.currentId)
+      const idx   = visibleIds.indexOf(prev.currentId)
       const nextId = visibleIds[(idx + 1) % visibleIds.length] ?? visibleIds[0]
       if (nextId !== undefined) play(nextId)
       return prev
@@ -161,7 +160,7 @@ export function usePlayer(): [PlayerState, PlayerControls] {
   const prev = useCallback((visibleIds: number[]) => {
     setState(prev => {
       if (!visibleIds.length) return prev
-      const idx = visibleIds.indexOf(prev.currentId)
+      const idx   = visibleIds.indexOf(prev.currentId)
       const prevId = visibleIds[(idx - 1 + visibleIds.length) % visibleIds.length] ?? visibleIds[0]
       if (prevId !== undefined) play(prevId)
       return prev
