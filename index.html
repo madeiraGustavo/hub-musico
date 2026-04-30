@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Max Souza — Baterista · Multi-instrumentista · Compositor</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <div class="nav__logo">MAX SOUZA</div>
+    <ul class="nav__links">
+      <li><a href="#sobre">Sobre</a></li>
+      <li><a href="#musicas">Músicas</a></li>
+      <li><a href="#projetos">Projetos</a></li>
+      <li><a href="#servicos">Serviços</a></li>
+      <li><a href="#contato" class="nav__cta">Contato</a></li>
+    </ul>
+    <button class="nav__hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="inicio">
+    <div class="hero__bg">
+      <div class="hero__waveform">
+        <canvas id="waveCanvas"></canvas>
+      </div>
+    </div>
+    <div class="hero__content">
+      <p class="hero__tag">Baterista · Multi-instrumentista · Compositor · Arranjador · Educador Musical</p>
+      <h1 class="hero__title">O ritmo que move<br /><span class="gradient-text">a sua música</span></h1>
+      <p class="hero__sub">Baterista profissional e multi-instrumentista formado pela Bituca — Universidade de Música Popular. Gravações, shows e projetos musicais em Juiz de Fora e em todo o Brasil.</p>
+      <div class="hero__actions">
+        <a href="#musicas" class="btn btn--primary">Ouvir Músicas</a>
+        <a href="#contato" class="btn btn--ghost">Trabalhar Juntos</a>
+      </div>
+      <div class="hero__stats">
+        <div class="stat"><span class="stat__num">10+</span><span class="stat__label">Artistas & Bandas</span></div>
+        <div class="stat"><span class="stat__num">2</span><span class="stat__label">Formações Bituca</span></div>
+        <div class="stat"><span class="stat__num">6+</span><span class="stat__label">Anos de Carreira</span></div>
+      </div>
+    </div>
+    
+  </section>
+
+  <!-- SOBRE -->
+  <section class="sobre" id="sobre">
+    <div class="container">
+      <div class="sobre__grid">
+        <div class="sobre__img-wrap">
+          <div class="sobre__img-placeholder">
+            <div class="sobre__vinyl-wrap">
+              <svg class="sobre__vinyl-svg" viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <radialGradient id="vinylBase" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%"   stop-color="#1a1a2e"/>
+                    <stop offset="30%"  stop-color="#0f0f1a"/>
+                    <stop offset="60%"  stop-color="#141420"/>
+                    <stop offset="100%" stop-color="#0a0a12"/>
+                  </radialGradient>
+                  <radialGradient id="vinylSheen" cx="35%" cy="30%" r="60%">
+                    <stop offset="0%"   stop-color="rgba(108,99,255,0.18)"/>
+                    <stop offset="40%"  stop-color="rgba(224,64,251,0.06)"/>
+                    <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+                  </radialGradient>
+                  <radialGradient id="labelGrad" cx="50%" cy="40%" r="55%">
+                    <stop offset="0%"   stop-color="#2a2060"/>
+                    <stop offset="60%"  stop-color="#1a1040"/>
+                    <stop offset="100%" stop-color="#110c30"/>
+                  </radialGradient>
+                  <radialGradient id="labelSheen" cx="40%" cy="35%" r="55%">
+                    <stop offset="0%"   stop-color="rgba(108,99,255,0.4)"/>
+                    <stop offset="100%" stop-color="rgba(224,64,251,0)"/>
+                  </radialGradient>
+                  <linearGradient id="highlightLine" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%"   stop-color="rgba(255,255,255,0.12)"/>
+                    <stop offset="50%"  stop-color="rgba(255,255,255,0.03)"/>
+                    <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+                  </linearGradient>
+                  <clipPath id="vinylClip">
+                    <circle cx="140" cy="140" r="134"/>
+                  </clipPath>
+                </defs>
+
+                <!-- Disco base -->
+                <circle cx="140" cy="140" r="134" fill="url(#vinylBase)"/>
+
+                <!-- Sulcos do vinil — grupos de arcos finos -->
+                <g clip-path="url(#vinylClip)" opacity="0.55">
+                  <circle cx="140" cy="140" r="128" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.8"/>
+                  <circle cx="140" cy="140" r="124" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.6"/>
+                  <circle cx="140" cy="140" r="120" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.8"/>
+                  <circle cx="140" cy="140" r="116" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.6"/>
+                  <circle cx="140" cy="140" r="112" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.8"/>
+                  <circle cx="140" cy="140" r="108" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.6"/>
+                  <circle cx="140" cy="140" r="104" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.8"/>
+                  <circle cx="140" cy="140" r="100" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.6"/>
+                  <circle cx="140" cy="140" r="96"  fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.8"/>
+                  <circle cx="140" cy="140" r="92"  fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.6"/>
+                  <circle cx="140" cy="140" r="88"  fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.8"/>
+                  <circle cx="140" cy="140" r="84"  fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.6"/>
+                  <circle cx="140" cy="140" r="80"  fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.8"/>
+                  <circle cx="140" cy="140" r="76"  fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.6"/>
+                  <circle cx="140" cy="140" r="72"  fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.8"/>
+                  <circle cx="140" cy="140" r="68"  fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.6"/>
+                  <circle cx="140" cy="140" r="64"  fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.8"/>
+                  <circle cx="140" cy="140" r="60"  fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.6"/>
+                  <!-- Reflexo roxo nos sulcos -->
+                  <circle cx="140" cy="140" r="118" fill="none" stroke="rgba(108,99,255,0.08)" stroke-width="2"/>
+                  <circle cx="140" cy="140" r="98"  fill="none" stroke="rgba(224,64,251,0.07)" stroke-width="2"/>
+                  <circle cx="140" cy="140" r="78"  fill="none" stroke="rgba(108,99,255,0.08)" stroke-width="2"/>
+                </g>
+
+                <!-- Sheen de luz no disco -->
+                <circle cx="140" cy="140" r="134" fill="url(#vinylSheen)"/>
+
+                <!-- Highlight diagonal -->
+                <ellipse cx="100" cy="90" rx="70" ry="30" fill="url(#highlightLine)" transform="rotate(-35 100 90)"/>
+
+                <!-- Label central -->
+                <circle cx="140" cy="140" r="46" fill="url(#labelGrad)"/>
+                <circle cx="140" cy="140" r="46" fill="url(#labelSheen)"/>
+                <circle cx="140" cy="140" r="44" fill="none" stroke="rgba(108,99,255,0.3)" stroke-width="1"/>
+
+                <!-- Texto no label -->
+                <text x="140" y="132" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="7.5" font-weight="700" letter-spacing="2.5" fill="rgba(255,255,255,0.75)">MAX SOUZA</text>
+                <line x1="118" y1="137" x2="162" y2="137" stroke="rgba(108,99,255,0.4)" stroke-width="0.8"/>
+                <text x="140" y="147" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="5.5" letter-spacing="1.5" fill="rgba(255,255,255,0.4)">BATERISTA</text>
+
+                <!-- Furo central -->
+                <circle cx="140" cy="140" r="5" fill="#0a0a12"/>
+                <circle cx="140" cy="140" r="5" fill="none" stroke="rgba(108,99,255,0.5)" stroke-width="0.8"/>
+
+                <!-- Borda do disco -->
+                <circle cx="140" cy="140" r="134" fill="none" stroke="rgba(108,99,255,0.2)" stroke-width="1.5"/>
+              </svg>
+            </div>
+          </div>
+          <div class="sobre__badge">
+            <span class="badge__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </span>
+            <span>Disponível para projetos</span>
+          </div>
+        </div>
+        <div class="sobre__text">
+          <p class="section-tag">Sobre mim</p>
+          <h2 class="section-title">A música é minha<br /><span class="gradient-text">linguagem nativa</span></h2>
+          <p>Natural de Rio-MG, multi-instrumentista formado em bateria (2018) e harmonia (2021) pela Bituca — Universidade de Música Popular (Barbacena), por grandes mestres como Mauro Rodrigues, Gladston Vieira e Felipe Moreira, com formação em composição ministrada por Ian Guest.</p>
+          <p>Antes da formação, atuou no cenário mineiro com artistas e bandas de rock, MPB e samba, em shows ao vivo, gravações de DVDs, clipes e músicas. Hoje está inserido na cena de Juiz de Fora como baterista profissional, educador musical (bateria e violão) e colabora como compositor e arranjador.</p>
+          <div class="sobre__skills">
+            <div class="skill-tag">Bateria</div>
+            <div class="skill-tag">Violão</div>
+            <div class="skill-tag">Rock</div>
+            <div class="skill-tag">MPB</div>
+            <div class="skill-tag">Samba</div>
+            <div class="skill-tag">Jazz Instrumental</div>
+            <div class="skill-tag">Pop</div>
+            <div class="skill-tag">Soul</div>
+          </div>
+          <div class="sobre__tools">
+            <span class="tool">Composição</span>
+            <span class="tool">Arranjo</span>
+            <span class="tool">Gravação</span>
+            <span class="tool">Educação Musical</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MÚSICAS / PLAYER -->
+  <section class="musicas" id="musicas">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-tag">Portfólio</p>
+        <h2 class="section-title">Composições em <span class="gradient-text">destaque</span></h2>
+        <p class="section-sub">Clique para ouvir. Gravações e composições instrumentais originais.</p>
+      </div>
+
+      <div class="musicas__filters">
+        <button class="filter-btn active" data-filter="all">Todas</button>
+        <button class="filter-btn" data-filter="piano">Piano</button>
+        <button class="filter-btn" data-filter="jazz">Jazz</button>
+        <button class="filter-btn" data-filter="ambient">Ambient</button>
+        <button class="filter-btn" data-filter="orquestral">Orquestral</button>
+        <button class="filter-btn" data-filter="rock">Rock</button>
+        <button class="filter-btn" data-filter="demo">Demo</button>
+      </div>
+
+      <div class="musicas__list" id="musicasList">
+
+        <div class="musica-card" data-genre="demo">
+          <div class="musica-card__play" data-musica="0">
+            <div class="play-icon">▶</div>
+          </div>
+          <div class="musica-card__info">
+            <h3>Teste de Áudio Real</h3>
+            <span class="musica-genre">Demo</span>
+          </div>
+          <div class="musica-card__meta">
+            <span>0:27</span>
+            <span>—</span>
+          </div>
+          <div class="musica-card__waveform">
+            <canvas class="mini-wave" width="120" height="32"></canvas>
+          </div>
+          <div class="musica-card__action">
+            <a href="#contato" class="btn btn--xs">Contato</a>
+          </div>
+        </div>
+
+        <div class="musica-card" data-genre="piano">
+          <div class="musica-card__play" data-musica="1">
+            <div class="play-icon">▶</div>
+          </div>
+          <div class="musica-card__info">
+            <h3>Chuva de Inverno</h3>
+            <span class="musica-genre">Piano Solo</span>
+          </div>
+          <div class="musica-card__meta">
+            <span>3:42</span>
+            <span>Dm</span>
+          </div>
+          <div class="musica-card__waveform">
+            <canvas class="mini-wave" width="120" height="32"></canvas>
+          </div>
+          <div class="musica-card__action">
+            <a href="#contato" class="btn btn--xs">Licenciar</a>
+          </div>
+        </div>
+
+        <div class="musica-card" data-genre="jazz">
+          <div class="musica-card__play" data-musica="2">
+            <div class="play-icon">▶</div>
+          </div>
+          <div class="musica-card__info">
+            <h3>Tarde no Café</h3>
+            <span class="musica-genre">Jazz</span>
+          </div>
+          <div class="musica-card__meta">
+            <span>4:15</span>
+            <span>F#m</span>
+          </div>
+          <div class="musica-card__waveform">
+            <canvas class="mini-wave" width="120" height="32"></canvas>
+          </div>
+          <div class="musica-card__action">
+            <a href="#contato" class="btn btn--xs">Licenciar</a>
+          </div>
+        </div>
+
+        <div class="musica-card" data-genre="ambient">
+          <div class="musica-card__play" data-musica="3">
+            <div class="play-icon">▶</div>
+          </div>
+          <div class="musica-card__info">
+            <h3>Horizonte Aberto</h3>
+            <span class="musica-genre">Ambient</span>
+          </div>
+          <div class="musica-card__meta">
+            <span>6:08</span>
+            <span>Am</span>
+          </div>
+          <div class="musica-card__waveform">
+            <canvas class="mini-wave" width="120" height="32"></canvas>
+          </div>
+          <div class="musica-card__action">
+            <a href="#contato" class="btn btn--xs">Licenciar</a>
+          </div>
+        </div>
+
+        <div class="musica-card" data-genre="orquestral">
+          <div class="musica-card__play" data-musica="4">
+            <div class="play-icon">▶</div>
+          </div>
+          <div class="musica-card__info">
+            <h3>Prelúdio em G</h3>
+            <span class="musica-genre">Orquestral</span>
+          </div>
+          <div class="musica-card__meta">
+            <span>5:30</span>
+            <span>G</span>
+          </div>
+          <div class="musica-card__waveform">
+            <canvas class="mini-wave" width="120" height="32"></canvas>
+          </div>
+          <div class="musica-card__action">
+            <a href="#contato" class="btn btn--xs">Licenciar</a>
+          </div>
+        </div>
+
+        <div class="musica-card" data-genre="piano">
+          <div class="musica-card__play" data-musica="5">
+            <div class="play-icon">▶</div>
+          </div>
+          <div class="musica-card__info">
+            <h3>Memória Viva</h3>
+            <span class="musica-genre">Piano Solo</span>
+          </div>
+          <div class="musica-card__meta">
+            <span>4:55</span>
+            <span>Cm</span>
+          </div>
+          <div class="musica-card__waveform">
+            <canvas class="mini-wave" width="120" height="32"></canvas>
+          </div>
+          <div class="musica-card__action">
+            <a href="#contato" class="btn btn--xs">Licenciar</a>
+          </div>
+        </div>
+
+        <div class="musica-card" data-genre="jazz">
+          <div class="musica-card__play" data-musica="6">
+            <div class="play-icon">▶</div>
+          </div>
+          <div class="musica-card__info">
+            <h3>Noite de Bossa</h3>
+            <span class="musica-genre">Jazz</span>
+          </div>
+          <div class="musica-card__meta">
+            <span>3:58</span>
+            <span>Bb</span>
+          </div>
+          <div class="musica-card__waveform">
+            <canvas class="mini-wave" width="120" height="32"></canvas>
+          </div>
+          <div class="musica-card__action">
+            <a href="#contato" class="btn btn--xs">Licenciar</a>
+          </div>
+        </div>
+
+        <div class="musica-card" data-genre="jazz">
+          <div class="musica-card__play" data-musica="7">
+            <div class="play-icon">▶</div>
+          </div>
+          <div class="musica-card__info">
+            <h3>Carlos Resende — Álbum Completo</h3>
+            <span class="musica-genre">Jazz</span>
+          </div>
+          <div class="musica-card__meta">
+            <span>Spotify</span>
+            <span>—</span>
+          </div>
+          <div class="musica-card__waveform">
+            <canvas class="mini-wave" width="120" height="32"></canvas>
+          </div>
+          <div class="musica-card__action">
+            <a href="https://open.spotify.com" target="_blank" rel="noopener" class="btn btn--xs">Ouvir</a>
+          </div>
+        </div>
+
+        <div class="musica-card" data-genre="rock">
+          <div class="musica-card__play" data-musica="8">
+            <div class="play-icon">▶</div>
+          </div>
+          <div class="musica-card__info">
+            <h3>FUGERE — Álbum Completo</h3>
+            <span class="musica-genre">Rock / Punk</span>
+          </div>
+          <div class="musica-card__meta">
+            <span>Spotify</span>
+            <span>—</span>
+          </div>
+          <div class="musica-card__waveform">
+            <canvas class="mini-wave" width="120" height="32"></canvas>
+          </div>
+          <div class="musica-card__action">
+            <a href="https://open.spotify.com" target="_blank" rel="noopener" class="btn btn--xs">Ouvir</a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Mini Player -->
+      <div class="player" id="player">
+        <div class="player__info">
+          <div class="player__thumb">♪</div>
+          <div>
+            <div class="player__title" id="playerTitle">—</div>
+            <div class="player__genre" id="playerGenre">—</div>
+          </div>
+        </div>
+        <div class="player__controls">
+          <button class="player__btn" id="prevBtn">⏮</button>
+          <button class="player__btn player__btn--main" id="playPauseBtn">▶</button>
+          <button class="player__btn" id="nextBtn">⏭</button>
+        </div>
+        <div class="player__progress-wrap">
+          <span class="player__time" id="currentTime">0:00</span>
+          <div class="player__progress" id="progressBar">
+            <div class="player__progress-fill" id="progressFill"></div>
+          </div>
+          <span class="player__time" id="totalTime">0:30</span>
+        </div>
+        <div class="player__volume">
+          <span>🔊</span>
+          <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.8" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJETOS -->
+  <section class="projetos" id="projetos">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-tag">Trabalhos</p>
+        <h2 class="section-title">Projetos <span class="gradient-text">recentes</span></h2>
+      </div>
+      <div class="projetos__grid">
+
+        <div class="projeto-card projeto-card--featured">
+          <a href="https://open.spotify.com/album/6C2q8Bone8s7KbexQXNeKo?si=CitWia4vTYq2Kk_avtiVgw" target="_blank" rel="noopener" class="projeto-card__img projeto-card__img--thumb" data-spotify-id="6C2q8Bone8s7KbexQXNeKo" style="background: linear-gradient(135deg, #3a1f5a, #5a2d7a);">
+            <div class="projeto-card__play-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 11.28a.625.625 0 0 1-.86.208c-2.353-1.438-5.314-1.763-8.802-.966a.625.625 0 1 1-.278-1.219c3.818-.872 7.094-.497 9.732 1.117a.625.625 0 0 1 .208.86zm1.223-2.72a.781.781 0 0 1-1.074.257c-2.693-1.655-6.796-2.135-9.983-1.168a.781.781 0 0 1-.453-1.494c3.641-1.105 8.17-.57 11.253 1.33a.781.781 0 0 1 .257 1.075zm.105-2.831C14.692 5.95 9.375 5.775 6.227 6.72a.937.937 0 1 1-.543-1.794c3.609-1.094 9.607-.882 13.396 1.394a.938.938 0 0 1-.966 1.609z"/></svg>
+            </div>
+            <div class="projeto-card__overlay">
+              <span class="projeto-card__year">Spotify</span>
+              <h3>FUGERE</h3>
+              <p>Álbum completo com participação na bateria, disponível no Spotify.</p>
+              <div class="projeto-card__tags">
+                <span>Rock / Punk</span><span>▶ Ouvir</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="projeto-card">
+          <a href="https://youtu.be/a7VedAE2Qdo?si=ebXjIqB2TeLF9Gk-" target="_blank" rel="noopener" class="projeto-card__img projeto-card__img--thumb" style="background-image: url('https://img.youtube.com/vi/a7VedAE2Qdo/hqdefault.jpg'); background-position: center 20%; background-size: 120%;">
+            <div class="projeto-card__play-btn">▶</div>
+            <div class="projeto-card__overlay">
+              <span class="projeto-card__year">YouTube</span>
+              <h3>Acoustic 'n Roll</h3>
+              <p>DVD ao vivo com gravação de bateria e performance completa ao lado da banda.</p>
+              <div class="projeto-card__tags">
+                <span>Rock</span><span>DVD ao Vivo</span><span>▶ Assistir</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="projeto-card">
+          <a href="https://youtu.be/HmBw1-Pu9YQ?si=xKLSbOg6cm4pYsXW" target="_blank" rel="noopener" class="projeto-card__img projeto-card__img--thumb" style="background-image: url('https://img.youtube.com/vi/HmBw1-Pu9YQ/hqdefault.jpg');">
+            <div class="projeto-card__play-btn">▶</div>
+            <div class="projeto-card__overlay">
+              <span class="projeto-card__year">YouTube</span>
+              <h3>Rodolfo Lamarca</h3>
+              <p>Participação em DVD com gravação de bateria e arranjos percussivos.</p>
+              <div class="projeto-card__tags">
+                <span>DVD</span><span>▶ Assistir</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="projeto-card">
+          <a href="https://open.spotify.com/album/5UcgfSjEfguojQpGT0Tlo3?si=GuqmRr0wTNCEwXU5fNo4lg" target="_blank" rel="noopener" class="projeto-card__img projeto-card__img--thumb" data-spotify-id="5UcgfSjEfguojQpGT0Tlo3" style="background: linear-gradient(135deg, #2b1f4a, #3d2a6b);">
+            <div class="projeto-card__play-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 11.28a.625.625 0 0 1-.86.208c-2.353-1.438-5.314-1.763-8.802-.966a.625.625 0 1 1-.278-1.219c3.818-.872 7.094-.497 9.732 1.117a.625.625 0 0 1 .208.86zm1.223-2.72a.781.781 0 0 1-1.074.257c-2.693-1.655-6.796-2.135-9.983-1.168a.781.781 0 0 1-.453-1.494c3.641-1.105 8.17-.57 11.253 1.33a.781.781 0 0 1 .257 1.075zm.105-2.831C14.692 5.95 9.375 5.775 6.227 6.72a.937.937 0 1 1-.543-1.794c3.609-1.094 9.607-.882 13.396 1.394a.938.938 0 0 1-.966 1.609z"/></svg>
+            </div>
+            <div class="projeto-card__overlay">
+              <span class="projeto-card__year">Spotify</span>
+              <h3>Carlos Resende</h3>
+              <p>Álbum completo com participação na bateria, disponível no Spotify.</p>
+              <div class="projeto-card__tags">
+                <span>Álbum</span><span>▶ Ouvir</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="projeto-card">
+          <a href="https://youtu.be/ohCgCqx6Xn0?si=yeugaTjIawUI3VRM" target="_blank" rel="noopener" class="projeto-card__img projeto-card__img--thumb" style="background-image: url('https://img.youtube.com/vi/ohCgCqx6Xn0/hqdefault.jpg');">
+            <div class="projeto-card__play-btn">▶</div>
+            <div class="projeto-card__overlay">
+              <span class="projeto-card__year">YouTube</span>
+              <h3>Silva Soul</h3>
+              <p>Clipe oficial com performance de bateria e produção musical.</p>
+              <div class="projeto-card__tags">
+                <span>Soul</span><span>Clipe</span><span>▶ Assistir</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVIÇOS -->
+  <section class="servicos" id="servicos">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-tag">O que ofereço</p>
+        <h2 class="section-title">Serviços <span class="gradient-text">disponíveis</span></h2>
+      </div>
+      <div class="servicos__grid">
+
+        <div class="servico-card">
+          <div class="servico-card__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-svg">
+              <!-- drum kit icon -->
+              <ellipse cx="12" cy="9" rx="8" ry="3"/>
+              <path d="M4 9v6c0 1.66 3.58 3 8 3s8-1.34 8-3V9"/>
+              <line x1="9" y1="21" x2="9" y2="15"/>
+              <line x1="15" y1="21" x2="15" y2="15"/>
+              <line x1="6" y1="22" x2="12" y2="21"/>
+              <line x1="18" y1="22" x2="12" y2="21"/>
+            </svg>
+          </div>
+          <h3>Bateria para Gravação</h3>
+          <p>Gravação profissional de bateria para álbuns, EPs, clipes e DVDs. Versatilidade em rock, MPB, samba, jazz, pop e soul.</p>
+          <ul>
+            <li>Gravação de alta qualidade</li>
+            <li>Múltiplos estilos</li>
+            <li>Entrega em stems</li>
+          </ul>
+          <div class="servico-card__price">Consulte o valor</div>
+        </div>
+
+        <div class="servico-card servico-card--highlight">
+          <div class="servico-card__badge">Popular</div>
+          <div class="servico-card__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-svg">
+              <path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/>
+              <path d="M19 10a7 7 0 0 1-14 0"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+              <line x1="8" y1="22" x2="16" y2="22"/>
+            </svg>
+          </div>
+          <h3>Shows & Performances</h3>
+          <p>Baterista profissional para shows, eventos e apresentações ao vivo com bandas e artistas.</p>
+          <ul>
+            <li>Shows ao vivo</li>
+            <li>Ensaios incluídos</li>
+            <li>Atuação nacional</li>
+          </ul>
+          <div class="servico-card__price">Consulte o valor</div>
+        </div>
+
+        <div class="servico-card">
+          <div class="servico-card__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-svg">
+              <path d="M9 18V5l12-2v13"/>
+              <circle cx="6" cy="18" r="3"/>
+              <circle cx="18" cy="16" r="3"/>
+            </svg>
+          </div>
+          <h3>Aulas de Bateria & Violão</h3>
+          <p>Educação musical presencial em Juiz de Fora. Aulas para iniciantes e intermediários com método personalizado.</p>
+          <ul>
+            <li>Aulas presenciais</li>
+            <li>Bateria e violão</li>
+            <li>Todos os níveis</li>
+          </ul>
+          <div class="servico-card__price">Consulte o valor</div>
+        </div>
+
+        <div class="servico-card">
+          <div class="servico-card__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-svg">
+              <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/>
+              <line x1="12" y1="8" x2="12" y2="16"/>
+              <line x1="8" y1="12" x2="16" y2="12"/>
+            </svg>
+          </div>
+          <h3>Composição & Arranjo</h3>
+          <p>Criação e arranjo musical para projetos autorais, com formação pela Bituca e orientação de Ian Guest.</p>
+          <ul>
+            <li>Composição original</li>
+            <li>Arranjo completo</li>
+            <li>Vários estilos</li>
+          </ul>
+          <div class="servico-card__price">Consulte o valor</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- DEPOIMENTOS -->
+  <section class="depoimentos">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-tag">Clientes</p>
+        <h2 class="section-title">O que dizem <span class="gradient-text">sobre mim</span></h2>
+      </div>
+      <div class="depoimentos__grid">
+
+        <div class="depo-card">
+          <div class="depo-card__stars">★★★★★</div>
+          <p>"O Max tem um groove incrível e uma sensibilidade musical rara. A gravação ficou exatamente como precisávamos. Profissional do início ao fim."</p>
+          <div class="depo-card__author">
+            <div class="depo-card__avatar" style="background: linear-gradient(135deg, #6c63ff, #e040fb);">RL</div>
+            <div>
+              <strong>Rodolfo Lamarca</strong>
+              <span>Artista Musical</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="depo-card">
+          <div class="depo-card__stars">★★★★★</div>
+          <p>"Versatilidade e técnica impecáveis. O Max entende o que a música precisa e entrega com precisão e energia em cada performance ao vivo."</p>
+          <div class="depo-card__author">
+            <div class="depo-card__avatar" style="background: linear-gradient(135deg, #00c9ff, #92fe9d);">CR</div>
+            <div>
+              <strong>Carlos Resende</strong>
+              <span>Músico & Compositor</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="depo-card">
+          <div class="depo-card__stars">★★★★★</div>
+          <p>"Trabalhar com o Max foi uma experiência incrível. Ele transita entre estilos com muita naturalidade e eleva qualquer projeto a outro nível."</p>
+          <div class="depo-card__author">
+            <div class="depo-card__avatar" style="background: linear-gradient(135deg, #f7971e, #ffd200);">SS</div>
+            <div>
+              <strong>Silva Soul</strong>
+              <span>Artista Musical</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTATO -->
+  <section class="contato" id="contato">
+    <div class="container">
+      <div class="contato__grid">
+        <div class="contato__info">
+          <p class="section-tag">Vamos criar</p>
+          <h2 class="section-title">Tem um projeto<br /><span class="gradient-text">em mente?</span></h2>
+          <p>Me conta o que você está pensando. Respondo em até 24 horas.</p>
+          <div class="contato__links">
+            <a href="mailto:maxsouzask8@gmail.com" class="contato__link">
+              <span class="contato__link-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </span>
+              maxsouzask8@gmail.com
+            </a>
+            <a href="https://wa.me/5532991092531" target="_blank" rel="noopener" class="contato__link">
+              <span class="contato__link-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </span>
+              (32) 99109-2531
+            </a>
+            <a href="#" class="contato__link">
+              <span class="contato__link-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </span>
+              Juiz de Fora - MG · Atuação Nacional
+            </a>
+          </div>
+        </div>
+        <form class="contato__form" id="contactForm" novalidate>
+          <div class="form-group">
+            <label for="nome">Nome</label>
+            <input type="text" id="nome" name="nome" placeholder="Seu nome" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="seu@email.com" required />
+          </div>
+          <div class="form-group">
+            <label for="servico">Serviço</label>
+            <select id="servico" name="servico">
+              <option value="">Selecione um serviço</option>
+              <option value="gravacao">Bateria para Gravação</option>
+              <option value="shows">Shows & Performances</option>
+              <option value="aulas">Aulas de Bateria / Violão</option>
+              <option value="composicao">Composição & Arranjo</option>
+              <option value="outro">Outro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="mensagem">Mensagem</label>
+            <textarea id="mensagem" name="mensagem" rows="4" placeholder="Fale sobre seu projeto..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn--primary btn--full">Enviar Mensagem</button>
+          <div class="form-feedback" id="formFeedback"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__top">
+        <div class="footer__brand">
+          <div class="footer__logo">MAX SOUZA</div>
+          <p>Baterista · Multi-instrumentista · Compositor · Juiz de Fora, MG 🇧🇷</p>
+        </div>
+        <div class="footer__nav">
+          <a href="#sobre">Sobre</a>
+          <a href="#musicas">Músicas</a>
+          <a href="#projetos">Projetos</a>
+          <a href="#servicos">Serviços</a>
+          <a href="#contato">Contato</a>
+        </div>
+        <div class="footer__social">
+          <a href="#" aria-label="Instagram">IG</a>
+          <a href="#" aria-label="YouTube">YT</a>
+          <a href="#" aria-label="SoundCloud">SC</a>
+          <a href="#" aria-label="Spotify">SP</a>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>© 2026 Max Souza Music. Todos os direitos reservados.</p>
+        <p>Juiz de Fora, MG 🇧🇷</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
