@@ -7,7 +7,7 @@ interface Props {
   musica: Track
   isPlaying: boolean
   isActive: boolean
-  onPlay: (id: number) => void
+  onPlay: () => void
 }
 
 function drawMiniWave(canvas: HTMLCanvasElement) {
@@ -47,7 +47,7 @@ export function MusicaCard({ musica, isPlaying, isActive, onPlay }: Props) {
     >
       {/* Play button */}
       <button
-        onClick={() => onPlay(musica.id)}
+        onClick={() => onPlay()}
         aria-label={isActive && isPlaying ? 'Pausar' : 'Reproduzir'}
         className={`w-12 h-12 rounded-full flex items-center justify-center border transition-all flex-shrink-0
           ${isActive

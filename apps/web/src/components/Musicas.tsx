@@ -1,11 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { usePlayer } from '@/hooks/usePlayer'
-import { useFilter } from '@/hooks/useFilter'
-import { getTracks } from '@/services/trackService'
-import { MusicaCard } from './MusicaCard'
-import { Player } from './Player'
+import { getTracks }           from '@/services/trackService'
+import { audioService }        from '@/services/audio/AudioService'
+import { usePlayerStore }      from '@/services/audio/usePlayerStore'
+import { useFilter }           from '@/hooks/useFilter'
+import { MusicaCard }          from './MusicaCard'
+import { Player }              from './Player'
 import type { Track, TrackGenre } from '@hub-musico/types'
 
 const FILTERS: { value: TrackGenre; label: string }[] = [
@@ -21,14 +22,29 @@ const FILTERS: { value: TrackGenre; label: string }[] = [
 export function Musicas() {
   const [tracks, setTracks] = useState<Track[]>([])
 
+  const currentTrack = usePlayerStore(s => s.currentTrack)
+  const isPlaying    = usePlayerStore(s => s.isPlaying)
+
   useEffect(() => {
     getTracks()
-      .then(setTracks)
+      .then(data => {
+        setTracks(data)
+        usePlayerStore.getState().setQueue(data, 0)
+      })
       .catch(err => console.error('Musicas: erro ao carregar faixas', err))
   }, [])
 
-  const [playerState, playerControls] = usePlayer(tracks)
-  const { active, setActive, visibleTracks, visibleIds } = useFilter(tracks)
+  const { active, setActive, visibleTracks } = useFilter(tracks)
+
+  async function handlePlay(track: Track) {
+    if (currentTrack?.id === track.id) {
+      await audioService.togglePlay()
+    } else {
+      // Atualiza a fila com as faixas visíveis e toca a selecionada
+      const idx = visibleTracks.findIndex(t => t.id === track.id)
+      await audioService.setQueueAndPlay(visibleTracks, idx)
+    }
+  }
 
   return (
     <section id="musicas" className="pt-[120px] bg-bg-base">
@@ -46,22 +62,21 @@ export function Musicas() {
           </p>
         </div>
 
+        {/* Filtros */}
         <div className="flex gap-2 flex-wrap mb-8">
           {FILTERS.map(f => (
-            <button
-              key={f.value}
-              onClick={() => setActive(f.value)}
+            <button key={f.value} onClick={() => setActive(f.value)}
               className={`px-5 py-2 rounded-[20px] text-sm font-medium border transition-all
                 ${active === f.value
                   ? 'bg-accent text-white border-accent'
                   : 'bg-bg-elevated text-text-secondary border-[rgba(255,255,255,0.07)] hover:bg-accent hover:text-white hover:border-accent'
-                }`}
-            >
+                }`}>
               {f.label}
             </button>
           ))}
         </div>
 
+        {/* Cards */}
         <div className="flex flex-col gap-0.5">
           {tracks.length === 0 ? (
             <p className="text-text-muted text-sm text-center py-8">Carregando...</p>
@@ -70,15 +85,15 @@ export function Musicas() {
               <MusicaCard
                 key={track.id}
                 musica={track}
-                isActive={playerState.currentId === track.id}
-                isPlaying={playerState.isPlaying && playerState.currentId === track.id}
-                onPlay={id => playerControls.play(id)}
+                isActive={currentTrack?.id === track.id}
+                isPlaying={isPlaying && currentTrack?.id === track.id}
+                onPlay={() => handlePlay(track)}
               />
             ))
           )}
         </div>
 
-        <Player state={playerState} controls={playerControls} visibleIds={visibleIds} />
+        <Player />
       </div>
     </section>
   )

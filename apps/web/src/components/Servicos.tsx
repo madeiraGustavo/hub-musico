@@ -68,7 +68,7 @@ export function Servicos() {
         <div className="grid grid-cols-4 gap-5 max-lg:grid-cols-2 max-sm:grid-cols-1">
           {servicos.map(servico => (
             <div key={servico.id}
-              className={`relative rounded-lg p-8 border transition-all hover:translate-y-[-4px]
+              className={`relative rounded-lg p-8 border transition-all hover:translate-y-[-4px] flex flex-col
                 ${servico.highlight
                   ? 'bg-[linear-gradient(135deg,rgba(108,99,255,0.1),rgba(224,64,251,0.05))] border-[rgba(108,99,255,0.35)] shadow-[0_0_32px_rgba(108,99,255,0.1)]'
                   : 'bg-bg-card border-[rgba(255,255,255,0.07)] hover:border-[rgba(108,99,255,0.35)] hover:shadow-[0_0_40px_rgba(108,99,255,0.25)]'
@@ -87,7 +87,7 @@ export function Servicos() {
               </div>
               <h3 className="font-head text-[1.1rem] font-bold mb-3">{servico.title}</h3>
               <p className="text-[0.875rem] text-text-secondary leading-[1.65] mb-4">{servico.description}</p>
-              <ul className="mb-5 space-y-1">
+              <ul className="mb-5 space-y-1 flex-1">
                 {servico.items.map(item => (
                   <li key={item} className="text-[0.8rem] text-text-secondary pl-4 relative
                     before:content-['✓'] before:absolute before:left-0 before:text-accent before:text-xs">
@@ -95,7 +95,7 @@ export function Servicos() {
                   </li>
                 ))}
               </ul>
-              <div className="text-[0.85rem] text-text-secondary border-t border-[rgba(255,255,255,0.07)] pt-4">
+              <div className="text-[0.85rem] text-text-secondary border-t border-[rgba(255,255,255,0.07)] pt-4 mt-auto">
                 {servico.price}
               </div>
             </div>
