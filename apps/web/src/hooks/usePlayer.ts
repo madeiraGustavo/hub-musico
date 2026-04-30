@@ -118,9 +118,15 @@ export function usePlayer(tracks: Track[]): [PlayerState, PlayerControls] {
     }))
 
     if (track.src && audioRef.current) {
-      audioRef.current.src = track.src
-      audioRef.current.load()
-      audioRef.current.play().catch(() => {})
+      const audio = audioRef.current
+      audio.src = track.src
+      audio.load()
+      // Aguarda o áudio estar pronto antes de dar play
+      const onCanPlay = () => {
+        audio.play().catch(err => console.error('usePlayer: play() falhou', err))
+        audio.removeEventListener('canplay', onCanPlay)
+      }
+      audio.addEventListener('canplay', onCanPlay)
       startRealProgress()
     } else {
       startSimProgress(() => {})

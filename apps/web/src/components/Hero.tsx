@@ -55,7 +55,7 @@ export function Hero() {
   }, [])
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden px-10 pt-[120px] pb-20">
+    <section className="relative min-h-screen flex items-center overflow-hidden px-10 pt-[80px] pb-20">
       {/* Background */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_60%_40%,rgba(108,99,255,0.12)_0%,transparent_70%),radial-gradient(ellipse_50%_40%_at_80%_70%,rgba(224,64,251,0.08)_0%,transparent_60%)]" />
 

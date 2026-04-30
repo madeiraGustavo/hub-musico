@@ -8,7 +8,7 @@ export const MUSICAS: Musica[] = [
     genreLabel: 'Demo',
     duration: '0:27',
     key: '—',
-    src: 'https://ia800501.us.archive.org/1/items/testmp3testfile/mpthreetest.mp3',
+    src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
   },
   { id: 1, title: 'Chuva de Inverno', genre: 'piano', genreLabel: 'Piano Solo',  duration: '3:42', key: 'Dm',  src: null },
   { id: 2, title: 'Tarde no Café',    genre: 'jazz',  genreLabel: 'Jazz',         duration: '4:15', key: 'F#m', src: null },

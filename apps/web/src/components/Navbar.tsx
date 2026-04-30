@@ -74,10 +74,21 @@ export function Navbar() {
           <a
             href="#contato"
             onClick={e => handleLinkClick(e, '#contato')}
-            className="px-5 py-2 rounded-[20px] bg-grad-main text-white font-semibold text-sm
-              hover:translate-y-[-1px] hover:shadow-[0_4px_16px_rgba(108,99,255,0.4)] transition-all"
+            className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors relative
+              after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5
+              after:bg-grad-main after:rounded-sm after:transition-all hover:after:w-full
+              md:text-sm text-xl"
           >
             Contato
+          </a>
+        </li>
+        <li>
+          <a
+            href="/login"
+            className="px-4 py-2 rounded-[20px] border border-[rgba(108,99,255,0.35)] text-accent
+              font-semibold text-sm hover:bg-accent-dim transition-all"
+          >
+            Login
           </a>
         </li>
       </ul>
