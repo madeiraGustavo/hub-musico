@@ -26,10 +26,9 @@ CREATE TABLE IF NOT EXISTS public.projects (
   created_at         TIMESTAMPTZ             NOT NULL DEFAULT NOW(),
   updated_at         TIMESTAMPTZ             NOT NULL DEFAULT NOW(),
 
-  CONSTRAINT projects_title_length CHECK (char_length(title) >= 2 AND char_length(title) <= 100),
-  -- Apenas um projeto featured por artista
-  CONSTRAINT projects_one_featured UNIQUE NULLS NOT DISTINCT (artist_id, featured)
-    DEFERRABLE INITIALLY DEFERRED
+  CONSTRAINT projects_title_length CHECK (char_length(title) >= 2 AND char_length(title) <= 100)
+  -- Nota: constraint de featured removida — substituída por índice parcial na migration 008
+  -- CREATE UNIQUE INDEX projects_one_featured_true ON public.projects (artist_id) WHERE featured = true;
 );
 
 CREATE TRIGGER projects_updated_at

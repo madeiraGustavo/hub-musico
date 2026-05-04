@@ -1,9 +1,8 @@
 /**
  * validateMime.ts
- * Validação de MIME type por magic bytes (primeiros bytes do arquivo)
- * NÃO confia na extensão ou no Content-Type enviado pelo cliente
- *
- * Regra OWASP A08: nunca confiar em metadados do cliente para validação de arquivo
+ * Validação de MIME type por magic bytes (primeiros bytes do arquivo).
+ * NÃO confia na extensão ou no Content-Type enviado pelo cliente.
+ * OWASP A08: nunca confiar em metadados do cliente para validação de arquivo.
  */
 
 export interface MimeValidationResult {
@@ -12,43 +11,9 @@ export interface MimeValidationResult {
   error?: string
 }
 
-// Magic bytes de cada tipo permitido
-const MAGIC_BYTES: Array<{
-  mime: string
-  bytes: number[]
-  offset: number
-}> = [
-  // JPEG
-  { mime: 'image/jpeg', bytes: [0xFF, 0xD8, 0xFF], offset: 0 },
-  // PNG
-  { mime: 'image/png',  bytes: [0x89, 0x50, 0x4E, 0x47], offset: 0 },
-  // WebP (RIFF....WEBP)
-  { mime: 'image/webp', bytes: [0x52, 0x49, 0x46, 0x46], offset: 0 },
-  // MP3 (ID3 tag)
-  { mime: 'audio/mpeg', bytes: [0x49, 0x44, 0x33], offset: 0 },
-  // MP3 (frame sync sem ID3)
-  { mime: 'audio/mpeg', bytes: [0xFF, 0xFB], offset: 0 },
-  { mime: 'audio/mpeg', bytes: [0xFF, 0xF3], offset: 0 },
-  { mime: 'audio/mpeg', bytes: [0xFF, 0xF2], offset: 0 },
-  // WAV (RIFF....WAVE)
-  { mime: 'audio/wav',  bytes: [0x52, 0x49, 0x46, 0x46], offset: 0 },
-  // FLAC
-  { mime: 'audio/flac', bytes: [0x66, 0x4C, 0x61, 0x43], offset: 0 },
-]
-
-// Tipos explicitamente bloqueados (independente de magic bytes)
-const BLOCKED_MIMES = new Set([
-  'image/svg+xml',
-  'text/html',
-  'text/javascript',
-  'application/javascript',
-  'application/x-php',
-])
-
-// Limites de tamanho por categoria
 export const SIZE_LIMITS = {
-  audio: 50 * 1024 * 1024,  // 50MB
-  image:  5 * 1024 * 1024,  //  5MB
+  audio: 50 * 1024 * 1024,
+  image:  5 * 1024 * 1024,
 } as const
 
 export type AllowedMime =
@@ -68,9 +33,55 @@ export const ALLOWED_MIMES = new Set<AllowedMime>([
   'audio/flac',
 ])
 
+const BLOCKED_MIMES = new Set([
+  'image/svg+xml',
+  'text/html',
+  'text/javascript',
+  'application/javascript',
+  'application/x-php',
+])
+
 export function getMediaCategory(mime: string): 'audio' | 'image' | null {
   if (mime.startsWith('audio/')) return 'audio'
   if (mime.startsWith('image/')) return 'image'
+  return null
+}
+
+function matchBytes(buf: Uint8Array, offset: number, magic: number[]): boolean {
+  return magic.every((byte, i) => buf[offset + i] === byte)
+}
+
+function detectMime(buf: Uint8Array): string | null {
+  // JPEG: FF D8 FF
+  if (matchBytes(buf, 0, [0xFF, 0xD8, 0xFF])) return 'image/jpeg'
+
+  // PNG: 89 50 4E 47
+  if (matchBytes(buf, 0, [0x89, 0x50, 0x4E, 0x47])) return 'image/png'
+
+  // FLAC: 66 4C 61 43
+  if (matchBytes(buf, 0, [0x66, 0x4C, 0x61, 0x43])) return 'audio/flac'
+
+  // MP3 com ID3 tag: 49 44 33
+  if (matchBytes(buf, 0, [0x49, 0x44, 0x33])) return 'audio/mpeg'
+
+  // MP3 frame sync (sem ID3): FF FB | FF F3 | FF F2
+  if (buf[0] === 0xFF && (buf[1] === 0xFB || buf[1] === 0xF3 || buf[1] === 0xF2)) {
+    return 'audio/mpeg'
+  }
+
+  // RIFF container — diferencia WAV e WebP pelos bytes 8-11
+  if (matchBytes(buf, 0, [0x52, 0x49, 0x46, 0x46])) {
+    const riffType = String.fromCharCode(
+      buf[8]  ?? 0,
+      buf[9]  ?? 0,
+      buf[10] ?? 0,
+      buf[11] ?? 0,
+    )
+    if (riffType === 'WAVE') return 'audio/wav'
+    if (riffType === 'WEBP') return 'image/webp'
+    return null // RIFF desconhecido — rejeita
+  }
+
   return null
 }
 
@@ -78,45 +89,28 @@ export async function validateMime(
   buffer: ArrayBuffer,
   declaredMime: string,
 ): Promise<MimeValidationResult> {
+  const normalized = declaredMime.toLowerCase().trim()
+
   // 1. Bloqueia tipos explicitamente proibidos
-  if (BLOCKED_MIMES.has(declaredMime.toLowerCase())) {
+  if (BLOCKED_MIMES.has(normalized)) {
     return { valid: false, detectedMime: null, error: 'Tipo de arquivo não permitido' }
   }
 
-  const bytes = new Uint8Array(buffer.slice(0, 16))
+  const buf = new Uint8Array(buffer.slice(0, 16))
+  const detectedMime = detectMime(buf)
 
-  // 2. Detecta MIME real pelos magic bytes
-  let detectedMime: string | null = null
-
-  for (const signature of MAGIC_BYTES) {
-    const { bytes: magic, offset } = signature
-    const match = magic.every((byte, i) => bytes[offset + i] === byte)
-    if (match) {
-      detectedMime = signature.mime
-      break
-    }
-  }
-
-  // Caso especial: WAV tem RIFF mas precisa verificar bytes 8-11 = "WAVE"
-  if (detectedMime === 'audio/mpeg' && bytes[0] === 0x52) {
-    // É RIFF — verifica se é WAV ou WebP
-    const riffType = String.fromCharCode(bytes[8] ?? 0, bytes[9] ?? 0, bytes[10] ?? 0, bytes[11] ?? 0)
-    if (riffType === 'WAVE') detectedMime = 'audio/wav'
-    else if (riffType === 'WEBP') detectedMime = 'image/webp'
-    else detectedMime = null
-  }
-
+  // 2. Não reconhecido pelos magic bytes
   if (!detectedMime) {
     return { valid: false, detectedMime: null, error: 'Formato de arquivo não reconhecido' }
   }
 
-  // 3. Verifica se o MIME detectado está na lista de permitidos
+  // 3. MIME detectado não está na whitelist
   if (!ALLOWED_MIMES.has(detectedMime as AllowedMime)) {
     return { valid: false, detectedMime, error: 'Tipo de arquivo não permitido' }
   }
 
-  // 4. Verifica se o MIME declarado bate com o detectado (evita spoofing)
-  if (detectedMime !== declaredMime) {
+  // 4. MIME declarado não bate com o detectado — possível spoofing
+  if (detectedMime !== normalized) {
     return {
       valid: false,
       detectedMime,
