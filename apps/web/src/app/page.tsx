@@ -1,27 +1,18 @@
-import { Navbar }      from '@/components/Navbar'
-import { Hero }        from '@/components/Hero'
-import { Sobre }       from '@/components/Sobre'
-import { Musicas }     from '@/components/Musicas'
-import { Projetos }    from '@/components/Projetos'
-import { Servicos }    from '@/components/Servicos'
-import { Depoimentos } from '@/components/Depoimentos'
-import { Contato }     from '@/components/Contato'
-import { Footer }      from '@/components/Footer'
+import { MusicianLayout } from '@/components/musician/MusicianLayout'
+import { getArtist }      from '@/services/artistService'
+import { getTracks }      from '@/services/trackService'
+import { getProjects }    from '@/services/projectService'
 
-export default function Home() {
+export default async function Home() {
+  const [artist, tracks, projects] = await Promise.all([
+    getArtist(),
+    getTracks(),
+    getProjects(),
+  ])
+
   return (
-    <>
-      <Navbar />
-      <main>
-        <Hero />
-        <Sobre />
-        <Musicas />
-        <Projetos />
-        <Servicos />
-        <Depoimentos />
-        <Contato />
-      </main>
-      <Footer />
-    </>
+    <main>
+      <MusicianLayout artist={artist} tracks={tracks} projects={projects} />
+    </main>
   )
 }

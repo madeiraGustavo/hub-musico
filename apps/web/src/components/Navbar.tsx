@@ -1,17 +1,32 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import type { ProfileConfig } from '@/lib/profile/profileConfig'
+import { PROFILE_CONFIG } from '@/lib/profile/profileConfig'
+import { GradientText } from '@/lib/profile/GradientText'
 
-const LINKS = [
+const DEFAULT_LINKS = [
   { href: '#sobre',    label: 'Sobre' },
   { href: '#musicas',  label: 'Músicas' },
   { href: '#projetos', label: 'Projetos' },
   { href: '#servicos', label: 'Serviços' },
 ]
 
-export function Navbar() {
+interface NavbarProps {
+  links?:      Array<{ href: string; label: string }>
+  artistName?: string
+  palette?:    ProfileConfig['palette']
+}
+
+export function Navbar({
+  links      = DEFAULT_LINKS,
+  artistName = 'MAX SOUZA',
+  palette    = PROFILE_CONFIG.musician.palette,
+}: NavbarProps) {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen]         = useState(false)
+
+  const id = `nav-${artistName.toLowerCase().replace(/\s+/g, '-')}`
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 40)
@@ -35,74 +50,71 @@ export function Navbar() {
     document.body.style.overflow = next ? 'hidden' : ''
   }
 
-  return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-[1000] flex items-center justify-between transition-all duration-300
-        ${scrolled
-          ? 'bg-[rgba(10,10,15,0.92)] backdrop-blur-xl shadow-[0_1px_0_rgba(108,99,255,0.15),0_4px_32px_rgba(0,0,0,0.5)] px-10 py-3.5'
-          : 'px-10 py-5'
-        }`}
-    >
-      {/* Logo */}
-      <div className="font-head text-2xl font-bold tracking-wide bg-grad-main bg-clip-text text-transparent">
-        MAX SOUZA
-      </div>
+  const bgBase = palette.bgBase
 
-      {/* Links desktop */}
-      <ul
-        className={`items-center gap-9 
-          ${open
-            ? 'flex fixed inset-0 bg-[rgba(10,10,15,0.97)] flex-col justify-center z-[999] gap-8'
-            : 'hidden md:flex'
-          }`}
+  return (
+    <>
+      {/* Estilos de hover isolados por ID */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        #${id} .nav-link { color: ${palette.textSecondary}; transition: color 0.2s; }
+        #${id} .nav-link:hover { color: ${palette.text}; }
+        #${id} .nav-login {
+          border: 1px solid ${palette.accentBorder};
+          color: ${palette.accent};
+          background: transparent;
+          transition: background 0.2s;
+        }
+        #${id} .nav-login:hover { background: ${palette.accentDim}; }
+      ` }} />
+
+      <nav id={id}
+        className="fixed top-0 left-0 right-0 z-[1000] flex items-center justify-between transition-all duration-300 px-10 py-3"
+        style={{
+          background:     scrolled ? `${bgBase}ee` : 'transparent',
+          backdropFilter: scrolled ? 'blur(20px)'  : 'none',
+          boxShadow:      scrolled ? `0 1px 0 ${palette.accentBorder}, 0 4px 32px rgba(0,0,0,0.5)` : 'none',
+        }}
       >
-        {LINKS.map(link => (
-          <li key={link.href}>
-            <a
-              href={link.href}
-              onClick={e => handleLinkClick(e, link.href)}
-              className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors relative
-                after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5
-                after:bg-grad-main after:rounded-sm after:transition-all hover:after:w-full
-                md:text-sm text-xl"
-            >
-              {link.label}
+        {/* Logo */}
+        <div className="font-head text-2xl font-bold tracking-wide">
+          <GradientText gradient={palette.gradient}>{artistName}</GradientText>
+        </div>
+
+        {/* Links desktop */}
+        <ul className={`items-center gap-9 ${open ? 'flex fixed inset-0 flex-col justify-center z-[999] gap-8' : 'hidden md:flex'}`}
+          style={open ? { background: bgBase } : {}}>
+          {links.map(link => (
+            <li key={link.href}>
+              <a href={link.href} onClick={e => handleLinkClick(e, link.href)}
+                className="nav-link text-sm font-medium">
+                {link.label}
+              </a>
+            </li>
+          ))}
+          <li>
+            <a href="#contato" onClick={e => handleLinkClick(e, '#contato')}
+              className="nav-link text-sm font-medium">
+              Contato
             </a>
           </li>
-        ))}
-        <li>
-          <a
-            href="#contato"
-            onClick={e => handleLinkClick(e, '#contato')}
-            className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors relative
-              after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5
-              after:bg-grad-main after:rounded-sm after:transition-all hover:after:w-full
-              md:text-sm text-xl"
-          >
-            Contato
-          </a>
-        </li>
-        <li>
-          <a
-            href="/login"
-            className="px-4 py-2 rounded-[20px] border border-[rgba(108,99,255,0.35)] text-accent
-              font-semibold text-sm hover:bg-accent-dim transition-all"
-          >
-            Login
-          </a>
-        </li>
-      </ul>
+          <li>
+            <a href="/login" className="nav-login px-4 py-2 rounded-[20px] font-semibold text-sm">
+              Login
+            </a>
+          </li>
+        </ul>
 
-      {/* Hamburger */}
-      <button
-        onClick={toggleMenu}
-        aria-label="Menu"
-        className="flex md:hidden flex-col gap-[5px] p-1 z-[1001]"
-      >
-        <span className={`block w-6 h-0.5 bg-text-primary rounded-sm transition-all ${open ? 'translate-y-[7px] rotate-45' : ''}`} />
-        <span className={`block w-6 h-0.5 bg-text-primary rounded-sm transition-all ${open ? 'opacity-0' : ''}`} />
-        <span className={`block w-6 h-0.5 bg-text-primary rounded-sm transition-all ${open ? 'translate-y-[-7px] -rotate-45' : ''}`} />
-      </button>
-    </nav>
+        {/* Hamburger */}
+        <button onClick={toggleMenu} aria-label="Menu"
+          className="flex md:hidden flex-col gap-[5px] p-1 z-[1001]">
+          <span className={`block w-6 h-0.5 rounded-sm transition-all ${open ? 'translate-y-[7px] rotate-45' : ''}`}
+            style={{ background: palette.text }} />
+          <span className={`block w-6 h-0.5 rounded-sm transition-all ${open ? 'opacity-0' : ''}`}
+            style={{ background: palette.text }} />
+          <span className={`block w-6 h-0.5 rounded-sm transition-all ${open ? 'translate-y-[-7px] -rotate-45' : ''}`}
+            style={{ background: palette.text }} />
+        </button>
+      </nav>
+    </>
   )
 }

@@ -1,8 +1,11 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { getProjects } from '@/services/projectService'
+import { useEffect, useRef } from 'react'
 import type { Project } from '@hub-musico/types'
+
+interface Props {
+  projects: Project[]
+}
 
 function SpotifyIcon() {
   return (
@@ -96,15 +99,7 @@ function ProjetoCard({ projeto }: ProjetoCardProps) {
   )
 }
 
-export function Projetos() {
-  const [projects, setProjects] = useState<Project[]>([])
-
-  useEffect(() => {
-    getProjects()
-      .then(setProjects)
-      .catch(err => console.error('Projetos: erro ao carregar projetos', err))
-  }, [])
-
+export function Projetos({ projects }: Props) {
   return (
     <section id="projetos" className="py-[120px] bg-bg-surface">
       <div className="max-w-[1200px] mx-auto px-6">

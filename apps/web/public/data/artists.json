@@ -2,6 +2,8 @@
   "artist": {
     "id": "max-souza",
     "name": "Max Souza",
+    "slug": "max-souza",
+    "profileType": "musician",
     "tagline": "Baterista · Multi-instrumentista · Compositor · Arranjador · Educador Musical",
     "bio": [
       "Natural de Rio-MG, multi-instrumentista formado em bateria (2018) e harmonia (2021) pela Bituca — Universidade de Música Popular (Barbacena), por grandes mestres como Mauro Rodrigues, Gladston Vieira e Felipe Moreira, com formação em composição ministrada por Ian Guest.",

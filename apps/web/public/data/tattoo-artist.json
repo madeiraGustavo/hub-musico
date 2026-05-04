@@ -1,0 +1,98 @@
+{
+  "artist": {
+    "id": "teste-tatuador",
+    "name": "Arte na Pele",
+    "slug": "arte-na-pele",
+    "profileType": "tattoo",
+    "tagline": "Tatuador Profissional · Especialista em Fine Line e Blackwork",
+    "bio": [
+      "Tatuador profissional com mais de 5 anos de experiência, especializado em Fine Line, Blackwork e Aquarela. Cada trabalho é único e pensado para durar.",
+      "Atendo em estúdio próprio em Juiz de Fora. Agendamentos pelo Instagram ou WhatsApp."
+    ],
+    "location": "Juiz de Fora - MG",
+    "reach": "Atendimento Presencial",
+    "contact": {
+      "email": "contato@artenapele.com",
+      "whatsapp": "5532999999999"
+    },
+    "social": {
+      "instagram": "@artenapele",
+      "youtube": null,
+      "soundcloud": null,
+      "spotify": null
+    },
+    "stats": [
+      { "value": "500+", "label": "Tatuagens" },
+      { "value": "5+",   "label": "Anos de Experiência" },
+      { "value": "100%", "label": "Satisfação" }
+    ],
+    "skills": ["Fine Line", "Blackwork", "Aquarela", "Geométrico", "Minimalista", "Old School"],
+    "tools": ["Máquina Rotativa", "Agulhas Premium", "Tintas Veganas", "Estúdio Próprio"],
+    "education": [],
+    "references": [],
+    "services": [
+      {
+        "id": "sessao-pequena",
+        "icon": "needle",
+        "title": "Sessão Pequena",
+        "description": "Tatuagens de até 10cm. Ideal para designs minimalistas e fine line.",
+        "items": ["Até 2h de sessão", "Arte inclusa", "Retoque gratuito"],
+        "price": "A partir de R$ 200",
+        "highlight": false
+      },
+      {
+        "id": "sessao-media",
+        "icon": "star",
+        "title": "Sessão Média",
+        "description": "Tatuagens de 10 a 20cm. Perfeita para peças com mais detalhes.",
+        "items": ["Até 4h de sessão", "Arte personalizada", "Retoque gratuito"],
+        "price": "A partir de R$ 400",
+        "highlight": true
+      },
+      {
+        "id": "sessao-grande",
+        "icon": "camera",
+        "title": "Sessão Grande",
+        "description": "Tatuagens acima de 20cm ou projetos de manga e costas.",
+        "items": ["Sessão completa", "Projeto exclusivo", "Acompanhamento total"],
+        "price": "Consulte o valor",
+        "highlight": false
+      },
+      {
+        "id": "agendamento",
+        "icon": "calendar",
+        "title": "Agendamento Online",
+        "description": "Reserve sua sessão com antecedência e garanta sua data.",
+        "items": ["Confirmação em 24h", "Sinal via PIX", "Reagendamento flexível"],
+        "price": "Sinal de R$ 100",
+        "highlight": false
+      }
+    ],
+    "testimonials": [
+      {
+        "id": "cliente1",
+        "text": "\"Trabalho incrível! O traço é muito preciso e o atendimento foi excelente do início ao fim.\"",
+        "author": "Ana Paula",
+        "role": "Cliente",
+        "initials": "AP",
+        "gradient": "linear-gradient(135deg, #e040fb, #6c63ff)"
+      },
+      {
+        "id": "cliente2",
+        "text": "\"Minha segunda tatuagem com ele e não me arrependo. Profissional e artista nato.\"",
+        "author": "Carlos M.",
+        "role": "Cliente",
+        "initials": "CM",
+        "gradient": "linear-gradient(135deg, #6c63ff, #e040fb)"
+      },
+      {
+        "id": "cliente3",
+        "text": "\"Fine line perfeita. Já indiquei para vários amigos e todos adoraram.\"",
+        "author": "Juliana R.",
+        "role": "Cliente",
+        "initials": "JR",
+        "gradient": "linear-gradient(135deg, #e040fb, #f7971e)"
+      }
+    ]
+  }
+}

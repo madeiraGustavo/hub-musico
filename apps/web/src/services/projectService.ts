@@ -1,14 +1,12 @@
 /**
  * projectService.ts
- *
- * Camada de acesso a dados de projetos.
- * Componentes React NUNCA importam dados diretamente — sempre via este serviço.
- *
- * Hoje: lê de /public/data/projects.json
- * FASE 3: substituir fetch por chamada à API REST sem alterar os componentes.
+ * Lê de /public/data/projects.json via fs (Server Components).
+ * FASE 6: substituir por chamada à API REST.
  */
 
 import type { Project } from '@hub-musico/types'
+import path from 'path'
+import fs   from 'fs/promises'
 
 interface ProjectsJson {
   projects: Project[]
@@ -19,13 +17,9 @@ let cache: Project[] | null = null
 async function fetchProjects(): Promise<Project[]> {
   if (cache) return cache
 
-  const res = await fetch('/data/projects.json', { cache: 'force-cache' })
-
-  if (!res.ok) {
-    throw new Error(`projectService: falha ao carregar dados (${res.status})`)
-  }
-
-  const json: ProjectsJson = await res.json() as ProjectsJson
+  const filePath = path.join(process.cwd(), 'public', 'data', 'projects.json')
+  const raw  = await fs.readFile(filePath, 'utf-8')
+  const json = JSON.parse(raw) as ProjectsJson
   cache = json.projects
   return cache
 }

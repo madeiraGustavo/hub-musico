@@ -1,14 +1,12 @@
 /**
  * trackService.ts
- *
- * Camada de acesso a dados de faixas musicais.
- * Componentes React NUNCA importam dados diretamente — sempre via este serviço.
- *
- * Hoje: lê de /public/data/tracks.json
- * FASE 3: substituir fetch por chamada à API REST sem alterar os componentes.
+ * Lê de /public/data/tracks.json via fs (Server Components).
+ * FASE 6: substituir por chamada à API REST.
  */
 
 import type { Track, TrackGenre } from '@hub-musico/types'
+import path from 'path'
+import fs   from 'fs/promises'
 
 interface TracksJson {
   tracks: Track[]
@@ -19,13 +17,9 @@ let cache: Track[] | null = null
 async function fetchTracks(): Promise<Track[]> {
   if (cache) return cache
 
-  const res = await fetch('/data/tracks.json', { cache: 'force-cache' })
-
-  if (!res.ok) {
-    throw new Error(`trackService: falha ao carregar dados (${res.status})`)
-  }
-
-  const json: TracksJson = await res.json() as TracksJson
+  const filePath = path.join(process.cwd(), 'public', 'data', 'tracks.json')
+  const raw  = await fs.readFile(filePath, 'utf-8')
+  const json = JSON.parse(raw) as TracksJson
   cache = json.tracks
   return cache
 }

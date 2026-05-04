@@ -1,13 +1,16 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getTracks }           from '@/services/trackService'
 import { audioService }        from '@/services/audio/AudioService'
 import { usePlayerStore }      from '@/services/audio/usePlayerStore'
 import { useFilter }           from '@/hooks/useFilter'
-import { MusicaCard }          from './MusicaCard'
-import { Player }              from './Player'
+import { MusicaCard }          from '@/components/MusicaCard'
+import { Player }              from '@/components/Player'
 import type { Track, TrackGenre } from '@hub-musico/types'
+
+interface Props {
+  tracks: Track[]
+}
 
 const FILTERS: { value: TrackGenre; label: string }[] = [
   { value: 'all',        label: 'Todas' },
@@ -19,20 +22,15 @@ const FILTERS: { value: TrackGenre; label: string }[] = [
   { value: 'demo',       label: 'Demo' },
 ]
 
-export function Musicas() {
-  const [tracks, setTracks] = useState<Track[]>([])
-
+export function Musicas({ tracks }: Props) {
   const currentTrack = usePlayerStore(s => s.currentTrack)
   const isPlaying    = usePlayerStore(s => s.isPlaying)
 
   useEffect(() => {
-    getTracks()
-      .then(data => {
-        setTracks(data)
-        usePlayerStore.getState().setQueue(data, 0)
-      })
-      .catch(err => console.error('Musicas: erro ao carregar faixas', err))
-  }, [])
+    if (tracks.length > 0) {
+      usePlayerStore.getState().setQueue(tracks, 0)
+    }
+  }, [tracks])
 
   const { active, setActive, visibleTracks } = useFilter(tracks)
 
@@ -79,7 +77,7 @@ export function Musicas() {
         {/* Cards */}
         <div className="flex flex-col gap-0.5">
           {tracks.length === 0 ? (
-            <p className="text-text-muted text-sm text-center py-8">Carregando...</p>
+            <p className="text-text-muted text-sm text-center py-8">Nenhuma faixa cadastrada.</p>
           ) : (
             visibleTracks.map(track => (
               <MusicaCard

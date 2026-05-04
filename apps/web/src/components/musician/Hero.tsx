@@ -1,8 +1,15 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import type { Artist } from '@hub-musico/types'
+import { PROFILE_CONFIG } from '@/lib/profile/profileConfig'
 
-export function Hero() {
+interface Props {
+  artist: Artist
+}
+
+export function Hero({ artist }: Props) {
+  const config = PROFILE_CONFIG[artist.profileType]
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -68,39 +75,34 @@ export function Hero() {
       <div className="relative z-10 max-w-[680px] animate-fade-in">
         <p className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.1em] uppercase text-accent mb-5
           before:content-[''] before:inline-block before:w-6 before:h-0.5 before:bg-accent before:rounded-sm">
-          Baterista · Multi-instrumentista · Compositor · Arranjador · Educador Musical
+          {config.heroTag}
         </p>
 
         <h1 className="font-head text-[clamp(2.8rem,6vw,5rem)] font-bold leading-[1.08] tracking-[-0.02em] mb-6">
-          O ritmo que move<br />
-          <span className="bg-grad-main bg-clip-text text-transparent">a sua música</span>
+          {config.heroTitle}<br />
+          <span className="bg-grad-main bg-clip-text text-transparent">{config.heroSubtitle}</span>
         </h1>
 
         <p className="text-[1.1rem] text-text-secondary max-w-[520px] mb-10 leading-[1.7]">
-          Baterista profissional e multi-instrumentista formado pela Bituca — Universidade de Música Popular.
-          Gravações, shows e projetos musicais em Juiz de Fora e em todo o Brasil.
+          {artist.tagline}
         </p>
 
         <div className="flex gap-4 flex-wrap mb-14">
           <a href="#musicas" className="inline-flex items-center justify-center px-7 py-3.5 rounded-[32px] bg-grad-main text-white font-semibold text-sm
             shadow-[0_4px_20px_rgba(108,99,255,0.4)] hover:translate-y-[-2px] hover:shadow-[0_8px_32px_rgba(108,99,255,0.55)] transition-all">
-            Ouvir Músicas
+            {config.heroCTA}
           </a>
           <a href="#contato" className="inline-flex items-center justify-center px-7 py-3.5 rounded-[32px] border border-[rgba(255,255,255,0.07)]
             text-text-primary font-semibold text-sm hover:border-accent hover:text-accent hover:bg-accent-dim transition-all">
-            Trabalhar Juntos
+            {config.heroSecondaryCTA}
           </a>
         </div>
 
         <div className="flex gap-10 flex-wrap">
-          {[
-            { num: '10+', label: 'Artistas & Bandas' },
-            { num: '2',   label: 'Formações Bituca' },
-            { num: '6+',  label: 'Anos de Carreira' },
-          ].map(stat => (
+          {artist.stats.map(stat => (
             <div key={stat.label} className="flex flex-col gap-1">
               <span className="font-head text-[2rem] font-bold bg-grad-main bg-clip-text text-transparent">
-                {stat.num}
+                {stat.value}
               </span>
               <span className="text-[0.8rem] text-text-muted uppercase tracking-[0.06em]">
                 {stat.label}

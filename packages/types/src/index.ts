@@ -1,3 +1,7 @@
+// ─── Profile Type ─────────────────────────────────────────────────────────────
+
+export type ArtistType = 'musician' | 'tattoo'
+
 // ─── Track ───────────────────────────────────────────────────────────────────
 
 export type TrackGenre =
@@ -59,7 +63,7 @@ export interface ArtistEducation {
 
 export interface ArtistService {
   id: string
-  icon: 'drum' | 'mic' | 'music' | 'compose'
+  icon: 'drum' | 'mic' | 'music' | 'compose' | 'needle' | 'camera' | 'calendar' | 'star'
   title: string
   description: string
   items: string[]
@@ -79,6 +83,8 @@ export interface ArtistTestimonial {
 export interface Artist {
   id: string
   name: string
+  slug: string
+  profileType: ArtistType          // fonte da verdade para renderização contextual
   tagline: string
   bio: string[]
   location: string
@@ -94,7 +100,7 @@ export interface Artist {
   testimonials: ArtistTestimonial[]
 }
 
-// ─── API Response wrappers (usados na FASE 3) ─────────────────────────────────
+// ─── API Response wrappers ────────────────────────────────────────────────────
 
 export interface ApiResponse<T> {
   data: T

@@ -1,4 +1,10 @@
-const NAV_LINKS = [
+'use client'
+
+import type { ProfileConfig } from '@/lib/profile/profileConfig'
+import { PROFILE_CONFIG } from '@/lib/profile/profileConfig'
+import { GradientText } from '@/lib/profile/GradientText'
+
+const DEFAULT_NAV = [
   { href: '#sobre',    label: 'Sobre' },
   { href: '#musicas',  label: 'Músicas' },
   { href: '#projetos', label: 'Projetos' },
@@ -13,50 +19,70 @@ const SOCIAL = [
   { href: '#', label: 'Spotify',   abbr: 'SP' },
 ]
 
-export function Footer() {
-  return (
-    <footer className="bg-bg-surface border-t border-[rgba(255,255,255,0.07)] py-8">
-      <div className="max-w-[1200px] mx-auto px-6">
+interface FooterProps {
+  artistName?: string
+  navLinks?:   Array<{ href: string; label: string }>
+  palette?:    ProfileConfig['palette']
+}
 
-        {/* Linha principal — tudo horizontal */}
+export function Footer({
+  artistName = 'MAX SOUZA',
+  navLinks   = DEFAULT_NAV,
+  palette    = PROFILE_CONFIG.musician.palette,
+}: FooterProps) {
+  // ID único por instância para isolar os estilos de hover
+  const id = `footer-${artistName.toLowerCase().replace(/\s+/g, '-')}`
+
+  return (
+    <footer id={id} style={{ background: palette.bgSurface, borderTop: `1px solid ${palette.accentBorder}`, padding: '2rem 0' }}>
+
+      {/* Estilos de hover isolados por ID — sem interferência entre perfis */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        #${id} .footer-link { color: ${palette.textSecondary}; transition: color 0.2s; }
+        #${id} .footer-link:hover { color: ${palette.text}; }
+        #${id} .footer-social {
+          color: ${palette.textSecondary};
+          border: 1px solid ${palette.accentBorder};
+          background: transparent;
+          transition: all 0.2s;
+        }
+        #${id} .footer-social:hover {
+          color: ${palette.accent};
+          background: ${palette.accentDim};
+          border-color: ${palette.accent};
+        }
+      ` }} />
+
+      <div className="max-w-[1200px] mx-auto px-6">
         <div className="flex items-center justify-between flex-wrap gap-6 mb-6">
 
-          {/* Logo */}
-          <div className="font-head text-xl font-bold tracking-wide bg-grad-main bg-clip-text text-transparent">
-            MAX SOUZA
+          <div className="font-head text-xl font-bold tracking-wide">
+            <GradientText gradient={palette.gradient}>{artistName}</GradientText>
           </div>
 
-          {/* Nav links */}
           <nav className="flex items-center gap-6 flex-wrap">
-            {NAV_LINKS.map(link => (
-              <a key={link.href} href={link.href}
-                className="text-sm text-text-secondary hover:text-text-primary transition-colors">
+            {navLinks.map(link => (
+              <a key={link.href} href={link.href} className="footer-link text-sm">
                 {link.label}
               </a>
             ))}
           </nav>
 
-          {/* Social */}
           <div className="flex items-center gap-2">
             {SOCIAL.map(s => (
               <a key={s.abbr} href={s.href} aria-label={s.label}
-                className="text-xs font-semibold tracking-[0.06em] text-text-secondary px-3 py-1.5
-                  border border-[rgba(255,255,255,0.07)] rounded-sm
-                  hover:text-accent hover:border-[rgba(108,99,255,0.35)] hover:bg-accent-dim transition-all">
+                className="footer-social text-xs font-semibold tracking-[0.06em] px-3 py-1.5 rounded-sm">
                 {s.abbr}
               </a>
             ))}
           </div>
-
         </div>
 
-        {/* Copyright */}
-        <div className="flex justify-between items-center pt-5 border-t border-[rgba(255,255,255,0.07)]
-          text-xs text-text-muted max-sm:flex-col max-sm:gap-2 max-sm:text-center">
-          <p>© 2026 Max Souza Music. Todos os direitos reservados.</p>
+        <div className="flex justify-between items-center pt-5 text-xs max-sm:flex-col max-sm:gap-2 max-sm:text-center"
+          style={{ borderTop: `1px solid ${palette.accentBorder}`, color: palette.textSecondary }}>
+          <p>© 2026 {artistName}. Todos os direitos reservados.</p>
           <p>Juiz de Fora, MG 🇧🇷</p>
         </div>
-
       </div>
     </footer>
   )

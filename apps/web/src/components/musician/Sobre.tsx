@@ -1,9 +1,14 @@
+import type { Artist } from '@hub-musico/types'
+import { PROFILE_CONFIG } from '@/lib/profile/profileConfig'
 import { VinylSVG } from './VinylSVG'
 
-const SKILLS  = ['Bateria', 'Violão', 'Rock', 'MPB', 'Samba', 'Jazz Instrumental', 'Pop', 'Soul']
-const TOOLS   = ['Composição', 'Arranjo', 'Gravação', 'Educação Musical']
+interface Props {
+  artist: Artist
+}
 
-export function Sobre() {
+export function Sobre({ artist }: Props) {
+  const config = PROFILE_CONFIG[artist.profileType]
+
   return (
     <section id="sobre" className="py-[120px] bg-bg-surface">
       <div className="max-w-[1200px] mx-auto px-6">
@@ -18,8 +23,6 @@ export function Sobre() {
                 <VinylSVG />
               </div>
             </div>
-
-            {/* Badge */}
             <div className="absolute bottom-[-16px] right-[-16px] bg-bg-elevated border border-[rgba(108,99,255,0.35)]
               rounded-md px-4 py-3 flex items-center gap-2 text-sm font-medium shadow-[0_4px_24px_rgba(0,0,0,0.4)]
               animate-pulse-glow">
@@ -37,23 +40,16 @@ export function Sobre() {
               Sobre mim
             </p>
             <h2 className="font-head text-[clamp(2rem,4vw,2.75rem)] font-bold leading-[1.15] mb-4">
-              A música é minha<br />
-              <span className="bg-grad-main bg-clip-text text-transparent">linguagem nativa</span>
+              {config.aboutTitle}<br />
+              <span className="bg-grad-main bg-clip-text text-transparent">{config.aboutSubtitle}</span>
             </h2>
 
-            <p className="text-text-secondary leading-[1.75] mb-4">
-              Natural de Rio-MG, multi-instrumentista formado em bateria (2018) e harmonia (2021) pela Bituca —
-              Universidade de Música Popular (Barbacena), por grandes mestres como Mauro Rodrigues, Gladston Vieira
-              e Felipe Moreira, com formação em composição ministrada por Ian Guest.
-            </p>
-            <p className="text-text-secondary leading-[1.75] mb-6">
-              Antes da formação, atuou no cenário mineiro com artistas e bandas de rock, MPB e samba, em shows ao
-              vivo, gravações de DVDs, clipes e músicas. Hoje está inserido na cena de Juiz de Fora como baterista
-              profissional, educador musical (bateria e violão) e colabora como compositor e arranjador.
-            </p>
+            {artist.bio.map((paragraph, i) => (
+              <p key={i} className="text-text-secondary leading-[1.75] mb-4">{paragraph}</p>
+            ))}
 
             <div className="flex flex-wrap gap-2 mb-6">
-              {SKILLS.map(skill => (
+              {artist.skills.map(skill => (
                 <span key={skill}
                   className="px-3.5 py-1.5 bg-accent-dim border border-[rgba(108,99,255,0.35)] rounded-[20px]
                     text-xs font-medium text-accent hover:bg-accent hover:text-white hover:translate-y-[-2px]
@@ -64,7 +60,7 @@ export function Sobre() {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              {TOOLS.map(tool => (
+              {artist.tools.map(tool => (
                 <span key={tool}
                   className="px-4 py-2 bg-bg-elevated border border-[rgba(255,255,255,0.07)] rounded-sm
                     text-xs text-text-secondary font-medium">
