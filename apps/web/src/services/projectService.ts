@@ -5,23 +5,24 @@
  */
 
 import type { Project } from '@hub-musico/types'
+import { MemoryCache } from '@/lib/cache'
 import path from 'path'
 import fs   from 'fs/promises'
 
-interface ProjectsJson {
-  projects: Project[]
-}
+interface ProjectsJson { projects: Project[] }
 
-let cache: Project[] | null = null
+const cache = new MemoryCache<Project[]>(60_000)
+const CACHE_KEY = 'projects'
 
 async function fetchProjects(): Promise<Project[]> {
-  if (cache) return cache
+  const cached = cache.get(CACHE_KEY)
+  if (cached) return cached
 
   const filePath = path.join(process.cwd(), 'public', 'data', 'projects.json')
   const raw  = await fs.readFile(filePath, 'utf-8')
   const json = JSON.parse(raw) as ProjectsJson
-  cache = json.projects
-  return cache
+  cache.set(CACHE_KEY, json.projects)
+  return json.projects
 }
 
 export async function getProjects(): Promise<Project[]> {

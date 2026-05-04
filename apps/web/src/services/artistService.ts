@@ -1,20 +1,18 @@
 /**
  * artistService.ts
- *
- * Camada de acesso a dados do artista.
- * Lê de /public/data/*.json via fs (Server Components) ou fetch (Client).
+ * Lê de /public/data/*.json via fs (Server Components).
  * FASE 6: substituir por chamada à API REST (Supabase).
  */
 
 import type { Artist, ArtistService, ArtistTestimonial } from '@hub-musico/types'
+import { MemoryCache } from '@/lib/cache'
 import path from 'path'
 import fs   from 'fs/promises'
 
-interface ArtistsJson {
-  artist: Artist
-}
+interface ArtistsJson { artist: Artist }
 
-const cache = new Map<string, Artist>()
+// Cache com TTL de 60s — evita dados antigos entre deploys serverless
+const cache = new MemoryCache<Artist>(60_000)
 
 const SLUG_TO_FILE: Record<string, string> = {
   'max-souza':    'artists.json',
@@ -33,7 +31,8 @@ async function readArtistFile(filename: string): Promise<Artist | null> {
 }
 
 async function fetchArtistBySlug(slug: string): Promise<Artist | null> {
-  if (cache.has(slug)) return cache.get(slug)!
+  const cached = cache.get(slug)
+  if (cached) return cached
 
   const filename = SLUG_TO_FILE[slug]
   if (!filename) return null

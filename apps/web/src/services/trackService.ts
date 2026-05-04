@@ -5,23 +5,24 @@
  */
 
 import type { Track, TrackGenre } from '@hub-musico/types'
+import { MemoryCache } from '@/lib/cache'
 import path from 'path'
 import fs   from 'fs/promises'
 
-interface TracksJson {
-  tracks: Track[]
-}
+interface TracksJson { tracks: Track[] }
 
-let cache: Track[] | null = null
+const cache = new MemoryCache<Track[]>(60_000)
+const CACHE_KEY = 'tracks'
 
 async function fetchTracks(): Promise<Track[]> {
-  if (cache) return cache
+  const cached = cache.get(CACHE_KEY)
+  if (cached) return cached
 
   const filePath = path.join(process.cwd(), 'public', 'data', 'tracks.json')
   const raw  = await fs.readFile(filePath, 'utf-8')
   const json = JSON.parse(raw) as TracksJson
-  cache = json.tracks
-  return cache
+  cache.set(CACHE_KEY, json.tracks)
+  return json.tracks
 }
 
 export async function getTracks(): Promise<Track[]> {
