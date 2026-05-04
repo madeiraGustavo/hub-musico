@@ -1,7 +1,12 @@
 /**
  * middleware.ts
- * Atualiza a sessão do Supabase em cada request
- * Protege rotas do dashboard que requerem autenticação
+ *
+ * Defesa em profundidade — duas camadas de autenticação:
+ * 1. Middleware (aqui): bloqueia requests não autenticados antes de chegar ao handler
+ * 2. requireAuth() em cada Route Handler: valida sessão + extrai artist_id do JWT
+ *
+ * Regra: adicionar qualquer nova rota sensível em PROTECTED_PATHS ou PROTECTED_API_PATHS.
+ * Nunca depender apenas da proteção de UI.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
