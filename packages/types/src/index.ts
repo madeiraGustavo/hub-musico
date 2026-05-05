@@ -80,6 +80,16 @@ export interface ArtistTestimonial {
   gradient: string
 }
 
+// ─── Portfolio Item (tattoo / visual artists) ─────────────────────────────────
+
+export interface PortfolioItem {
+  id: string
+  src: string
+  alt: string
+  style: string
+  href: string
+}
+
 export interface Artist {
   id: string
   name: string
@@ -98,6 +108,7 @@ export interface Artist {
   references: string[]
   services: ArtistService[]
   testimonials: ArtistTestimonial[]
+  portfolio?: PortfolioItem[]   // opcional — usado por perfis visuais (tattoo, etc.)
 }
 
 // ─── API Response wrappers ────────────────────────────────────────────────────

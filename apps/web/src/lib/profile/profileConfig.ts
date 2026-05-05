@@ -118,7 +118,7 @@ export const PROFILE_CONFIG: Record<ArtistType, ProfileConfig> = {
     serviceLabel:     'Sessão',
     portfolioLabel:   'Galeria',
 
-    heroTag:          'Tatuador Profissional · Artista Visual',
+    heroTag:          'Tatuador Profissional · Fine Line · Blackwork · Pontilhismo',
     heroTitle:        'Arte que fica',
     heroSubtitle:     'na sua pele',
     heroCTA:          'Ver Portfólio',
@@ -147,16 +147,16 @@ export const PROFILE_CONFIG: Record<ArtistType, ProfileConfig> = {
     },
 
     palette: {
-      accent:        '#e0e0e0',
-      accentAlt:     '#ffffff',
-      accentDim:     'rgba(255,255,255,0.06)',
-      accentBorder:  'rgba(255,255,255,0.2)',
+      accent:        '#c9a96e',
+      accentAlt:     '#f0d898',
+      accentDim:     'rgba(201,169,110,0.1)',
+      accentBorder:  'rgba(201,169,110,0.25)',
       bgBase:        '#0d0d0d',
-      bgSurface:     '#141414',
+      bgSurface:     '#111111',
       bgCard:        '#1a1a1a',
       text:          '#f5f5f5',
       textSecondary: '#a0a0a0',
-      gradient:      'linear-gradient(135deg, #ffffff, #888888)',
+      gradient:      'linear-gradient(135deg, #c9a96e, #f0d898)',
     },
   },
 }
