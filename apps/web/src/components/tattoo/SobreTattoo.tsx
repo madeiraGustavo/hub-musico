@@ -114,37 +114,33 @@ export function SobreTattoo({ artist }: Props) {
               </p>
             ))}
 
-            {/* Skills */}
-            <div className="flex flex-wrap gap-2 mt-8 mb-6">
+            {/* Skills + Tools em grid uniforme */}
+            <div className="mt-8 mb-8 grid grid-cols-3 gap-2">
               {artist.skills.map(skill => (
-                <span
+                <div
                   key={skill}
-                  className="px-4 py-1.5 rounded-sm text-xs font-medium tracking-wide"
+                  className="px-3 py-2 rounded-sm text-xs font-medium text-center"
                   style={{
-                    background: 'rgba(201,169,110,0.08)',
-                    border: '1px solid rgba(201,169,110,0.25)',
+                    background: 'rgba(201,169,110,0.07)',
+                    border: '1px solid rgba(201,169,110,0.2)',
                     color: '#c9a96e',
                   }}
                 >
                   {skill}
-                </span>
+                </div>
               ))}
-            </div>
-
-            {/* Tools */}
-            <div className="flex flex-wrap gap-2 mb-8">
               {artist.tools.map(tool => (
-                <span
+                <div
                   key={tool}
-                  className="px-4 py-1.5 rounded-sm text-xs"
+                  className="px-3 py-2 rounded-sm text-xs text-center"
                   style={{
-                    background: '#1a1a1a',
-                    border: '1px solid rgba(255,255,255,0.07)',
-                    color: '#666',
+                    background: 'rgba(201,169,110,0.07)',
+                    border: '1px solid rgba(201,169,110,0.2)',
+                    color: '#c9a96e',
                   }}
                 >
                   {tool}
-                </span>
+                </div>
               ))}
             </div>
 

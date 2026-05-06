@@ -14,8 +14,6 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 
 const PROTECTED_PATHS = ['/dashboard']
 
-// Rotas de API que requerem autenticação — validadas no middleware como camada extra
-// A validação principal continua sendo feita em cada Route Handler via requireAuth()
 const PROTECTED_API_PATHS = [
   '/api/dashboard',
   '/api/upload',

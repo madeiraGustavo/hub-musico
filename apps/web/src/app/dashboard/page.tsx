@@ -29,9 +29,10 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-3 gap-5 max-md:grid-cols-1">
         {[
-          { label: 'Faixas',   href: '/dashboard/tracks',  icon: '🎵' },
-          { label: 'Projetos', href: '/dashboard/projects', icon: '🎬' },
-          { label: 'Perfil',   href: '/dashboard/profile',  icon: '👤' },
+          { label: 'Faixas',   href: '/dashboard/tracks',   icon: '🎵' },
+          { label: 'Projetos', href: '/dashboard/projects',  icon: '🎬' },
+          { label: 'Serviços', href: '/dashboard/services',  icon: '💼' },
+          { label: 'Perfil',   href: '/dashboard/profile',   icon: '👤' },
         ].map(card => (
           <a key={card.href} href={card.href}
             className="bg-bg-card border border-[rgba(255,255,255,0.07)] rounded-lg p-6

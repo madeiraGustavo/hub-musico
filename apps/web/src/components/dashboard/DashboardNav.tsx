@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { href: '/dashboard',          label: 'Início',   icon: '⊞' },
   { href: '/dashboard/tracks',   label: 'Faixas',   icon: '♪' },
   { href: '/dashboard/projects', label: 'Projetos', icon: '▶' },
+  { href: '/dashboard/services', label: 'Serviços', icon: '💼' },
   { href: '/dashboard/profile',  label: 'Perfil',   icon: '◉' },
 ]
 

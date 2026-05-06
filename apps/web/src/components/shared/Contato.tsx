@@ -6,15 +6,6 @@ import { PROFILE_CONFIG } from '@/lib/profile/profileConfig'
 import { useContactForm } from '@/hooks/useContactForm'
 import { GradientText } from '@/lib/profile/GradientText'
 
-const SERVICOS_OPTIONS = [
-  { value: 'gravacao',   label: 'Bateria para Gravação' },
-  { value: 'shows',      label: 'Shows & Performances' },
-  { value: 'aulas',      label: 'Aulas de Bateria / Violão' },
-  { value: 'composicao', label: 'Composição & Arranjo' },
-  { value: 'sessao',     label: 'Sessão de Tatuagem' },
-  { value: 'outro',      label: 'Outro' },
-]
-
 interface Props {
   artist:      Artist
   profileType?: ArtistType
@@ -28,6 +19,11 @@ export function Contato({
 }: Props) {
   const { form, feedback, loading, handleChange, handleSubmit } = useContactForm()
   const id = `contato-${profileType}`
+
+  const servicoOptions = artist.services.map(s => ({
+    value: s.id,
+    label: s.title,
+  }))
 
   return (
     <section id="contato" style={{ background: palette.bgBase, padding: '120px 0' }}>
@@ -122,7 +118,7 @@ export function Contato({
               <select id="servico" name="servico" value={form.servico} onChange={handleChange}
                 className="contato-input rounded-md px-4 py-3 text-sm w-full">
                 <option value="">Selecione um serviço</option>
-                {SERVICOS_OPTIONS.map(opt => (
+                {servicoOptions.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </select>

@@ -67,14 +67,14 @@ export function Servicos({
               <h3 className="font-head text-[1.1rem] font-bold mb-3" style={{ color: palette.text }}>
                 {servico.title}
               </h3>
-              <p className="text-[0.875rem] leading-[1.65] mb-4" style={{ color: palette.textSecondary }}>
+              <p className="text-[0.875rem] leading-[1.65] mb-4 min-h-[72px]" style={{ color: palette.textSecondary }}>
                 {servico.description}
               </p>
-              <ul className="mb-5 space-y-1 flex-1">
+              <ul className="mb-5 space-y-2 flex-1">
                 {servico.items.map(item => (
-                  <li key={item} className="text-[0.8rem] pl-4 relative flex items-start gap-1.5"
+                  <li key={item} className="text-[0.8rem] flex items-start gap-1.5"
                     style={{ color: palette.textSecondary }}>
-                    <span style={{ color: palette.accent }} className="flex-shrink-0 text-xs">✓</span>
+                    <span style={{ color: palette.accent }} className="flex-shrink-0 text-xs mt-0.5">✓</span>
                     {item}
                   </li>
                 ))}

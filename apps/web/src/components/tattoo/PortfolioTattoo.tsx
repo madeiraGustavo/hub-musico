@@ -83,59 +83,37 @@ export function PortfolioTattoo({ artist }: Props) {
     ? portfolio
     : portfolio.filter(p => p.style === activeStyle)
 
-  const ig = artist.social['instagram'] ?? 'martt_atoo'
-
   return (
     <section id="portfolio" style={{ background: '#0d0d0d', padding: '120px 0' }}>
       <div className="max-w-[1200px] mx-auto px-8">
 
         {/* Header */}
-        <div className="flex items-end justify-between mb-12 max-md:flex-col max-md:items-start max-md:gap-6">
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <span className="block w-6 h-px" style={{ background: '#c9a96e' }} />
-              <span
-                className="text-[0.7rem] font-bold tracking-[0.2em] uppercase"
-                style={{ color: '#c9a96e' }}
-              >
-                Galeria
-              </span>
-            </div>
-            <h2
-              className="font-head font-bold leading-[1.1] tracking-[-0.02em]"
-              style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', color: '#f5f5f5' }}
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="block w-6 h-px" style={{ background: '#c9a96e' }} />
+            <span
+              className="text-[0.7rem] font-bold tracking-[0.2em] uppercase"
+              style={{ color: '#c9a96e' }}
             >
-              Trabalhos em{' '}
-              <span
-                style={{
-                  backgroundImage: 'linear-gradient(135deg, #c9a96e, #f0d898)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                destaque
-              </span>
-            </h2>
+              Galeria
+            </span>
           </div>
-
-          <a
-            href={`https://instagram.com/${ig}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-sm text-sm font-medium transition-all hover:translate-y-[-1px]"
-            style={{
-              border: '1px solid rgba(201,169,110,0.3)',
-              color: '#c9a96e',
-            }}
+          <h2
+            className="font-head font-bold leading-[1.1] tracking-[-0.02em]"
+            style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', color: '#f5f5f5' }}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-              <circle cx="12" cy="12" r="4"/>
-              <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
-            </svg>
-            Ver todos no Instagram
-          </a>
+            Trabalhos em{' '}
+            <span
+              style={{
+                backgroundImage: 'linear-gradient(135deg, #c9a96e, #f0d898)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
+              destaque
+            </span>
+          </h2>
         </div>
 
         {/* Style filters */}
@@ -188,29 +166,11 @@ export function PortfolioTattoo({ artist }: Props) {
           </div>
         )}
 
-        {/* Bottom CTA */}
+        {/* Bottom note */}
         <div className="text-center mt-14">
-          <p className="text-sm mb-4" style={{ color: '#555' }}>
+          <p className="text-sm" style={{ color: '#555' }}>
             Mais de 800 trabalhos realizados
           </p>
-          <a
-            href={`https://instagram.com/${ig}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-sm font-semibold text-sm transition-all hover:translate-y-[-2px]"
-            style={{
-              background: 'linear-gradient(135deg, #c9a96e, #f0d898)',
-              color: '#0d0d0d',
-              boxShadow: '0 4px 24px rgba(201,169,110,0.25)',
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-              <circle cx="12" cy="12" r="4"/>
-              <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
-            </svg>
-            Ver portfólio completo no Instagram
-          </a>
         </div>
 
       </div>
