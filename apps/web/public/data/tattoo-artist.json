@@ -1,7 +1,7 @@
 {
   "artist": {
     "id": "martt-atoo",
-    "name": "Arte na Pele",
+    "name": "Matheus Barbosa",
     "slug": "arte-na-pele",
     "profileType": "tattoo",
     "tagline": "Tatuador profissional especializado em Fine Line, Blackwork e Pontilhismo. Cada traço é pensado para durar.",
@@ -34,64 +34,64 @@
       {
         "id": "p1",
         "src": "https://images.unsplash.com/photo-1611501275019-9b5cda994e8d?w=600&q=80",
-        "alt": "Fine line floral no antebraço",
-        "style": "Fine Line",
+        "alt": "Tatuagem nas costas - blackwork detalhado",
+        "style": "Blackwork",
         "href": "https://www.instagram.com/martt_atoo"
       },
       {
         "id": "p2",
-        "src": "https://images.unsplash.com/photo-1590246814883-57c511e4f2f8?w=600&q=80",
-        "alt": "Blackwork geométrico no ombro",
+        "src": "https://images.unsplash.com/photo-1568515045052-f9a854d70bfd?w=600&q=80",
+        "alt": "Tatuador aplicando tatuagem - processo",
         "style": "Blackwork",
         "href": "https://www.instagram.com/martt_atoo"
       },
       {
         "id": "p3",
-        "src": "https://images.unsplash.com/photo-1568515387631-8b650bbcdb90?w=600&q=80",
-        "alt": "Pontilhismo mandala",
-        "style": "Pontilhismo",
+        "src": "https://images.unsplash.com/photo-1597852075234-fd721ac361d3?w=600&q=80",
+        "alt": "Tatuagem no braço direito - cover up",
+        "style": "Blackwork",
         "href": "https://www.instagram.com/martt_atoo"
       },
       {
         "id": "p4",
-        "src": "https://images.unsplash.com/photo-1542856391-010fb87dcfed?w=600&q=80",
-        "alt": "Minimalista traço único",
+        "src": "https://images.unsplash.com/photo-1542727365-19732a80dcfd?w=600&q=80",
+        "alt": "Tatuagem minimalista no braço e pulso",
         "style": "Minimalista",
         "href": "https://www.instagram.com/martt_atoo"
       },
       {
         "id": "p5",
-        "src": "https://images.unsplash.com/photo-1598971861713-54ad16a7e72e?w=600&q=80",
-        "alt": "Fine line botânico",
-        "style": "Fine Line",
+        "src": "https://images.unsplash.com/photo-1562379825-415aea84ebcf?w=600&q=80",
+        "alt": "Tatuagem floral blackwork no pescoço",
+        "style": "Blackwork",
         "href": "https://www.instagram.com/martt_atoo"
       },
       {
         "id": "p6",
-        "src": "https://images.unsplash.com/photo-1612459284270-b9a6f8a8e2e0?w=600&q=80",
-        "alt": "Blackwork ornamental",
+        "src": "https://images.unsplash.com/photo-1604374376934-2df6fad6519b?w=600&q=80",
+        "alt": "Tatuagem tribal blackwork no braço",
         "style": "Blackwork",
         "href": "https://www.instagram.com/martt_atoo"
       },
       {
         "id": "p7",
-        "src": "https://images.unsplash.com/photo-1604881991720-f91add269bed?w=600&q=80",
-        "alt": "Geométrico no braço",
-        "style": "Geométrico",
+        "src": "https://images.unsplash.com/photo-1598371839696-5c5bb00bdc28?w=600&q=80",
+        "alt": "Tatuagem floral nas costas",
+        "style": "Floral",
         "href": "https://www.instagram.com/martt_atoo"
       },
       {
         "id": "p8",
-        "src": "https://images.unsplash.com/photo-1561948955-570b270e7c36?w=600&q=80",
-        "alt": "Floral delicado no pulso",
+        "src": "https://images.unsplash.com/photo-1565058379802-bbe93b2f703a?w=600&q=80",
+        "alt": "Tatuador trabalhando no braço do cliente",
         "style": "Fine Line",
         "href": "https://www.instagram.com/martt_atoo"
       },
       {
         "id": "p9",
-        "src": "https://images.unsplash.com/photo-1590246815117-b5c3b7e0e8e0?w=600&q=80",
-        "alt": "Pontilhismo abstrato",
-        "style": "Pontilhismo",
+        "src": "https://images.unsplash.com/photo-1562962230-16e4623d36e6?w=600&q=80",
+        "alt": "Tatuagem floral no braço - fine line",
+        "style": "Fine Line",
         "href": "https://www.instagram.com/martt_atoo"
       }
     ],
