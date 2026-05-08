@@ -25,3 +25,17 @@ export async function deleteFile(bucket: string, key: string): Promise<void> {
   const { error } = await supabase.storage.from(bucket).remove([key])
   if (error) throw new Error(`Storage delete failed: ${error.message}`)
 }
+
+export async function createSignedUrl(
+  bucket:        string,
+  key:           string,
+  expiresInSecs: number,
+): Promise<string> {
+  const { data, error } = await supabase.storage
+    .from(bucket)
+    .createSignedUrl(key, expiresInSecs)
+  if (error || !data?.signedUrl) {
+    throw new Error(`Storage signed URL failed: ${error?.message ?? 'no URL returned'}`)
+  }
+  return data.signedUrl
+}

@@ -39,17 +39,17 @@ Migração do hub-art de Supabase-first para Fastify-first em três fases. Este 
   - Criar `apps/api/src/hooks/authenticate.ts` como `preHandler` que: (1) extrai Bearer token do header `Authorization`, (2) verifica assinatura com `JWT_SECRET` via `@fastify/jwt`, (3) busca `role` e `artist_id` no banco via Prisma — nunca do token, (4) retorna 401 se token ausente/inválido/expirado, (5) retorna 403 se `artist_id` não existir no banco, (6) injeta `AuthContext` em `request.user`
   - _Requirements: 3.1, 3.4, 3.5, 3.7, 3.8_
 
-- [ ]* 5.1 Escrever testes unitários para o hook `authenticate.ts`
+- [ ] 5.1 Escrever testes unitários para o hook `authenticate.ts`
   - Testar: token ausente → 401, token malformado → 401, token expirado → 401, token válido mas `artist_id` nulo → 403, token válido com `artist_id` → injeta `AuthContext` corretamente
   - _Requirements: 3.7, 3.8_
 
-- [ ]* 5.2 Escrever property test — Property 5: Token expirado é rejeitado
+- [ ] 5.2 Escrever property test — Property 5: Token expirado é rejeitado
   - **Property 5: Token expirado é rejeitado**
   - Para qualquer access token com `exp` no passado, qualquer endpoint protegido deve retornar HTTP 401 com `{ "error": "Não autorizado" }`
   - Usar `fc.integer()` para gerar timestamps no passado; assinar tokens com `exp` expirado e verificar que `authenticate` retorna 401
   - **Validates: Requirements 3.7**
 
-- [ ]* 5.3 Escrever property test — Property 3: `artist_id` nunca vem do token
+- [ ] 5.3 Escrever property test — Property 3: `artist_id` nunca vem do token
   - **Property 3: `artist_id` nunca vem do token**
   - Para qualquer request autenticado, o `artist_id` em `request.user` deve ser igual ao valor retornado pela query `SELECT artist_id FROM users WHERE id = <userId>` — nunca igual a um valor arbitrário passado no body ou query string
   - Usar `fc.uuid()` para gerar `artistId` arbitrários no body/query e verificar que o hook sempre usa o valor do banco
@@ -77,17 +77,17 @@ Migração do hub-art de Supabase-first para Fastify-first em três fases. Este 
     - `getSession(userId)`: retorna dados públicos do usuário via `findUserById`
     - _Requirements: 3.1, 4.7_
 
-  - [ ]* 6.4 Escrever testes unitários para `auth.service.ts`
+  - [ ] 6.4 Escrever testes unitários para `auth.service.ts`
     - Testar: login com credenciais corretas, login com senha errada → lança erro, login com email inexistente → lança erro, refresh com token revogado → lança erro, refresh com token expirado → lança erro
     - _Requirements: 3.1_
 
-  - [ ]* 6.5 Escrever property test — Property 1: JWT round-trip preserva identidade
+  - [ ] 6.5 Escrever property test — Property 1: JWT round-trip preserva identidade
     - **Property 1: JWT round-trip preserva identidade do usuário**
     - Para qualquer usuário válido que faz login, o access token emitido, quando verificado, deve retornar exatamente o `userId` e `role` do usuário que fez login — sem mutação
     - Usar `fc.record({ userId: fc.uuid(), role: fc.constantFrom('admin', 'artist', 'editor') })` para gerar contextos de usuário
     - **Validates: Requirements 3.1, 3.7**
 
-  - [ ]* 6.6 Escrever property test — Property 2: Refresh token invalida após uso
+  - [ ] 6.6 Escrever property test — Property 2: Refresh token invalida após uso
     - **Property 2: Refresh token invalida após uso (rotação)**
     - Para qualquer refresh token válido, após ser usado para emitir um novo access token, o token original deve ter `revoked = true` no banco e não deve mais ser aceito
     - Usar `fc.uuid()` para gerar `userId`s e simular ciclo completo de rotação
@@ -108,13 +108,13 @@ Migração do hub-art de Supabase-first para Fastify-first em três fases. Este 
   - Garantir que todos os testes não-opcionais passam, que a API inicia sem erros com variáveis de ambiente válidas, e que o fluxo login → refresh → logout funciona end-to-end
   - _Requirements: 4.1, 4.9_
 
-- [ ]* 7.1 Escrever property test — Property 4: Ownership impede acesso cruzado
+- [ ] 7.1 Escrever property test — Property 4: Ownership impede acesso cruzado
   - **Property 4: Ownership impede acesso cruzado**
   - Para qualquer par de artistas distintos A e B, uma operação de escrita (PATCH/DELETE) autenticada como A em um recurso pertencente a B deve retornar HTTP 403 — nunca HTTP 200 ou 204
   - Usar `fc.uuid()` para gerar `userIdA`, `userIdB`, `resourceArtistId` com pré-condição `userIdA !== userIdB && resourceArtistId !== userIdA`
   - **Validates: Requirements 3.4, 3.7, 3.8**
 
-- [ ]* 7.2 Escrever property test — Property 6: Validação de input rejeita dados inválidos
+- [ ] 7.2 Escrever property test — Property 6: Validação de input rejeita dados inválidos
   - **Property 6: Validação de input rejeita dados inválidos**
   - Para qualquer payload que viole o schema Zod de um endpoint (campo obrigatório ausente, tipo errado, string fora dos limites), a API deve retornar HTTP 422 e o recurso no banco não deve ser criado ou modificado
   - Usar `fc.record()` com campos intencionalmente inválidos (strings vazias, números negativos, tipos errados) para cada schema Zod definido
@@ -177,6 +177,168 @@ Migração do hub-art de Supabase-first para Fastify-first em três fases. Este 
 
 ---
 
+## Fase 2 — Migração completa dos módulos de negócio
+
+A Fase 2 implementa a lógica real nos módulos que retornam 501 desde a Fase 1, migra o frontend para chamar exclusivamente a API Fastify, e remove os Route Handlers de negócio do Next.js. Ao final desta fase, `apps/web` é frontend puro.
+
+- [x] 13. Implementar módulo `profile` (substituir stubs por lógica real)
+  - [x] 13.1 Implementar `profile.repository.ts`
+    - `findByArtistId(artistId)`: já implementado com Prisma — verificar que retorna todos os campos necessários: `id`, `name`, `slug`, `tagline`, `bio`, `location`, `reach`, `email`, `whatsapp`, `skills`, `tools`, `isActive`, `createdAt`
+    - `update(artistId, data)`: já implementado — garantir que campos `email` e `whatsapp` são atualizados apenas quando presentes no payload (campos sensíveis)
+    - _Requirements: 4.4, 4.6_
+
+  - [x] 13.2 Implementar `profile.controller.ts`
+    - `getProfileHandler`: chama `findByArtistId(request.user.artistId)`, retorna 404 se não encontrado, retorna 200 com `{ data }` espelhando o Route Handler atual
+    - `updateProfileHandler`: valida body com `UpdateProfileSchema`, aplica restrição de campos sensíveis (`email`, `whatsapp`) apenas para roles `artist` e `admin` — `editor` recebe 403 se tentar alterar esses campos, chama `update(artistId, filteredData)`, retorna 200 com `{ data }`
+    - _Requirements: 3.4, 4.4, 4.6_
+
+  - [x] 13.3 Escrever testes unitários para `profile.controller.ts`
+    - Testar: GET retorna perfil correto, GET retorna 404 se artista não existe, PATCH com role `editor` tentando alterar `email` → 403, PATCH com campos válidos → 200
+    - _Requirements: 3.4, 4.4_
+
+- [x] 14. Implementar módulo `tracks` (substituir stubs por lógica real)
+  - [x] 14.1 Implementar `tracks.repository.ts`
+    - `findAllByArtist(artistId)`: `prisma.track.findMany({ where: { artistId }, orderBy: { sortOrder: 'asc' }, select: { id, title, genre, genreLabel, duration, key, isPublic, sortOrder, createdAt } })`
+    - `findById(id)`: `prisma.track.findUnique({ where: { id }, select: { id, artistId } })` — usado para verificação de ownership
+    - `create(artistId, data)`: `prisma.track.create({ data: { ...data, artistId } })` — `artistId` vem do `AuthContext`, nunca do body
+    - `update(id, artistId, data)`: `prisma.track.update({ where: { id, artistId }, data })` — double-check de ownership na query
+    - `remove(id, artistId)`: `prisma.track.delete({ where: { id, artistId } })` — double-check de ownership na query
+    - _Requirements: 3.4, 3.5, 4.6_
+
+  - [x] 14.2 Implementar `tracks.controller.ts`
+    - `getTracksHandler`: chama `findAllByArtist(request.user.artistId)`, retorna 200 com `{ data }`
+    - `createTrackHandler`: valida body com `CreateTrackSchema`, chama `create(artistId, parsed.data)`, retorna 201 com `{ data }`
+    - `updateTrackHandler`: busca track via `findById(params.id)`, verifica ownership (track.artistId === request.user.artistId ou role === 'admin'), valida body com `UpdateTrackSchema`, chama `update(id, artistId, parsed.data)`, retorna 200 com `{ data }`
+    - `deleteTrackHandler`: busca track via `findById(params.id)`, verifica ownership, chama `remove(id, artistId)`, retorna 204
+    - _Requirements: 3.4, 3.5, 4.3, 4.6_
+
+  - [x] 14.3 Escrever testes unitários para `tracks.controller.ts`
+    - Testar: GET lista tracks do artista correto, POST cria track com `artistId` do JWT (não do body), PATCH em track de outro artista → 403, DELETE com role `editor` → 403, PATCH em track inexistente → 404
+    - _Requirements: 3.4, 3.5, 4.3_
+
+- [x] 15. Implementar módulo `projects` (substituir stubs por lógica real)
+  - [x] 15.1 Implementar `projects.repository.ts`
+    - `findAllByArtist(artistId)`: `prisma.project.findMany({ where: { artistId }, orderBy: { sortOrder: 'asc' }, select: { id, title, platform, tags, href, featured, status, sortOrder, createdAt } })`
+    - `findById(id)`: `prisma.project.findUnique({ where: { id }, select: { id, artistId } })` — para verificação de ownership
+    - `create(artistId, data)`: `prisma.project.create({ data: { ...data, artistId } })`
+    - `update(id, artistId, data)`: `prisma.project.update({ where: { id, artistId }, data })`
+    - _Requirements: 3.4, 3.5, 4.6_
+
+  - [x] 15.2 Implementar `projects.controller.ts`
+    - `getProjectsHandler`: chama `findAllByArtist(request.user.artistId)`, retorna 200 com `{ data }`
+    - `createProjectHandler`: valida body com `CreateProjectSchema`, chama `create(artistId, parsed.data)`, retorna 201 com `{ data }`
+    - _Requirements: 3.4, 4.3, 4.6_
+
+  - [x] 15.3 Escrever testes unitários para `projects.controller.ts`
+    - Testar: GET lista projetos do artista correto, POST cria projeto com `artistId` do JWT, POST com `href` inválida → 422
+    - _Requirements: 3.4, 4.3_
+
+- [x] 16. Implementar módulo `services` (substituir stubs por lógica real)
+  - [x] 16.1 Implementar `services.repository.ts`
+    - `findAllByArtist(artistId)`: `prisma.service.findMany({ where: { artistId }, orderBy: { sortOrder: 'asc' }, select: { id, icon, title, description, items, price, highlight, sortOrder, active, createdAt } })`
+    - `findById(id)`: `prisma.service.findUnique({ where: { id }, select: { id, artistId } })` — para verificação de ownership
+    - `create(artistId, data)`: `prisma.service.create({ data: { ...data, artistId } })`
+    - `update(id, artistId, data)`: `prisma.service.update({ where: { id, artistId }, data })`
+    - `remove(id, artistId)`: `prisma.service.delete({ where: { id, artistId } })`
+    - _Requirements: 3.4, 3.5, 4.6_
+
+  - [x] 16.2 Implementar `services.controller.ts`
+    - `getServicesHandler`: chama `findAllByArtist(request.user.artistId)`, retorna 200 com `{ data }`
+    - `createServiceHandler`: valida body com `CreateServiceSchema`, chama `create(artistId, parsed.data)`, retorna 201 com `{ data }`
+    - `updateServiceHandler`: busca service via `findById(params.id)`, verifica ownership, valida body com `UpdateServiceSchema`, chama `update(id, artistId, parsed.data)`, retorna 200 com `{ data }`
+    - `deleteServiceHandler`: busca service via `findById(params.id)`, verifica ownership (apenas roles `artist` e `admin`), chama `remove(id, artistId)`, retorna 204
+    - _Requirements: 3.4, 3.5, 4.3, 4.6_
+
+  - [x] 16.3 Escrever testes unitários para `services.controller.ts`
+    - Testar: GET lista serviços do artista correto, POST cria serviço com `artistId` do JWT, PATCH em serviço de outro artista → 403, DELETE com role `editor` → 403
+    - _Requirements: 3.4, 3.5, 4.3_
+
+- [x] 17. Implementar módulo `upload` (substituir stub por lógica real)
+  - [x] 17.1 Criar `apps/api/src/lib/validateMime.ts`
+    - Portar a lógica de `apps/web/src/lib/upload/validateMime.ts` para a API Fastify
+    - `validateMime(buffer: ArrayBuffer, declaredMime: string): Promise<{ valid: boolean; error?: string }>` — valida por magic bytes, não apenas pelo Content-Type declarado
+    - `getMediaCategory(mimeType: string): 'audio' | 'image' | null` — retorna categoria ou null se MIME não permitido
+    - Bloquear SVG e tipos não listados em `ALLOWED_MIMES` explicitamente
+    - _Requirements: 4.5, 5.2_
+
+  - [x] 17.2 Implementar `upload.service.ts`
+    - `uploadMedia(artistId, file: { buffer: Buffer; mimeType: string; size: number })`:
+      1. Chama `getMediaCategory(mimeType)` — retorna 415 se não permitido
+      2. Verifica `size` contra `SIZE_LIMITS[category]` — retorna 413 se exceder
+      3. Chama `validateMime(buffer, mimeType)` — retorna 415 se magic bytes inválidos
+      4. Gera `storageKey = \`${artistId}/${category}/${randomUUID()}.${ext}\`` — nunca usa nome do cliente
+      5. Chama `storage.uploadFile(env.STORAGE_BUCKET, storageKey, buffer, mimeType)`
+      6. Insere registro em `media_assets` via `prisma.mediaAsset.create()`
+      7. **Rollback**: se o insert falhar, chama `storage.deleteFile(env.STORAGE_BUCKET, storageKey)` antes de lançar erro
+      8. Retorna URL assinada via `supabase.storage.createSignedUrl(storageKey, 3600)` — nunca a `storageKey` direta
+    - _Requirements: 4.5, 5.2, 5.3_
+
+  - [x] 17.3 Implementar `upload.controller.ts`
+    - `uploadHandler`: lê multipart via `request.file()` (requer `@fastify/multipart`), extrai `buffer`, `mimeType` e `size`, chama `uploadMedia(request.user.artistId, file)`, retorna 201 com `{ id, url, mimeType, sizeBytes, createdAt }`
+    - Adicionar `@fastify/multipart` como dependência em `apps/api/package.json`
+    - Registrar plugin `@fastify/multipart` em `apps/api/src/app.ts` com limite de `fileSize: 50 * 1024 * 1024`
+    - _Requirements: 4.5, 5.2_
+
+  - [x] 17.4 Escrever testes unitários para `upload.service.ts`
+    - Testar: MIME não permitido → lança erro 415, arquivo acima do limite → lança erro 413, magic bytes inválidos → lança erro 415, falha no insert após upload → rollback chama `deleteFile`, upload bem-sucedido → retorna URL assinada
+    - _Requirements: 4.5, 5.2, 5.3_
+
+- [x] 18. Checkpoint — todos os endpoints da API Fastify funcionais
+  - Verificar que todos os módulos retornam respostas corretas (não mais 501)
+  - Verificar que ownership é aplicado em todos os endpoints de escrita (PATCH/DELETE)
+  - Verificar que `artist_id` nunca vem do body — sempre do `AuthContext`
+  - Verificar que upload faz rollback correto em caso de falha no banco
+  - _Requirements: 3.4, 3.5, 4.3, 4.5, 4.6_
+
+- [x] 19. Migrar o frontend (`apps/web`) para chamar a API Fastify
+  - [x] 19.1 Criar `apps/web/src/lib/api/client.ts`
+    - Criar cliente HTTP tipado com `baseUrl = process.env.NEXT_PUBLIC_API_URL`
+    - Implementar `apiGet<T>(path)` e `apiPost<T>(path, body)`, `apiPatch<T>(path, body)`, `apiDelete(path)` — todos injetam `Authorization: Bearer <accessToken>` e `credentials: 'include'` para o cookie de refresh
+    - Implementar interceptor de 401: tenta `POST /auth/refresh` automaticamente uma vez, se falhar redireciona para login
+    - Armazenar `accessToken` em memória (variável de módulo) — nunca em `localStorage`
+    - _Requirements: 4.1, 4.8_
+
+  - [x] 19.2 Migrar chamadas de auth no frontend
+    - Atualizar `apps/web/src/app/api/auth/login/route.ts` para fazer proxy para `POST ${API_URL}/auth/login` — repassa body e cookies de resposta
+    - Atualizar `apps/web/src/app/api/auth/session/route.ts` para fazer proxy para `GET ${API_URL}/auth/session` com Bearer token
+    - Manter os Route Handlers de auth como proxies temporários durante a Fase 2 para não quebrar o Middleware do Next.js
+    - _Requirements: 4.1, 4.8_
+
+  - [x] 19.3 Migrar chamadas de dashboard no frontend
+    - Atualizar todos os `fetch('/api/dashboard/...')` nos componentes e pages de `apps/web/src/app/dashboard/` para usar o `apiClient` apontando para `${API_URL}/dashboard/...`
+    - Atualizar chamadas de upload de `fetch('/api/upload')` para `${API_URL}/upload`
+    - Garantir que o `accessToken` é enviado em todas as chamadas autenticadas
+    - _Requirements: 4.1, 4.8_
+
+  - [x] 19.4 Escrever testes de integração para o fluxo Web → API
+    - Testar fluxo completo: login via proxy → recebe `accessToken` → chama `/dashboard/tracks` com Bearer → recebe dados
+    - Testar refresh automático: simular 401 em chamada de dashboard → interceptor faz refresh → retry bem-sucedido
+    - _Requirements: 4.1, 4.8, 4.9_
+
+- [x] 20. Remover Route Handlers de negócio do Next.js (Fase 3 — limpeza)
+  - Remover `apps/web/src/app/api/dashboard/tracks/route.ts` e `apps/web/src/app/api/dashboard/tracks/[id]/route.ts`
+  - Remover `apps/web/src/app/api/dashboard/profile/route.ts`
+  - Remover `apps/web/src/app/api/dashboard/projects/route.ts`
+  - Remover `apps/web/src/app/api/dashboard/services/route.ts` e `apps/web/src/app/api/dashboard/services/[id]/route.ts`
+  - Remover `apps/web/src/app/api/upload/route.ts`
+  - Verificar que nenhum componente do `apps/web` ainda importa ou chama esses endpoints diretamente
+  - _Requirements: 4.1, 4.9_
+
+- [x] 21. Atualizar Middleware do Next.js para JWT próprio
+  - Atualizar `apps/web/src/middleware.ts` para validar o JWT próprio da API Fastify em vez de usar `supabase.auth.getUser()`
+  - O Middleware deve verificar a presença do cookie `refreshToken` ou do `accessToken` em memória para decidir se redireciona para login
+  - Remover dependências de `NEXT_PUBLIC_SUPABASE_ANON_KEY` e `NEXT_PUBLIC_SUPABASE_URL` do Middleware
+  - _Requirements: 4.1, 5.3, 5.8_
+
+- [x] 22. Checkpoint final — Fase 2 completa
+  - Verificar que todos os testes não-opcionais passam
+  - Verificar que `apps/web` não contém mais Route Handlers de negócio
+  - Confirmar que o fluxo completo login → dashboard → upload → logout funciona end-to-end via API Fastify
+  - Confirmar que o Middleware do Next.js valida JWT próprio corretamente
+  - _Requirements: 4.1, 4.9, 5.3, 5.8_
+
+---
+
 ## Notas
 
 - Tasks marcadas com `*` são opcionais e podem ser puladas para um MVP mais rápido
@@ -184,3 +346,4 @@ Migração do hub-art de Supabase-first para Fastify-first em três fases. Este 
 - Os esqueletos das tasks 8 e 9 retornam 501 intencionalmente — serão implementados na Fase 2
 - Property tests usam `fast-check` com mínimo de 100 iterações por propriedade
 - O campo `User.password` é `null` durante a Fase 1 para usuários existentes (auth via Supabase); novos logins via API Fastify preenchem o hash bcrypt
+- A task 20 (remoção dos Route Handlers) só deve ser executada após a task 19 estar completa e validada em ambiente de staging

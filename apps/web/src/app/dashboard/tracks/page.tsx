@@ -1,16 +1,22 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { apiGet, apiDelete } from '@/lib/api/client'
 
 interface Track {
   id: string
   title: string
   genre: string
-  genre_label: string
+  genreLabel: string
   duration: string | null
-  is_public: boolean
-  sort_order: number
-  created_at: string
+  isPublic: boolean
+  sortOrder: number
+  createdAt: string
+}
+
+interface TracksResponse {
+  data?: Track[]
+  error?: string
 }
 
 export default function TracksPage() {
@@ -19,9 +25,8 @@ export default function TracksPage() {
   const [error, setError]     = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/dashboard/tracks')
-      .then(r => r.json())
-      .then((d: { data?: Track[]; error?: string }) => {
+    apiGet<TracksResponse>('/dashboard/tracks')
+      .then((d) => {
         if (d.error) setError(d.error)
         else setTracks(d.data ?? [])
       })
@@ -31,9 +36,12 @@ export default function TracksPage() {
 
   async function handleDelete(id: string) {
     if (!confirm('Deletar esta faixa?')) return
-    const res = await fetch(`/api/dashboard/tracks/${id}`, { method: 'DELETE' })
-    if (res.ok) setTracks(prev => prev.filter(t => t.id !== id))
-    else alert('Erro ao deletar faixa')
+    try {
+      await apiDelete(`/dashboard/tracks/${id}`)
+      setTracks(prev => prev.filter(t => t.id !== id))
+    } catch {
+      alert('Erro ao deletar faixa')
+    }
   }
 
   return (
@@ -61,11 +69,11 @@ export default function TracksPage() {
               rounded-md px-5 py-4 hover:border-[rgba(108,99,255,0.35)] transition-all">
             <div>
               <h3 className="font-semibold text-sm">{track.title}</h3>
-              <span className="text-xs text-accent uppercase tracking-wider">{track.genre_label}</span>
+              <span className="text-xs text-accent uppercase tracking-wider">{track.genreLabel}</span>
             </div>
             <div className="flex items-center gap-3">
-              <span className={`text-xs px-2 py-0.5 rounded-xl ${track.is_public ? 'bg-green-900/30 text-green-400' : 'bg-gray-800 text-gray-400'}`}>
-                {track.is_public ? 'Público' : 'Privado'}
+              <span className={`text-xs px-2 py-0.5 rounded-xl ${track.isPublic ? 'bg-green-900/30 text-green-400' : 'bg-gray-800 text-gray-400'}`}>
+                {track.isPublic ? 'Público' : 'Privado'}
               </span>
               <a href={`/dashboard/tracks/${track.id}`}
                 className="text-xs text-accent hover:underline">Editar</a>

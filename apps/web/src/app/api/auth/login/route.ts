@@ -1,63 +1,42 @@
 /**
  * POST /api/auth/login
- * Autentica o artista com email e senha via Supabase Auth
+ * Proxy para POST ${API_URL}/auth/login na API Fastify
  *
- * Segurança:
- * - Validação de input antes de qualquer operação
- * - Nunca retorna detalhes internos do erro ao cliente
- * - Sessão gerenciada via cookies HttpOnly pelo Supabase SSR
+ * Mantido como proxy durante a Fase 2 para não quebrar o Middleware do Next.js.
+ * Repassa o body e os cookies de resposta (refreshToken HttpOnly) para o browser.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 
-interface LoginBody {
-  email: string
-  password: string
-}
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-function validateBody(body: unknown): body is LoginBody {
-  if (!body || typeof body !== 'object') return false
-  const b = body as Record<string, unknown>
-  return (
-    typeof b['email'] === 'string' &&
-    typeof b['password'] === 'string' &&
-    EMAIL_RE.test(b['email']) &&
-    b['password'].length >= 6
-  )
-}
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? ''
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   let body: unknown
-
   try {
     body = await req.json()
   } catch {
     return NextResponse.json({ error: 'Corpo da requisição inválido' }, { status: 400 })
   }
 
-  if (!validateBody(body)) {
-    return NextResponse.json({ error: 'Email ou senha inválidos' }, { status: 400 })
+  let apiRes: Response
+  try {
+    apiRes = await fetch(`${API_URL}/auth/login`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(body),
+    })
+  } catch {
+    return NextResponse.json({ error: 'Serviço indisponível' }, { status: 503 })
   }
 
-  const supabase = createClient()
+  const data = await apiRes.json() as Record<string, unknown>
+  const res  = NextResponse.json(data, { status: apiRes.status })
 
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email:    body.email.trim().toLowerCase(),
-    password: body.password,
-  })
-
-  if (error || !data.session) {
-    // Não expõe detalhes do erro — apenas mensagem genérica
-    return NextResponse.json({ error: 'Credenciais inválidas' }, { status: 401 })
+  // Repassa cookies Set-Cookie da API (refreshToken HttpOnly) para o browser
+  const setCookie = apiRes.headers.get('set-cookie')
+  if (setCookie) {
+    res.headers.set('set-cookie', setCookie)
   }
 
-  return NextResponse.json({
-    user: {
-      id:    data.user.id,
-      email: data.user.email,
-    },
-  })
+  return res
 }

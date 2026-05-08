@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { apiGet } from '@/lib/api/client'
 
 interface Project {
   id: string
@@ -9,7 +10,12 @@ interface Project {
   tags: string[]
   featured: boolean
   status: string
-  created_at: string
+  createdAt: string
+}
+
+interface ProjectsResponse {
+  data?: Project[]
+  error?: string
 }
 
 export default function ProjectsPage() {
@@ -18,9 +24,8 @@ export default function ProjectsPage() {
   const [error, setError]       = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/dashboard/projects')
-      .then(r => r.json())
-      .then((d: { data?: Project[]; error?: string }) => {
+    apiGet<ProjectsResponse>('/dashboard/projects')
+      .then((d) => {
         if (d.error) setError(d.error)
         else setProjects(d.data ?? [])
       })

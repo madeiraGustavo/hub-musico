@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useContactForm } from '@/hooks/useContactForm'
+import { apiGet, apiPatch } from '@/lib/api/client'
 
 interface Profile {
   id: string
@@ -16,6 +16,10 @@ interface Profile {
   tools: string[]
 }
 
+interface ProfileResponse {
+  data?: Profile
+}
+
 export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
@@ -23,9 +27,9 @@ export default function ProfilePage() {
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; msg: string } | null>(null)
 
   useEffect(() => {
-    fetch('/api/dashboard/profile')
-      .then(r => r.json())
-      .then((d: { data?: Profile }) => setProfile(d.data ?? null))
+    apiGet<ProfileResponse>('/dashboard/profile')
+      .then((d) => setProfile(d.data ?? null))
+      .catch(() => setProfile(null))
       .finally(() => setLoading(false))
   }, [])
 
@@ -35,22 +39,21 @@ export default function ProfilePage() {
     setSaving(true)
     setFeedback(null)
 
-    const res = await fetch('/api/dashboard/profile', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    try {
+      await apiPatch('/dashboard/profile', {
         name:     profile.name,
         tagline:  profile.tagline,
         location: profile.location,
         reach:    profile.reach,
         skills:   profile.skills,
         tools:    profile.tools,
-      }),
-    })
-
-    if (res.ok) setFeedback({ type: 'success', msg: 'Perfil atualizado com sucesso!' })
-    else        setFeedback({ type: 'error',   msg: 'Erro ao atualizar perfil.' })
-    setSaving(false)
+      })
+      setFeedback({ type: 'success', msg: 'Perfil atualizado com sucesso!' })
+    } catch {
+      setFeedback({ type: 'error', msg: 'Erro ao atualizar perfil.' })
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (loading) return <p className="text-text-muted">Carregando...</p>
@@ -62,10 +65,10 @@ export default function ProfilePage() {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         {[
-          { id: 'name',     label: 'Nome',       value: profile.name,     key: 'name' as const },
-          { id: 'tagline',  label: 'Tagline',    value: profile.tagline ?? '', key: 'tagline' as const },
-          { id: 'location', label: 'Localização',value: profile.location ?? '', key: 'location' as const },
-          { id: 'reach',    label: 'Alcance',    value: profile.reach ?? '', key: 'reach' as const },
+          { id: 'name',     label: 'Nome',        value: profile.name,        key: 'name'     as const },
+          { id: 'tagline',  label: 'Tagline',     value: profile.tagline ?? '', key: 'tagline'  as const },
+          { id: 'location', label: 'Localização', value: profile.location ?? '', key: 'location' as const },
+          { id: 'reach',    label: 'Alcance',     value: profile.reach ?? '',  key: 'reach'    as const },
         ].map(field => (
           <div key={field.id} className="flex flex-col gap-2">
             <label className="text-sm font-medium text-text-secondary">{field.label}</label>

@@ -1,4 +1,5 @@
 import Fastify, { type FastifyInstance } from 'fastify'
+import multipart      from '@fastify/multipart'
 import sensiblePlugin  from './plugins/sensible.js'
 import corsPlugin      from './plugins/cors.js'
 import rateLimitPlugin from './plugins/rateLimit.js'
@@ -13,11 +14,12 @@ import { uploadRoutes }   from './modules/upload/upload.routes.js'
 export async function buildApp(): Promise<FastifyInstance> {
   const fastify = Fastify({ logger: true })
 
-  // Plugins — ordem: sensible → cors → rateLimit → jwt
+  // Plugins — ordem: sensible → cors → rateLimit → jwt → multipart
   await fastify.register(sensiblePlugin)
   await fastify.register(corsPlugin)
   await fastify.register(rateLimitPlugin)
   await fastify.register(jwtPlugin)
+  await fastify.register(multipart, { limits: { fileSize: 50 * 1024 * 1024 } })
 
   // Rotas
   await fastify.register(authRoutes)

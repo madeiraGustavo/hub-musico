@@ -1,24 +1,31 @@
 /**
  * GET /api/auth/session
- * Retorna os dados da sessão atual (usuário autenticado)
- * Usado pelo frontend para verificar se está logado
+ * Proxy para GET ${API_URL}/auth/session na API Fastify
+ *
+ * Mantido como proxy durante a Fase 2 para não quebrar o Middleware do Next.js.
+ * Lê o accessToken do header Authorization e o repassa para a API.
  */
 
-import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest, NextResponse } from 'next/server'
 
-export async function GET(): Promise<NextResponse> {
-  const supabase = createClient()
-  const { data: { user }, error } = await supabase.auth.getUser()
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? ''
 
-  if (error || !user) {
-    return NextResponse.json({ user: null }, { status: 401 })
+export async function GET(req: NextRequest): Promise<NextResponse> {
+  const authorization = req.headers.get('authorization') ?? ''
+
+  let apiRes: Response
+  try {
+    apiRes = await fetch(`${API_URL}/auth/session`, {
+      method:  'GET',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': authorization,
+      },
+    })
+  } catch {
+    return NextResponse.json({ user: null }, { status: 503 })
   }
 
-  return NextResponse.json({
-    user: {
-      id:    user.id,
-      email: user.email,
-    },
-  })
+  const data = await apiRes.json() as Record<string, unknown>
+  return NextResponse.json(data, { status: apiRes.status })
 }

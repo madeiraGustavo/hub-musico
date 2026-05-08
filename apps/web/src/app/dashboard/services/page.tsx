@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { apiGet, apiPost, apiPatch, apiDelete } from '@/lib/api/client'
 
 interface Service {
   id: string
@@ -11,18 +12,28 @@ interface Service {
   price: string
   highlight: boolean
   active: boolean
-  sort_order: number
+  sortOrder: number
+}
+
+interface ServicesResponse {
+  data?: Service[]
+  error?: string
+}
+
+interface ServiceResponse {
+  data?: Service
+  error?: string
 }
 
 const ICONS = ['drum','mic','music','compose','needle','camera','calendar','star']
 
-const EMPTY: Omit<Service, 'id' | 'active' | 'sort_order'> = {
-  icon: 'star',
-  title: '',
+const EMPTY: Omit<Service, 'id' | 'active' | 'sortOrder'> = {
+  icon:        'star',
+  title:       '',
   description: '',
-  items: [],
-  price: '',
-  highlight: false,
+  items:       [],
+  price:       '',
+  highlight:   false,
 }
 
 export default function ServicesPage() {
@@ -37,9 +48,8 @@ export default function ServicesPage() {
   const [feedback, setFeedback] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/dashboard/services')
-      .then(r => r.json())
-      .then((d: { data?: Service[]; error?: string }) => {
+    apiGet<ServicesResponse>('/dashboard/services')
+      .then((d) => {
         if (d.error) setError(d.error)
         else setServices(d.data ?? [])
       })
@@ -48,7 +58,7 @@ export default function ServicesPage() {
   }, [])
 
   function openNew() {
-    setEditing({ ...EMPTY, id: '', active: true, sort_order: services.length })
+    setEditing({ ...EMPTY, id: '', active: true, sortOrder: services.length })
     setIsNew(true)
     setFeedback(null)
   }
@@ -77,44 +87,38 @@ export default function ServicesPage() {
       items:       editing.items,
       price:       editing.price,
       highlight:   editing.highlight,
-      sort_order:  editing.sort_order,
+      sortOrder:   editing.sortOrder,
       active:      editing.active,
     }
 
-    const url    = isNew ? '/api/dashboard/services' : `/api/dashboard/services/${editing.id}`
-    const method = isNew ? 'POST' : 'PATCH'
-
-    const res = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    })
-
-    const json = await res.json() as { data?: Service; error?: string }
-
-    if (!res.ok) {
-      setFeedback(json.error ?? 'Erro ao salvar')
+    try {
+      if (isNew) {
+        await apiPost<ServiceResponse>('/dashboard/services', body)
+        // Recarrega a lista para pegar o objeto completo
+        const list = await apiGet<ServicesResponse>('/dashboard/services')
+        setServices(list.data ?? [])
+      } else {
+        const json = await apiPatch<ServiceResponse>(`/dashboard/services/${editing.id}`, body)
+        if (json.data) {
+          setServices(prev => prev.map(s => s.id === json.data!.id ? { ...s, ...json.data } : s))
+        }
+      }
+      closeForm()
+    } catch (err) {
+      setFeedback(err instanceof Error ? err.message : 'Erro ao salvar')
+    } finally {
       setSaving(false)
-      return
     }
-
-    if (isNew && json.data) {
-      // Recarrega a lista para pegar o objeto completo
-      const list = await fetch('/api/dashboard/services').then(r => r.json()) as { data?: Service[] }
-      setServices(list.data ?? [])
-    } else if (json.data) {
-      setServices(prev => prev.map(s => s.id === json.data!.id ? { ...s, ...json.data } : s))
-    }
-
-    closeForm()
-    setSaving(false)
   }
 
   async function handleDelete(id: string) {
     if (!confirm('Deletar este serviço?')) return
-    const res = await fetch(`/api/dashboard/services/${id}`, { method: 'DELETE' })
-    if (res.ok) setServices(prev => prev.filter(s => s.id !== id))
-    else alert('Erro ao deletar serviço')
+    try {
+      await apiDelete(`/dashboard/services/${id}`)
+      setServices(prev => prev.filter(s => s.id !== id))
+    } catch {
+      alert('Erro ao deletar serviço')
+    }
   }
 
   return (
