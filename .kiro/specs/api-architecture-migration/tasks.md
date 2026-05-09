@@ -39,17 +39,17 @@ Migração do hub-art de Supabase-first para Fastify-first em três fases. Este 
   - Criar `apps/api/src/hooks/authenticate.ts` como `preHandler` que: (1) extrai Bearer token do header `Authorization`, (2) verifica assinatura com `JWT_SECRET` via `@fastify/jwt`, (3) busca `role` e `artist_id` no banco via Prisma — nunca do token, (4) retorna 401 se token ausente/inválido/expirado, (5) retorna 403 se `artist_id` não existir no banco, (6) injeta `AuthContext` em `request.user`
   - _Requirements: 3.1, 3.4, 3.5, 3.7, 3.8_
 
-- [ ] 5.1 Escrever testes unitários para o hook `authenticate.ts`
+- [x] 5.1 Escrever testes unitários para o hook `authenticate.ts`
   - Testar: token ausente → 401, token malformado → 401, token expirado → 401, token válido mas `artist_id` nulo → 403, token válido com `artist_id` → injeta `AuthContext` corretamente
   - _Requirements: 3.7, 3.8_
 
-- [ ] 5.2 Escrever property test — Property 5: Token expirado é rejeitado
+- [x] 5.2 Escrever property test — Property 5: Token expirado é rejeitado
   - **Property 5: Token expirado é rejeitado**
   - Para qualquer access token com `exp` no passado, qualquer endpoint protegido deve retornar HTTP 401 com `{ "error": "Não autorizado" }`
   - Usar `fc.integer()` para gerar timestamps no passado; assinar tokens com `exp` expirado e verificar que `authenticate` retorna 401
   - **Validates: Requirements 3.7**
 
-- [ ] 5.3 Escrever property test — Property 3: `artist_id` nunca vem do token
+- [x] 5.3 Escrever property test — Property 3: `artist_id` nunca vem do token
   - **Property 3: `artist_id` nunca vem do token**
   - Para qualquer request autenticado, o `artist_id` em `request.user` deve ser igual ao valor retornado pela query `SELECT artist_id FROM users WHERE id = <userId>` — nunca igual a um valor arbitrário passado no body ou query string
   - Usar `fc.uuid()` para gerar `artistId` arbitrários no body/query e verificar que o hook sempre usa o valor do banco
@@ -77,17 +77,17 @@ Migração do hub-art de Supabase-first para Fastify-first em três fases. Este 
     - `getSession(userId)`: retorna dados públicos do usuário via `findUserById`
     - _Requirements: 3.1, 4.7_
 
-  - [ ] 6.4 Escrever testes unitários para `auth.service.ts`
+  - [x] 6.4 Escrever testes unitários para `auth.service.ts`
     - Testar: login com credenciais corretas, login com senha errada → lança erro, login com email inexistente → lança erro, refresh com token revogado → lança erro, refresh com token expirado → lança erro
     - _Requirements: 3.1_
 
-  - [ ] 6.5 Escrever property test — Property 1: JWT round-trip preserva identidade
+  - [x] 6.5 Escrever property test — Property 1: JWT round-trip preserva identidade
     - **Property 1: JWT round-trip preserva identidade do usuário**
     - Para qualquer usuário válido que faz login, o access token emitido, quando verificado, deve retornar exatamente o `userId` e `role` do usuário que fez login — sem mutação
     - Usar `fc.record({ userId: fc.uuid(), role: fc.constantFrom('admin', 'artist', 'editor') })` para gerar contextos de usuário
     - **Validates: Requirements 3.1, 3.7**
 
-  - [ ] 6.6 Escrever property test — Property 2: Refresh token invalida após uso
+  - [x] 6.6 Escrever property test — Property 2: Refresh token invalida após uso
     - **Property 2: Refresh token invalida após uso (rotação)**
     - Para qualquer refresh token válido, após ser usado para emitir um novo access token, o token original deve ter `revoked = true` no banco e não deve mais ser aceito
     - Usar `fc.uuid()` para gerar `userId`s e simular ciclo completo de rotação
@@ -108,13 +108,13 @@ Migração do hub-art de Supabase-first para Fastify-first em três fases. Este 
   - Garantir que todos os testes não-opcionais passam, que a API inicia sem erros com variáveis de ambiente válidas, e que o fluxo login → refresh → logout funciona end-to-end
   - _Requirements: 4.1, 4.9_
 
-- [ ] 7.1 Escrever property test — Property 4: Ownership impede acesso cruzado
+- [x] 7.1 Escrever property test — Property 4: Ownership impede acesso cruzado
   - **Property 4: Ownership impede acesso cruzado**
   - Para qualquer par de artistas distintos A e B, uma operação de escrita (PATCH/DELETE) autenticada como A em um recurso pertencente a B deve retornar HTTP 403 — nunca HTTP 200 ou 204
   - Usar `fc.uuid()` para gerar `userIdA`, `userIdB`, `resourceArtistId` com pré-condição `userIdA !== userIdB && resourceArtistId !== userIdA`
   - **Validates: Requirements 3.4, 3.7, 3.8**
 
-- [ ] 7.2 Escrever property test — Property 6: Validação de input rejeita dados inválidos
+- [x] 7.2 Escrever property test — Property 6: Validação de input rejeita dados inválidos
   - **Property 6: Validação de input rejeita dados inválidos**
   - Para qualquer payload que viole o schema Zod de um endpoint (campo obrigatório ausente, tipo errado, string fora dos limites), a API deve retornar HTTP 422 e o recurso no banco não deve ser criado ou modificado
   - Usar `fc.record()` com campos intencionalmente inválidos (strings vazias, números negativos, tipos errados) para cada schema Zod definido
