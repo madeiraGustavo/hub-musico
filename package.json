@@ -1,8 +1,8 @@
 {
-  "name": "hub-musico",
+  "name": "hub-art",
   "private": true,
   "version": "0.0.1",
-  "description": "Plataforma de portfólio para músicos profissionais",
+  "description": "Plataforma de portfólio para artistas profissionais",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -12,6 +12,7 @@
     "build": "pnpm --filter './packages/*' build && pnpm --filter './apps/*' build",
     "lint": "pnpm --recursive lint",
     "typecheck": "pnpm --recursive typecheck",
+    "test": "pnpm -r test",
     "audit": "pnpm audit --audit-level=moderate"
   },
   "engines": {

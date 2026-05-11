@@ -4,7 +4,7 @@
 
 - Todo recurso do sistema pertence a um `artist_id`
 - Um artista só pode visualizar, criar, editar e deletar seus próprios recursos
-- O `artist_id` é extraído do JWT autenticado — nunca aceito como parâmetro do cliente
+- O `artist_id` é resolvido via banco de dados: `SELECT artist_id FROM users WHERE id = userId` — nunca extraído diretamente do JWT nem aceito como parâmetro do cliente. O JWT carrega apenas `{ sub: userId }`; o `artist_id` é sempre obtido do registro do usuário no banco pelo hook `authenticate`
 - Artista não pode ser deletado se possuir recursos ativos vinculados
 
 ## Domínio: Mídia (Media)

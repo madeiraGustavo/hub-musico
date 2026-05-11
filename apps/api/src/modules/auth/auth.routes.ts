@@ -12,7 +12,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post('/auth/login',   loginHandler)
   fastify.post('/auth/refresh', refreshHandler)
 
-  // Rotas protegidas — requerem Bearer JWT válido
-  fastify.post('/auth/logout',  { preHandler: authenticate }, logoutHandler)
+  // Rota pública — revogação via cookie refreshToken (access token pode ter expirado)
+  fastify.post('/auth/logout',  logoutHandler)
   fastify.get('/auth/session',  { preHandler: authenticate }, sessionHandler)
 }

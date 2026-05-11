@@ -1,4 +1,4 @@
-import type { Artist } from '@hub-musico/types'
+import type { Artist } from '@hub-art/types'
 
 interface Props {
   artist: Artist

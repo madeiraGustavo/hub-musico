@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useState } from 'react'
-import type { Artist, PortfolioItem } from '@hub-musico/types'
+import type { Artist, PortfolioItem } from '@hub-art/types'
 
 interface Props {
   artist: Artist

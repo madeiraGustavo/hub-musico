@@ -17,6 +17,7 @@ import {
   findRefreshToken,
   revokeRefreshToken,
   revokeAllUserTokens,
+  findArtistById,
   type UserWithAuth,
 } from './auth.repository.js'
 
@@ -28,10 +29,16 @@ export interface TokenPair {
 }
 
 export interface SessionData {
-  id:       string
-  email:    string
-  role:     string
-  artistId: string | null
+  authenticated: true
+  user: {
+    id:    string
+    email: string
+    role:  string
+  }
+  artist: {
+    id:   string
+    slug: string
+  } | null
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -127,10 +134,17 @@ export async function getSession(userId: string): Promise<SessionData> {
   const user = await findUserById(userId)
   if (!user) throw new Error('Usuário não encontrado')
 
+  const artist = user.artistId
+    ? await findArtistById(user.artistId)
+    : null
+
   return {
-    id:       user.id,
-    email:    user.email,
-    role:     user.role,
-    artistId: user.artistId,
+    authenticated: true,
+    user: {
+      id:    user.id,
+      email: user.email,
+      role:  user.role,
+    },
+    artist,
   }
 }

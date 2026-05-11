@@ -1,16 +1,37 @@
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { apiGet } from '@/lib/api/client'
 import { DashboardNav } from '@/components/dashboard/DashboardNav'
 
-export default async function DashboardLayout({
+interface SessionData {
+  authenticated: true
+  user: { id: string; email: string; role: string }
+  artist: { id: string; slug: string } | null
+}
+
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const [loading, setLoading] = useState(true)
 
-  if (!user) redirect('/login')
+  useEffect(() => {
+    apiGet<SessionData>('/auth/session')
+      .then(() => setLoading(false))
+      .catch(() => {
+        // apiGet já trata 401 com redirectToLogin() — nada a fazer aqui
+      })
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-bg-base flex items-center justify-center">
+        <span className="text-text-muted text-sm">Carregando...</span>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-bg-base flex">

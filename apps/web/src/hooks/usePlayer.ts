@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { Track } from '@hub-musico/types'
+import type { Track } from '@hub-art/types'
 
 const DURATION_SIM = 30
 
@@ -12,7 +12,7 @@ function formatTime(s: number): string {
 }
 
 export interface PlayerState {
-  currentId: number
+  currentId: string
   isPlaying: boolean
   progress: number
   currentTime: string
@@ -22,10 +22,10 @@ export interface PlayerState {
 }
 
 export interface PlayerControls {
-  play: (id: number) => void
+  play: (id: string) => void
   togglePlay: () => void
-  next: (visibleIds: number[]) => void
-  prev: (visibleIds: number[]) => void
+  next: (visibleIds: string[]) => void
+  prev: (visibleIds: string[]) => void
   seek: (pct: number) => void
   setVolume: (vol: number) => void
 }
@@ -36,7 +36,7 @@ export function usePlayer(tracks: Track[]): [PlayerState, PlayerControls] {
   const elapsedRef = useRef(0)
 
   const [state, setState] = useState<PlayerState>({
-    currentId:   -1,
+    currentId:   '',
     isPlaying:   false,
     progress:    0,
     currentTime: '0:00',
@@ -98,7 +98,7 @@ export function usePlayer(tracks: Track[]): [PlayerState, PlayerControls] {
     }, 500)
   }, [stopTimer])
 
-  const play = useCallback((id: number) => {
+  const play = useCallback((id: string) => {
     const track = tracks.find(t => t.id === id)
     if (!track) return
 
@@ -135,7 +135,7 @@ export function usePlayer(tracks: Track[]): [PlayerState, PlayerControls] {
 
   const togglePlay = useCallback(() => {
     setState(prev => {
-      if (prev.currentId === -1) return prev
+      if (prev.currentId === '') return prev
       const next = !prev.isPlaying
       if (next) {
         const track = tracks.find(t => t.id === prev.currentId)
@@ -153,7 +153,7 @@ export function usePlayer(tracks: Track[]): [PlayerState, PlayerControls] {
     })
   }, [tracks, startRealProgress, startSimProgress, stopTimer])
 
-  const next = useCallback((visibleIds: number[]) => {
+  const next = useCallback((visibleIds: string[]) => {
     setState(prev => {
       if (!visibleIds.length) return prev
       const idx   = visibleIds.indexOf(prev.currentId)
@@ -163,7 +163,7 @@ export function usePlayer(tracks: Track[]): [PlayerState, PlayerControls] {
     })
   }, [play])
 
-  const prev = useCallback((visibleIds: number[]) => {
+  const prev = useCallback((visibleIds: string[]) => {
     setState(prev => {
       if (!visibleIds.length) return prev
       const idx   = visibleIds.indexOf(prev.currentId)

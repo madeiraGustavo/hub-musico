@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import type { Track } from '@hub-musico/types'
+import type { Track } from '@hub-art/types'
 
 interface Props {
   musica: Track

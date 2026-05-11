@@ -1,4 +1,4 @@
-import type { Artist } from '@hub-musico/types'
+import type { Artist } from '@hub-art/types'
 import { PROFILE_CONFIG } from '@/lib/profile/profileConfig'
 import { VinylSVG } from './VinylSVG'
 

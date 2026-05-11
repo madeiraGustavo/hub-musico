@@ -1,29 +1,32 @@
-import { createClient } from '@/lib/supabase/server'
-import { createAdminClient } from '@/lib/supabase/admin'
+'use client'
 
-export default async function DashboardPage() {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+import { useEffect, useState } from 'react'
+import { apiGet } from '@/lib/api/client'
 
-  const admin = createAdminClient()
-  const { data: userData } = await admin
-    .from('users')
-    .select('role, artist_id')
-    .eq('id', user!.id)
-    .single<{ role: string; artist_id: string | null }>()
+interface SessionData {
+  authenticated: true
+  user: { id: string; email: string; role: string }
+  artist: { id: string; slug: string } | null
+}
 
-  const { data: stats } = await admin
-    .from('tracks')
-    .select('id', { count: 'exact', head: true })
-    .eq('artist_id', userData?.artist_id ?? '')
+export default function DashboardPage() {
+  const [session, setSession] = useState<SessionData | null>(null)
+
+  useEffect(() => {
+    apiGet<SessionData>('/auth/session')
+      .then(setSession)
+      .catch(() => {
+        // apiGet já trata 401 com redirectToLogin() — nada a fazer aqui
+      })
+  }, [])
 
   return (
     <div>
       <h1 className="font-head text-3xl font-bold mb-2">Dashboard</h1>
       <p className="text-text-secondary mb-8">
-        Bem-vindo, <span className="text-accent">{user?.email}</span>
+        Bem-vindo, <span className="text-accent">{session?.user.email}</span>
         <span className="ml-2 text-xs bg-accent-dim text-accent px-2 py-0.5 rounded-xl uppercase tracking-wider">
-          {userData?.role}
+          {session?.user.role}
         </span>
       </p>
 

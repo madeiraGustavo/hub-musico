@@ -90,8 +90,10 @@ apps/web (Next.js)
          → retorna novo { accessToken } + novo cookie refreshToken
 
 4. Logout
-   Client → POST /auth/logout Authorization: Bearer <access_token>
-         → API revoga todos os refresh tokens do usuário no banco
+   Client → POST /auth/logout (cookie refreshToken enviado automaticamente — Bearer não obrigatório)
+         → API verifica assinatura do refreshToken com JWT_REFRESH_SECRET
+         → extrai userId do payload (sub)
+         → revoga todos os refresh tokens do usuário no banco
          → limpa cookie refreshToken
 ```
 

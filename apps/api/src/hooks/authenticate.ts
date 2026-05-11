@@ -42,7 +42,7 @@ export function authenticateRoles(allowedRoles: UserRole[]) {
       return reply.code(401).send({ error: 'Não autorizado' })
     }
 
-    const payload = request.user as unknown as { sub: string; role: string }
+    const payload = request.user as unknown as { sub: string }
 
     if (!payload?.sub) {
       return reply.code(401).send({ error: 'Não autorizado' })

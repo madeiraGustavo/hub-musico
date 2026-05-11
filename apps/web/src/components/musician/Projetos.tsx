@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import type { Project } from '@hub-musico/types'
+import type { Project } from '@hub-art/types'
 
 interface Props {
   projects: Project[]

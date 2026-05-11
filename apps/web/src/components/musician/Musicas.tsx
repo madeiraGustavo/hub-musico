@@ -6,7 +6,7 @@ import { usePlayerStore }      from '@/services/audio/usePlayerStore'
 import { useFilter }           from '@/hooks/useFilter'
 import { MusicaCard }          from '@/components/musician/MusicaCard'
 import { Player }              from '@/components/Player'
-import type { Track, TrackGenre } from '@hub-musico/types'
+import type { Track, TrackGenre } from '@hub-art/types'
 
 interface Props {
   tracks: Track[]

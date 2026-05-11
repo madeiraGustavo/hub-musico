@@ -12,7 +12,7 @@ interface Service {
   price: string
   highlight: boolean
   active: boolean
-  sortOrder: number
+  sort_order: number
 }
 
 interface ServicesResponse {
@@ -27,7 +27,7 @@ interface ServiceResponse {
 
 const ICONS = ['drum','mic','music','compose','needle','camera','calendar','star']
 
-const EMPTY: Omit<Service, 'id' | 'active' | 'sortOrder'> = {
+const EMPTY: Omit<Service, 'id' | 'active' | 'sort_order'> = {
   icon:        'star',
   title:       '',
   description: '',
@@ -58,7 +58,7 @@ export default function ServicesPage() {
   }, [])
 
   function openNew() {
-    setEditing({ ...EMPTY, id: '', active: true, sortOrder: services.length })
+    setEditing({ ...EMPTY, id: '', active: true, sort_order: services.length })
     setIsNew(true)
     setFeedback(null)
   }
@@ -87,7 +87,7 @@ export default function ServicesPage() {
       items:       editing.items,
       price:       editing.price,
       highlight:   editing.highlight,
-      sortOrder:   editing.sortOrder,
+      sort_order:  editing.sort_order,
       active:      editing.active,
     }
 

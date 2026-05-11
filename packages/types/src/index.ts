@@ -12,9 +12,10 @@ export type TrackGenre =
   | 'orquestral'
   | 'rock'
   | 'demo'
+  | 'outro'
 
 export interface Track {
-  id: number
+  id: string
   title: string
   genre: TrackGenre
   genreLabel: string
@@ -41,6 +42,8 @@ export interface Project {
   backgroundStyle: string
   backgroundPosition: string | null
   backgroundSize: string | null
+  status: 'draft' | 'active' | 'archived'
+  sortOrder: number
 }
 
 // ─── Artist ──────────────────────────────────────────────────────────────────

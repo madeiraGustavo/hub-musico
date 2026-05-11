@@ -38,7 +38,16 @@ export async function update(artistId: string, data: Partial<UpdateProfileBody>)
     select: {
       id:        true,
       name:      true,
+      slug:      true,
       tagline:   true,
+      bio:       true,
+      location:  true,
+      reach:     true,
+      email:     true,
+      whatsapp:  true,
+      skills:    true,
+      tools:     true,
+      isActive:  true,
       updatedAt: true,
     },
   })

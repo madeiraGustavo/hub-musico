@@ -1,4 +1,4 @@
-import type { Artist, Track, Project } from '@hub-musico/types'
+import type { Artist, Track, Project } from '@hub-art/types'
 import { PROFILE_CONFIG } from '@/lib/profile/profileConfig'
 import { Navbar }        from '@/components/Navbar'
 import { Hero }          from './Hero'

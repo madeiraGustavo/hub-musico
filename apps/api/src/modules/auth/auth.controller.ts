@@ -6,8 +6,10 @@
  */
 
 import type { FastifyRequest, FastifyReply } from 'fastify'
+import jwt from 'jsonwebtoken'
 import { LoginSchema, RefreshSchema } from './auth.schema.js'
 import * as authService from './auth.service.js'
+import { env } from '../../env.js'
 
 const REFRESH_COOKIE = 'refreshToken'
 const COOKIE_OPTIONS = {
@@ -73,7 +75,23 @@ export async function logoutHandler(
   request: FastifyRequest,
   reply:   FastifyReply,
 ): Promise<void> {
-  await authService.logout(request.user.userId)
+  const token = (request.cookies as Record<string, string | undefined>)[REFRESH_COOKIE]
+
+  if (!token) {
+    reply.clearCookie(REFRESH_COOKIE, { path: '/' })
+    return reply.code(400).send({ error: 'Refresh token ausente ou inválido' })
+  }
+
+  let userId: string
+  try {
+    const payload = jwt.verify(token, env.JWT_REFRESH_SECRET) as { sub: string }
+    userId = payload.sub
+  } catch {
+    reply.clearCookie(REFRESH_COOKIE, { path: '/' })
+    return reply.code(400).send({ error: 'Refresh token ausente ou inválido' })
+  }
+
+  await authService.logout(userId)
   reply.clearCookie(REFRESH_COOKIE, { path: '/' })
   return reply.code(204).send()
 }
@@ -85,5 +103,5 @@ export async function sessionHandler(
   reply:   FastifyReply,
 ): Promise<void> {
   const session = await authService.getSession(request.user.userId)
-  return reply.code(200).send({ data: session })
+  return reply.code(200).send(session)
 }

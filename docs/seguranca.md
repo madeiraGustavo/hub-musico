@@ -55,6 +55,52 @@ interface AuthContext {
 | Role insuficiente para a rota                   | 403  | `{ "error": "Permissão insuficiente" }`            |
 | Recurso pertence a outro artista                | 403  | `{ "error": "Acesso negado" }`                     |
 
+## Modelo de Sessão e Logout
+
+### Payload do JWT
+
+O access token emitido pela API Fastify contém **apenas** `{ sub: userId, iat, exp }`. Os campos `artistId` e `role` **nunca** são incluídos no payload do token — eles são sempre buscados no banco de dados pelo hook `authenticate` a cada requisição autenticada.
+
+```typescript
+// Payload do access token — apenas sub
+{ sub: "uuid-do-usuario", iat: 1700000000, exp: 1700000900 }
+
+// O hook authenticate faz:
+// SELECT id, role, artist_id FROM users WHERE id = payload.sub
+// e injeta { userId, artistId, role } em request.user
+```
+
+Isso garante que alterações de `role` ou `artistId` no banco têm efeito imediato — sem necessidade de revogar tokens existentes.
+
+### Proteção de sessão em duas camadas
+
+| Camada | Responsável | Mecanismo | Escopo |
+|--------|-------------|-----------|--------|
+| 1ª linha | `middleware.ts` (Next.js) | Verifica presença do cookie `refreshToken` | Protege a UI — impede renderização de páginas do dashboard sem cookie |
+| Autoridade final | `GET /auth/session` (API Fastify) | Valida assinatura JWT, busca usuário no banco | Valida o token de fato — retorna 401 para tokens inválidos, expirados ou revogados |
+
+O `middleware.ts` é uma defesa de primeira linha que verifica apenas a **presença** do cookie `refreshToken` — não valida o JWT. A validação real ocorre na API Fastify via `GET /auth/session`, que é a autoridade final sobre o estado da sessão.
+
+### Modelo de logout
+
+`POST /auth/logout` **não requer Bearer token**. A revogação é feita via cookie `refreshToken`:
+
+```
+Client → POST /auth/logout (cookie refreshToken enviado automaticamente)
+       → API verifica assinatura do refreshToken com JWT_REFRESH_SECRET
+       → extrai userId do payload (sub)
+       → revoga todos os refresh tokens do usuário no banco
+       → limpa o cookie refreshToken na resposta
+       → retorna 204
+```
+
+**Justificativa:** o access token pode ter expirado (duração de 15 min), mas o usuário ainda precisa conseguir fazer logout. Exigir Bearer nesse endpoint criaria uma janela onde o usuário fica "preso" com sessão ativa após expiração do access token.
+
+| Situação | Comportamento |
+|----------|---------------|
+| Cookie `refreshToken` presente e válido | 204 — tokens revogados, cookie limpo |
+| Cookie `refreshToken` ausente ou inválido | 400 `{ "error": "Refresh token ausente ou inválido" }` |
+
 ## Convivência Supabase Auth + JWT Próprio (Fase 1)
 
 Durante a Fase 1, os dois sistemas de auth coexistem:

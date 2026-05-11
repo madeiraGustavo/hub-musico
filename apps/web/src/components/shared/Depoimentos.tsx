@@ -1,4 +1,4 @@
-import type { ArtistTestimonial, ArtistType } from '@hub-musico/types'
+import type { ArtistTestimonial, ArtistType } from '@hub-art/types'
 import type { ProfileConfig } from '@/lib/profile/profileConfig'
 import { PROFILE_CONFIG } from '@/lib/profile/profileConfig'
 import { GradientText } from '@/lib/profile/GradientText'

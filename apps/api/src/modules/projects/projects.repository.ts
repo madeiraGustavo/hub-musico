@@ -25,12 +25,12 @@ export async function findAllByArtist(artistId: string) {
 
 /**
  * Busca um projeto pelo ID.
- * Retorna apenas id e artistId — usado exclusivamente para verificação de ownership.
+ * Retorna id, artistId e status — usado para verificação de ownership e regra de negócio do DELETE.
  */
 export async function findById(id: string) {
   return prisma.project.findUnique({
     where:  { id },
-    select: { id: true, artistId: true },
+    select: { id: true, artistId: true, status: true },
   })
 }
 
@@ -82,5 +82,16 @@ export async function update(id: string, artistId: string, data: UpdateProjectBo
       ...(data.background_size    !== undefined && { backgroundSize:     data.background_size }),
       ...(data.sort_order         !== undefined && { sortOrder:          data.sort_order }),
     },
+  })
+}
+
+/**
+ * Remove um projeto.
+ * O double-check de ownership na query (where: { id, artistId }) garante que
+ * um artista não pode remover projetos de outro artista mesmo com ID correto.
+ */
+export async function remove(id: string, artistId: string) {
+  return prisma.project.delete({
+    where: { id, artistId },
   })
 }

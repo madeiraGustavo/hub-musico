@@ -9,7 +9,7 @@
  *   config.trackLabel  // "Faixas" ou "Estilos"
  */
 
-import type { ArtistType } from '@hub-musico/types'
+import type { ArtistType } from '@hub-art/types'
 
 export interface ProfileConfig {
   // Labels contextuais

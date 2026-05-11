@@ -69,3 +69,12 @@ export async function revokeAllUserTokens(userId: string): Promise<void> {
     data:  { revoked: true },
   })
 }
+
+// ── Artist ────────────────────────────────────────────────────────────────────
+
+export async function findArtistById(id: string): Promise<{ id: string; slug: string } | null> {
+  return prisma.artist.findUnique({
+    where: { id },
+    select: { id: true, slug: true },
+  })
+}

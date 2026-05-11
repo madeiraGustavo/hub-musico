@@ -75,11 +75,11 @@ enum MediaType {
 
 // ── Models ───────────────────────────────────────────────────────────────────
 
-/// Estende auth.users do Supabase (Fase 1) ou é autônomo (Fase 3)
+/// Usuário autônomo — autenticação gerenciada pela API Fastify via JWT próprio
 model User {
   id        String    @id @db.Uuid
   email     String    @unique
-  /// Gerenciado pela API Fastify — hash bcrypt. Null durante Fase 1 (auth via Supabase)
+  /// Hash bcrypt gerenciado pela API Fastify. Null para usuários migrados sem senha definida.
   password  String?
   role      UserRole  @default(artist)
   artistId  String?   @map("artist_id") @db.Uuid

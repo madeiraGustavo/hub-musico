@@ -4,7 +4,7 @@
  * FASE 6: substituir por chamada à API REST.
  */
 
-import type { Track, TrackGenre } from '@hub-musico/types'
+import type { Track, TrackGenre } from '@hub-art/types'
 import { MemoryCache } from '@/lib/cache'
 import path from 'path'
 import fs   from 'fs/promises'
@@ -35,7 +35,7 @@ export async function getTracksByGenre(genre: TrackGenre): Promise<Track[]> {
   return tracks.filter(t => t.genre === genre)
 }
 
-export async function getTrackById(id: number): Promise<Track | undefined> {
+export async function getTrackById(id: string): Promise<Track | undefined> {
   const tracks = await fetchTracks()
   return tracks.find(t => t.id === id)
 }

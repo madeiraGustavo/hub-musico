@@ -29,6 +29,7 @@ vi.mock('./auth.repository.js', () => ({
   findRefreshToken:    vi.fn(),
   revokeRefreshToken:  vi.fn(),
   revokeAllUserTokens: vi.fn(),
+  findArtistById:      vi.fn(),
 }))
 
 // ── Mock password lib ─────────────────────────────────────────────────────────
@@ -38,12 +39,13 @@ vi.mock('../../lib/password.js', () => ({
 
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
-import { refresh } from './auth.service.js'
+import { refresh, getSession } from './auth.service.js'
 import {
   findUserById,
   createRefreshToken,
   findRefreshToken,
   revokeRefreshToken,
+  findArtistById,
 } from './auth.repository.js'
 
 // ── Property 1: JWT round-trip preserva identidade do usuário ─────────────────
@@ -142,11 +144,11 @@ describe('Property 2: Refresh token invalida após uso (rotação)', () => {
               revoked:   false,
             }
 
-            const mockUser = {
+            const mockUser: import('./auth.repository.js').UserWithAuth = {
               id:       userId,
               email:    `${userId}@example.com`,
               password: '$2a$12$hashedpassword',
-              role:     'artist' as const,
+              role:     'artist',
               artistId: crypto.randomUUID(),
             }
 
@@ -226,6 +228,93 @@ describe('Property 2: Refresh token invalida após uso (rotação)', () => {
             // No new token should have been issued
             expect(createRefreshToken).not.toHaveBeenCalled()
             expect(revokeRefreshToken).not.toHaveBeenCalled()
+          },
+        ),
+        { numRuns: 100 },
+      )
+    },
+  )
+})
+
+// ── Property 3: Estrutura completa da resposta de sessão ──────────────────────
+//
+// Para qualquer usuário com qualquer role e com/sem artistId, `getSession`
+// deve retornar sempre:
+//   { authenticated: true, user: { id, email, role }, artist: { id, slug } | null }
+//
+// Validates: Requirements 6.1
+
+describe('Property 3: Estrutura completa da resposta de sessão', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it(
+    'para qualquer usuário com role e com/sem artistId, getSession retorna a estrutura completa correta',
+    async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            userId:   fc.uuid(),
+            email:    fc.emailAddress(),
+            role:     fc.constantFrom('admin', 'artist', 'editor' as const),
+            artistId: fc.option(fc.uuid(), { nil: null }),
+          }),
+          async ({ userId, email, role, artistId }) => {
+            vi.resetAllMocks()
+
+            // ── Arrange ──────────────────────────────────────────────────────
+
+            const mockUser: import('./auth.repository.js').UserWithAuth = {
+              id:       userId,
+              email,
+              password: '$2a$12$hashedpassword',
+              role:     role as 'admin' | 'artist' | 'editor',
+              artistId,
+            }
+
+            vi.mocked(findUserById).mockResolvedValue(mockUser)
+
+            if (artistId !== null) {
+              const mockArtist = {
+                id:   artistId,
+                slug: `artist-${artistId.slice(0, 8)}`,
+              }
+              vi.mocked(findArtistById).mockResolvedValue(mockArtist)
+            } else {
+              vi.mocked(findArtistById).mockResolvedValue(null)
+            }
+
+            // ── Act ───────────────────────────────────────────────────────────
+
+            const session = await getSession(userId)
+
+            // ── Assert: authenticated is always true ──────────────────────────
+
+            expect(session.authenticated).toBe(true)
+
+            // ── Assert: user object has exactly id, email, role ───────────────
+
+            expect(session.user).toBeDefined()
+            expect(session.user.id).toBe(userId)
+            expect(session.user.email).toBe(email)
+            expect(session.user.role).toBe(role)
+
+            // ── Assert: artist shape depends on artistId ──────────────────────
+
+            if (artistId !== null) {
+              expect(session.artist).not.toBeNull()
+              expect(session.artist).toMatchObject({
+                id:   artistId,
+                slug: expect.any(String),
+              })
+              // findArtistById must have been called with the correct artistId
+              expect(findArtistById).toHaveBeenCalledWith(artistId)
+            } else {
+              expect(session.artist).toBeNull()
+              // findArtistById must NOT have been called when artistId is null
+              expect(findArtistById).not.toHaveBeenCalled()
+            }
           },
         ),
         { numRuns: 100 },

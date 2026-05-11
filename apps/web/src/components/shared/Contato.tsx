@@ -1,6 +1,6 @@
 'use client'
 
-import type { Artist, ArtistType } from '@hub-musico/types'
+import type { Artist, ArtistType } from '@hub-art/types'
 import type { ProfileConfig } from '@/lib/profile/profileConfig'
 import { PROFILE_CONFIG } from '@/lib/profile/profileConfig'
 import { useContactForm } from '@/hooks/useContactForm'

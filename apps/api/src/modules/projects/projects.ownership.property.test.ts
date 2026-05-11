@@ -1,13 +1,13 @@
 /**
- * tracks.ownership.property.test.ts
+ * projects.ownership.property.test.ts
  *
- * Property-based tests for Property 4: Ownership impede acesso cruzado
+ * Property-based tests for Property 5: Ownership check para operações de escrita em projetos
  *
  * Para qualquer par de artistas distintos A e B, uma operação de escrita
- * (PATCH/DELETE) autenticada como A em um recurso pertencente a B deve
+ * (PATCH/DELETE) autenticada como A em um projeto pertencente a B deve
  * retornar HTTP 403 — nunca HTTP 200 ou 204.
  *
- * Validates: Requirements 3.4, 3.7, 3.8
+ * Validates: Requirements 9.4, 9.5, 9.6
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
@@ -20,7 +20,7 @@ vi.mock('../../lib/prisma.js', () => ({
     user: {
       findUnique: vi.fn(),
     },
-    track: {
+    project: {
       findUnique: vi.fn(),
     },
   },
@@ -29,11 +29,11 @@ vi.mock('../../lib/prisma.js', () => ({
 // ── Mock env ──────────────────────────────────────────────────────────────────
 vi.mock('../../env.js', () => ({
   env: {
-    JWT_SECRET:         'test-jwt-secret',
-    JWT_REFRESH_SECRET: 'test-jwt-refresh-secret',
+    JWT_SECRET:         'test-jwt-secret-32-chars-minimum!!',
+    JWT_REFRESH_SECRET: 'test-jwt-refresh-secret-32-chars!!',
     ALLOWED_ORIGINS:    'http://localhost:3000',
     STORAGE_BUCKET:     'test-bucket',
-    PORT:               '3001',
+    PORT:               '3333',
   },
 }))
 
@@ -41,9 +41,8 @@ import { prisma } from '../../lib/prisma.js'
 
 // ── Ownership check logic ─────────────────────────────────────────────────────
 //
-// This is the core ownership enforcement function that controllers use
-// (or will use in Phase 2) to guard PATCH/DELETE operations.
-// It is extracted here as a pure, testable unit.
+// This mirrors the ownership enforcement logic in projects.controller.ts.
+// Extracted here as a pure, testable unit.
 
 interface AuthContext {
   userId:   string
@@ -100,84 +99,98 @@ function makeRequest(overrides: Partial<FastifyRequest> = {}): FastifyRequest {
   } as unknown as FastifyRequest
 }
 
-// ── Simulated controller handler (mirrors what Phase 2 will implement) ────────
+// ── Simulated controller handlers (mirrors projects.controller.ts) ────────────
 //
-// This simulates the PATCH/DELETE handler logic:
+// These simulate the PATCH/DELETE handler logic:
 // 1. Auth context is already injected by the authenticate hook (preHandler)
 // 2. Handler fetches the resource from the repository
 // 3. Handler calls assertOwnership
 // 4. If not allowed → 403
-// 5. If allowed → proceed (returns 200/204 in real impl, 501 in stubs)
+// 5. If allowed → proceed (returns 200/204 in real impl, stubs here)
 
 async function simulatePatchHandler(
   request: FastifyRequest & { user: AuthContext; params: { id: string } },
   reply: FastifyReply,
 ): Promise<void> {
-  const track = await (prisma.track as unknown as {
-    findUnique: (args: unknown) => Promise<{ id: string; artistId: string } | null>
+  const project = await (prisma.project as unknown as {
+    findUnique: (args: unknown) => Promise<{ id: string; artistId: string; status: string } | null>
   }).findUnique({
     where:  { id: request.params.id },
-    select: { id: true, artistId: true },
+    select: { id: true, artistId: true, status: true },
   })
 
-  if (!track) {
+  if (!project) {
     reply.code(404).send({ error: 'Não encontrado' })
     return
   }
 
-  const result = assertOwnership(request.user, track.artistId)
+  const result = assertOwnership(request.user, project.artistId)
   if (!result.allowed) {
     reply.code(result.status!).send({ error: result.error })
     return
   }
 
-  // Would proceed with update in Phase 2 — return 200 for test purposes
-  reply.code(200).send({ id: track.id })
+  // Would proceed with update in real impl — return 200 for test purposes
+  reply.code(200).send({ id: project.id })
 }
 
 async function simulateDeleteHandler(
   request: FastifyRequest & { user: AuthContext; params: { id: string } },
   reply: FastifyReply,
 ): Promise<void> {
-  const track = await (prisma.track as unknown as {
-    findUnique: (args: unknown) => Promise<{ id: string; artistId: string } | null>
+  const { role } = request.user
+
+  // Editor não tem permissão para deletar (mirrors projects.controller.ts)
+  if (role === 'editor') {
+    reply.code(403).send({ error: 'Permissão insuficiente' })
+    return
+  }
+
+  const project = await (prisma.project as unknown as {
+    findUnique: (args: unknown) => Promise<{ id: string; artistId: string; status: string } | null>
   }).findUnique({
     where:  { id: request.params.id },
-    select: { id: true, artistId: true },
+    select: { id: true, artistId: true, status: true },
   })
 
-  if (!track) {
+  if (!project) {
     reply.code(404).send({ error: 'Não encontrado' })
     return
   }
 
-  const result = assertOwnership(request.user, track.artistId)
+  const result = assertOwnership(request.user, project.artistId)
   if (!result.allowed) {
     reply.code(result.status!).send({ error: result.error })
     return
   }
 
-  // Would proceed with delete in Phase 2 — return 204 for test purposes
+  // Regra de negócio: apenas projetos em draft podem ser removidos
+  if (project.status !== 'draft') {
+    reply.code(422).send({ error: 'Apenas projetos em rascunho podem ser removidos' })
+    return
+  }
+
+  // Would proceed with delete in real impl — return 204 for test purposes
   reply.code(204).send()
 }
 
-// ─── Property 4: Ownership impede acesso cruzado ─────────────────────────────
+// ─── Property 5: Ownership check para operações de escrita em projetos ────────
 
 /**
- * Property 4: Ownership impede acesso cruzado
+ * Property 5: Ownership check para operações de escrita em projetos
  *
  * Para qualquer par de artistas distintos A e B, uma operação de escrita
- * (PATCH/DELETE) autenticada como A em um recurso pertencente a B deve
+ * (PATCH/DELETE) autenticada como A em um projeto pertencente a B deve
  * retornar HTTP 403 — nunca HTTP 200 ou 204.
  *
- * Validates: Requirements 3.4, 3.7, 3.8
+ * Validates: Requirements 9.4, 9.5, 9.6
  */
-describe('Property 4: Ownership impede acesso cruzado', () => {
+describe('Property 5: Ownership check para operações de escrita em projetos', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
-  // ── 4.1 assertOwnership — função pura ────────────────────────────────────
+  // ── 5.1 assertOwnership — função pura ────────────────────────────────────
 
   it(
     'assertOwnership retorna 403 para qualquer par de artistIds distintos (mínimo 100 iterações)',
@@ -237,31 +250,32 @@ describe('Property 4: Ownership impede acesso cruzado', () => {
     },
   )
 
-  // ── 4.2 PATCH handler — acesso cruzado retorna 403 ───────────────────────
+  // ── 5.2 PATCH handler — acesso cruzado retorna 403 ───────────────────────
 
   it(
-    'PATCH com artistId diferente do recurso retorna 403 — nunca 200 (mínimo 100 iterações)',
+    'PATCH com artistId diferente do projeto retorna 403 — nunca 200 (mínimo 100 iterações)',
     async () => {
       await fc.assert(
         fc.asyncProperty(
           fc.uuid(), // userIdA
           fc.uuid(), // userIdB
           fc.uuid(), // resourceArtistId (pertence a B)
-          fc.uuid(), // trackId
-          async (userIdA, userIdB, resourceArtistId, trackId) => {
+          fc.uuid(), // projectId
+          async (userIdA, userIdB, resourceArtistId, projectId) => {
             fc.pre(userIdA !== userIdB && resourceArtistId !== userIdA)
 
             vi.resetAllMocks()
 
-            // Simula recurso pertencente a resourceArtistId (não a userIdA)
-            vi.mocked(prisma.track.findUnique).mockResolvedValue({
-              id:       trackId,
+            // Simula projeto pertencente a resourceArtistId (não a userIdA)
+            vi.mocked(prisma.project.findUnique).mockResolvedValue({
+              id:       projectId,
               artistId: resourceArtistId,
-            } as unknown as Awaited<ReturnType<typeof prisma.track.findUnique>>)
+              status:   'draft',
+            } as unknown as Awaited<ReturnType<typeof prisma.project.findUnique>>)
 
             const request = makeRequest({
               user:   { userId: userIdA, artistId: userIdA, role: 'artist' } as AuthContext,
-              params: { id: trackId },
+              params: { id: projectId },
             }) as FastifyRequest & { user: AuthContext; params: { id: string } }
 
             const reply = makeReply()
@@ -284,31 +298,32 @@ describe('Property 4: Ownership impede acesso cruzado', () => {
     },
   )
 
-  // ── 4.3 DELETE handler — acesso cruzado retorna 403 ──────────────────────
+  // ── 5.3 DELETE handler — acesso cruzado retorna 403 ──────────────────────
 
   it(
-    'DELETE com artistId diferente do recurso retorna 403 — nunca 204 (mínimo 100 iterações)',
+    'DELETE com artistId diferente do projeto retorna 403 — nunca 204 (mínimo 100 iterações)',
     async () => {
       await fc.assert(
         fc.asyncProperty(
           fc.uuid(), // userIdA
           fc.uuid(), // userIdB
           fc.uuid(), // resourceArtistId (pertence a B)
-          fc.uuid(), // trackId
-          async (userIdA, userIdB, resourceArtistId, trackId) => {
+          fc.uuid(), // projectId
+          async (userIdA, userIdB, resourceArtistId, projectId) => {
             fc.pre(userIdA !== userIdB && resourceArtistId !== userIdA)
 
             vi.resetAllMocks()
 
-            // Simula recurso pertencente a resourceArtistId (não a userIdA)
-            vi.mocked(prisma.track.findUnique).mockResolvedValue({
-              id:       trackId,
+            // Simula projeto pertencente a resourceArtistId (não a userIdA), em draft
+            vi.mocked(prisma.project.findUnique).mockResolvedValue({
+              id:       projectId,
               artistId: resourceArtistId,
-            } as unknown as Awaited<ReturnType<typeof prisma.track.findUnique>>)
+              status:   'draft',
+            } as unknown as Awaited<ReturnType<typeof prisma.project.findUnique>>)
 
             const request = makeRequest({
               user:   { userId: userIdA, artistId: userIdA, role: 'artist' } as AuthContext,
-              params: { id: trackId },
+              params: { id: projectId },
             }) as FastifyRequest & { user: AuthContext; params: { id: string } }
 
             const reply = makeReply()
@@ -331,7 +346,7 @@ describe('Property 4: Ownership impede acesso cruzado', () => {
     },
   )
 
-  // ── 4.4 Admin bypassa ownership ───────────────────────────────────────────
+  // ── 5.4 Admin bypassa ownership ───────────────────────────────────────────
 
   it(
     'admin bypassa ownership — assertOwnership sempre permite acesso para role admin (mínimo 100 iterações)',
@@ -361,7 +376,7 @@ describe('Property 4: Ownership impede acesso cruzado', () => {
     },
   )
 
-  // ── 4.5 Resposta de erro nunca expõe 200 ou 204 ───────────────────────────
+  // ── 5.5 Resposta de erro nunca expõe 200 ou 204 ───────────────────────────
 
   it(
     'para qualquer par de artistas distintos, o status de resposta é sempre 403 — nunca 200 nem 204 (mínimo 100 iterações)',

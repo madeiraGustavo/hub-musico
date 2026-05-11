@@ -12,7 +12,7 @@
 
 import { audioEngine }    from './AudioEngine'
 import { usePlayerStore } from './usePlayerStore'
-import type { Track }     from '@hub-musico/types'
+import type { Track }     from '@hub-art/types'
 
 let initialized = false
 

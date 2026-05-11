@@ -12,7 +12,7 @@
 
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import type { Track } from '@hub-musico/types'
+import type { Track } from '@hub-art/types'
 
 export type RepeatMode = 'none' | 'one' | 'all'
 

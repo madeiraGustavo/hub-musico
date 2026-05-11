@@ -4,7 +4,7 @@
  * FASE 6: substituir por chamada à API REST.
  */
 
-import type { Project } from '@hub-musico/types'
+import type { Project } from '@hub-art/types'
 import { MemoryCache } from '@/lib/cache'
 import path from 'path'
 import fs   from 'fs/promises'
