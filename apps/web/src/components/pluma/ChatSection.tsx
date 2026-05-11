@@ -18,49 +18,55 @@ export function ChatSection(): JSX.Element {
   const handlePillClick = (text: string) => setInputValue(text)
 
   return (
-    <section id="chat" className="bg-[#1C3F3A] text-[#EBE8D8]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-5xl md:text-6xl font-bold mb-6 text-[#EBE8D8]">
-            Pluma Answers
-          </h2>
-          <p className="text-lg mb-10 text-[#EBE8D8] opacity-80">
-            Pergunte sobre suas finanças em linguagem natural. O Pluma entende e responde.
-          </p>
+    <section id="chat" className="bg-[#1C3F3A]">
+      {/* Headline */}
+      <div className="border-b border-[#EBE8D8]/10 px-6 lg:px-12 py-16 lg:py-20">
+        <p className="text-[#2E8F86] text-xs tracking-[0.3em] uppercase mb-6">
+          Pluma Answers
+        </p>
+        <h2 className="font-[family-name:var(--font-anton)] text-[clamp(3rem,7vw,7rem)] leading-[0.9] tracking-tight text-[#EBE8D8] uppercase">
+          PERGUNTE<br />
+          QUALQUER<br />
+          <span className="text-[#2E8F86]">COISA.</span>
+        </h2>
+      </div>
 
-          {/* Chat card */}
-          <div className="bg-[#0f2b27] rounded-lg p-6 mb-6">
-            <div className="flex items-center gap-3 mb-6">
-              <input
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder={CHAT_PLACEHOLDER}
-                className="flex-1 bg-[#1C3F3A] text-[#EBE8D8] placeholder-[#EBE8D8]/50 border border-[#EBE8D8]/20 rounded px-4 py-3 text-base outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2E8F86]"
-              />
-              <button
-                type="button"
-                aria-label="Enviar pergunta"
-                className="bg-[#2E8F86] hover:bg-[#1C3F3A] border border-[#2E8F86] text-white rounded px-5 py-3 transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EBE8D8]"
-              >
-                Enviar
-              </button>
-            </div>
+      {/* Chat interface */}
+      <div className="px-6 lg:px-12 py-12">
+        {/* Input row */}
+        <div className="flex gap-0 mb-8 border border-[#EBE8D8]/20">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder={CHAT_PLACEHOLDER}
+            className="flex-1 bg-transparent text-[#EBE8D8] placeholder-[#EBE8D8]/30 px-6 py-4 text-base outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-[#2E8F86]"
+          />
+          <button
+            type="button"
+            className="bg-[#2E8F86] text-[#050706] px-6 py-4 text-xs font-bold tracking-widest uppercase hover:bg-[#EBE8D8] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EBE8D8] flex-shrink-0"
+          >
+            Enviar
+          </button>
+        </div>
 
-            {/* Prompt pills */}
-            <div className="flex flex-wrap gap-2">
-              {PROMPT_PILLS.map((pill) => (
-                <button
-                  key={pill}
-                  type="button"
-                  onClick={() => handlePillClick(pill)}
-                  className="text-sm text-[#EBE8D8] bg-[#1C3F3A] border border-[#EBE8D8]/20 rounded-full px-4 py-2 hover:bg-[#2E8F86] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EBE8D8]"
-                >
-                  {pill}
-                </button>
-              ))}
-            </div>
-          </div>
+        {/* Pills label */}
+        <p className="text-[#EBE8D8]/40 text-xs tracking-widest uppercase mb-4">
+          Sugestões
+        </p>
+
+        {/* Prompt pills — brutalist tag style */}
+        <div className="flex flex-wrap gap-3">
+          {PROMPT_PILLS.map((pill) => (
+            <button
+              key={pill}
+              type="button"
+              onClick={() => handlePillClick(pill)}
+              className="text-xs text-[#EBE8D8] border border-[#EBE8D8]/20 px-4 py-3 tracking-wide hover:bg-[#2E8F86] hover:border-[#2E8F86] hover:text-[#050706] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EBE8D8] text-left"
+            >
+              {pill}
+            </button>
+          ))}
         </div>
       </div>
     </section>

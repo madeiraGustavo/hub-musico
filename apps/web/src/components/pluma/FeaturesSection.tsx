@@ -4,19 +4,19 @@ import { MessageCircleIcon } from './icons/MessageCircleIcon'
 
 const FEATURES = [
   {
-    icon: <LandmarkIcon className="w-8 h-8 text-[#1C3F3A]" aria-hidden="true" />,
+    icon: <LandmarkIcon className="w-6 h-6 text-[#2E8F86]" aria-hidden="true" />,
     title: 'Conecta automaticamente',
     description:
       'Conecta automaticamente todas suas contas via Open Finance do Banco Central.',
   },
   {
-    icon: <WalletIcon className="w-8 h-8 text-[#1C3F3A]" aria-hidden="true" />,
+    icon: <WalletIcon className="w-6 h-6 text-[#2E8F86]" aria-hidden="true" />,
     title: 'Experiência personalizada',
     description:
       'Responde suas dúvidas em linguagem humana e sugere ações para sua situação real.',
   },
   {
-    icon: <MessageCircleIcon className="w-8 h-8 text-[#1C3F3A]" aria-hidden="true" />,
+    icon: <MessageCircleIcon className="w-6 h-6 text-[#2E8F86]" aria-hidden="true" />,
     title: 'Atualiza sozinho',
     description:
       'Não precisa fazer input manual. Você só conversa e toma decisões.',
@@ -25,25 +25,46 @@ const FEATURES = [
 
 export function FeaturesSection(): JSX.Element {
   return (
-    <section id="features" className="bg-white py-20 lg:py-32">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-5xl md:text-6xl font-bold text-[#050706] mb-16 leading-tight">
-          Menos planilhas. Mais clareza.
+    <section id="features" className="bg-[#EBE8D8]">
+      {/* Big headline block */}
+      <div className="border-b border-[#050706]/10 px-6 lg:px-12 py-16 lg:py-24">
+        <p className="text-[#1C3F3A] text-xs tracking-[0.3em] uppercase mb-6">
+          Por que Pluma
+        </p>
+        <h2 className="font-[family-name:var(--font-anton)] text-[clamp(3.5rem,8vw,8rem)] leading-[0.9] tracking-tight text-[#050706] uppercase">
+          MENOS<br />
+          PLANILHAS.<br />
+          <span className="text-[#1C3F3A]">MAIS CLAREZA.</span>
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {FEATURES.map((feature) => (
-            <div
-              key={feature.title}
-              className="border border-[rgba(28,63,58,0.16)] rounded-sm p-8 hover:-translate-y-1 transition-transform duration-200"
-            >
-              <div className="mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold text-[#050706] mb-3">
+      </div>
+
+      {/* Feature rows — brutalist list style */}
+      <div>
+        {FEATURES.map((feature, i) => (
+          <div
+            key={feature.title}
+            className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] border-b border-[#050706]/10 hover:-translate-y-1 transition-transform duration-200"
+          >
+            {/* Number + icon */}
+            <div className="flex items-center gap-6 px-6 lg:px-12 py-8 border-b lg:border-b-0 lg:border-r border-[#050706]/10">
+              <span className="font-[family-name:var(--font-anton)] text-6xl text-[#050706]/10 leading-none select-none">
+                0{i + 1}
+              </span>
+              <div className="w-10 h-10 bg-[#1C3F3A] flex items-center justify-center flex-shrink-0">
+                {feature.icon}
+              </div>
+            </div>
+            {/* Content */}
+            <div className="px-6 lg:px-12 py-8">
+              <h3 className="font-[family-name:var(--font-anton)] text-2xl lg:text-3xl text-[#050706] uppercase mb-3 tracking-tight">
                 {feature.title}
               </h3>
-              <p className="text-[#050706] leading-relaxed">{feature.description}</p>
+              <p className="text-[#050706]/70 text-base leading-relaxed max-w-lg">
+                {feature.description}
+              </p>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </section>
   )

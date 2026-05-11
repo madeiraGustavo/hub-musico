@@ -1,49 +1,76 @@
 // Server Component — sem props
 export function HeroSection(): JSX.Element {
   return (
-    <section id="hero" className="bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          {/* Coluna esquerda: copy */}
-          <div>
-            <p className="text-xs font-semibold tracking-widest uppercase text-[#1C3F3A] mb-4">
-              ASSISTENTE FINANCEIRO COM IA
+    <section id="hero" className="bg-[#050706] overflow-hidden">
+      {/* Top bar */}
+      <div className="border-b border-[#EBE8D8]/10 px-6 lg:px-12 py-4 flex items-center justify-between">
+        <span className="text-[#EBE8D8] text-xs tracking-[0.3em] uppercase font-medium">
+          Pluma
+        </span>
+        <span className="text-[#EBE8D8]/40 text-xs tracking-widest uppercase hidden md:block">
+          Assistente Financeiro com IA
+        </span>
+        <a
+          href="/register"
+          className="text-[#EBE8D8] text-xs tracking-widest uppercase border border-[#EBE8D8]/30 px-4 py-2 hover:bg-[#EBE8D8] hover:text-[#050706] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2E8F86]"
+        >
+          Entrar
+        </a>
+      </div>
+
+      {/* Hero grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[85vh]">
+        {/* Left: visual placeholder */}
+        <div
+          aria-hidden="true"
+          className="relative bg-[#1C3F3A] flex items-end order-2 lg:order-1 min-h-[40vh] lg:min-h-0"
+        >
+          {/* Abstract financial grid pattern */}
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute top-8 left-8 w-32 h-32 border border-[#2E8F86]" />
+            <div className="absolute top-16 left-16 w-32 h-32 border border-[#EBE8D8]" />
+            <div className="absolute bottom-24 right-8 w-48 h-1 bg-[#2E8F86]" />
+            <div className="absolute bottom-32 right-8 w-32 h-1 bg-[#EBE8D8]" />
+            <div className="absolute bottom-40 right-8 w-40 h-1 bg-[#2E8F86]" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full border border-[#2E8F86]/40" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full border border-[#EBE8D8]/20" />
+          </div>
+          {/* Big teal accent number */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[#2E8F86] font-[family-name:var(--font-anton)] text-[20vw] lg:text-[12vw] leading-none opacity-30 select-none">
+            R$
+          </div>
+          {/* Bottom label */}
+          <div className="relative z-10 p-8 border-t border-[#EBE8D8]/10 w-full">
+            <p className="text-[#EBE8D8]/60 text-xs tracking-widest uppercase">
+              Conectado ao Open Finance do Banco Central
             </p>
+          </div>
+        </div>
 
-            <h1
-              className="font-[family-name:var(--font-anton)] text-5xl md:text-7xl lg:text-8xl leading-none tracking-tight text-[#050706] mb-6"
-            >
-              Seu dinheiro,<br />
-              finalmente<br />
-              claro.
+        {/* Right: copy */}
+        <div className="flex flex-col justify-between p-8 lg:p-12 order-1 lg:order-2 border-l border-[#EBE8D8]/10">
+          <div>
+            <p className="text-[#2E8F86] text-xs tracking-[0.3em] uppercase mb-8">
+              Assistente Financeiro com IA
+            </p>
+            <h1 className="font-[family-name:var(--font-anton)] text-[clamp(4rem,10vw,9rem)] leading-[0.9] tracking-tight text-[#EBE8D8] mb-8 uppercase">
+              SEU<br />
+              DINHEIRO,<br />
+              <span className="text-[#2E8F86]">FINALMENTE</span><br />
+              CLARO.
             </h1>
+          </div>
 
-            <p className="text-base md:text-lg text-[#050706] font-normal leading-relaxed mb-8 max-w-md">
+          <div>
+            <p className="text-[#EBE8D8]/70 text-base lg:text-lg leading-relaxed mb-10 max-w-sm">
               Pluma conecta todas as suas contas, entende seus hábitos e responde suas dúvidas financeiras em linguagem humana.
             </p>
-
             <a
               href="/register"
-              className="inline-block bg-[#1C3F3A] text-white rounded px-6 py-3 text-base font-semibold transition-colors duration-200 hover:bg-[#2E8F86] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className="inline-block bg-[#2E8F86] text-[#050706] px-8 py-4 text-sm font-bold tracking-widest uppercase hover:bg-[#EBE8D8] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EBE8D8]"
             >
               Teste grátis por 14 dias
             </a>
-          </div>
-
-          {/* Coluna direita: mockup do produto */}
-          <div
-            aria-hidden="true"
-            className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br from-[#1C3F3A] via-[#2E8F86] to-[#EBE8D8] flex items-center justify-center"
-          >
-            {/* Card de chat simulado */}
-            <div className="w-4/5 bg-white/10 backdrop-blur-sm rounded-xl p-6 space-y-3">
-              <div className="h-3 bg-white/40 rounded-full w-3/4" />
-              <div className="h-3 bg-white/30 rounded-full w-full" />
-              <div className="h-3 bg-white/30 rounded-full w-5/6" />
-              <div className="mt-4 h-10 bg-[#EBE8D8]/20 rounded-lg flex items-center px-3">
-                <div className="h-2 bg-white/30 rounded-full w-1/2" />
-              </div>
-            </div>
           </div>
         </div>
       </div>

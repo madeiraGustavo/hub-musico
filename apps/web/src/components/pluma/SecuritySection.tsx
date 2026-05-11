@@ -23,38 +23,48 @@ export const SECURITY_ITEMS = [
   },
 ]
 
-export const CARD_BORDER_CLASS = 'border border-[rgba(28,63,58,0.16)]'
-
 export function SecuritySection(): JSX.Element {
   return (
-    <section id="security" className="bg-[#EBE8D8] py-20 lg:py-32">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#050706] mb-12">
-          Segurança que você pode confiar.
+    <section id="security" className="bg-[#EBE8D8]">
+      {/* Headline */}
+      <div className="border-t border-b border-[#050706]/10 px-6 lg:px-12 py-16 lg:py-24 bg-[#1C3F3A]">
+        <p className="text-[#2E8F86] text-xs tracking-[0.3em] uppercase mb-6">
+          Segurança
+        </p>
+        <h2 className="font-[family-name:var(--font-anton)] text-[clamp(3rem,7vw,7rem)] leading-[0.9] tracking-tight text-[#EBE8D8] uppercase">
+          SEUS DADOS,<br />
+          <span className="text-[#2E8F86]">PROTEGIDOS.</span>
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {SECURITY_ITEMS.map((item) => (
-            <div
-              key={item.title}
-              className={`${CARD_BORDER_CLASS} bg-white rounded p-6 flex gap-4`}
-            >
-              <div className="flex-shrink-0 mt-1">
-                <CheckIcon
-                  aria-hidden="true"
-                  className="w-5 h-5 text-[#1C3F3A]"
-                />
+      </div>
+
+      {/* Grid 2x2 */}
+      <div className="grid grid-cols-1 md:grid-cols-2">
+        {SECURITY_ITEMS.map((item, i) => (
+          <div
+            key={item.title}
+            className={`px-6 lg:px-12 py-10 border-[#050706]/10
+              ${i % 2 === 0 ? 'md:border-r' : ''}
+              ${i < 2 ? 'border-b' : ''}
+              border-b md:border-b-0
+              ${i === 0 ? 'md:border-b' : ''}
+              ${i === 1 ? 'md:border-b' : ''}
+            `}
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-8 h-8 bg-[#2E8F86] flex items-center justify-center flex-shrink-0 mt-1">
+                <CheckIcon aria-hidden="true" className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h3 className="text-[#050706] font-semibold text-lg mb-2">
+                <h3 className="font-[family-name:var(--font-anton)] text-xl lg:text-2xl text-[#050706] uppercase tracking-tight mb-2">
                   {item.title}
                 </h3>
-                <p className="text-[#050706] text-base leading-relaxed">
+                <p className="text-[#050706]/70 text-sm leading-relaxed">
                   {item.description}
                 </p>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </section>
   )
