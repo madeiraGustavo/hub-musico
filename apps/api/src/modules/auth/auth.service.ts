@@ -44,8 +44,10 @@ export interface SessionData {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function signAccessToken(user: UserWithAuth): string {
+  // Payload mínimo: apenas sub (userId). role e artistId são sempre buscados
+  // no banco pelo hook authenticate — nunca extraídos do token.
   return jwt.sign(
-    { sub: user.id, role: user.role },
+    { sub: user.id },
     env.JWT_SECRET,
     { expiresIn: '15m' },
   )
