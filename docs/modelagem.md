@@ -17,22 +17,20 @@ Schema derivado das migrations `apps/api/migrations/001–009`. O Prisma conecta
 ## Entidades
 
 ### User
-Estende `auth.users` do Supabase na Fase 1. Na Fase 3, a FK para `auth.users` é removida e `password` passa a ser `NOT NULL`.
+Usuário autônomo — autenticação gerenciada exclusivamente pela API Fastify via JWT próprio. Não há dependência do Supabase Auth.
 
 ```
-id          UUID        PK — mesmo UUID do auth.users (Fase 1)
+id          UUID        PK DEFAULT gen_random_uuid()
 email       TEXT        UNIQUE NOT NULL
-password    TEXT        nullable — hash bcrypt, gerenciado pela API Fastify
-                        null para usuários existentes (auth via Supabase na Fase 1)
+password    TEXT        nullable — hash bcrypt gerenciado pela API Fastify.
+                        Null para usuários migrados sem senha definida.
 role        user_role   NOT NULL DEFAULT 'artist'
 artist_id   UUID        FK → artists(id) ON DELETE SET NULL, nullable
 created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 ```
 
-**Relação com `auth.users` (Fase 1):** `public.users.id` referencia `auth.users.id` via FK com `ON DELETE CASCADE`. Na Fase 3, essa FK é removida via migration e `password` torna-se obrigatório.
-
-**Gerenciamento de `password`:** o campo é preenchido com hash bcrypt pela API Fastify no momento do login. Usuários que ainda autenticam via Supabase Auth têm `password = null`.
+**Gerenciamento de `password`:** o campo é preenchido com hash bcrypt pela API Fastify no momento do cadastro ou redefinição de senha. O Supabase Auth não tem acesso nem visibilidade sobre este campo.
 
 ### Artist
 Perfil público do artista. Um `User` tem no máximo um `Artist` (relação 1:1 via `user_id`).
@@ -210,7 +208,7 @@ idx_media_assets_entity       ON media_assets(entity_type, entity_id)
 idx_media_assets_storage_key  ON media_assets(storage_key)
 ```
 
-### Índices para o modelo de auth JWT (a criar)
+### Índices para o modelo de auth JWT
 
 ```sql
 -- refresh_tokens

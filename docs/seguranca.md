@@ -98,19 +98,10 @@ Client → POST /auth/logout (cookie refreshToken enviado automaticamente)
 
 | Situação | Comportamento |
 |----------|---------------|
-| Cookie `refreshToken` presente e válido | 204 — tokens revogados, cookie limpo |
+| Cookie `refreshToken` presente e válido | 204 — **todos** os refresh tokens do usuário são revogados (todos os dispositivos), cookie limpo |
 | Cookie `refreshToken` ausente ou inválido | 400 `{ "error": "Refresh token ausente ou inválido" }` |
 
-## Convivência Supabase Auth + JWT Próprio (Fase 1)
-
-Durante a Fase 1, os dois sistemas de auth coexistem:
-
-- **Sessões existentes:** continuam autenticadas via Supabase Auth (cookie de sessão SSR)
-- **Novos logins via API Fastify:** usam JWT próprio (access token Bearer + refresh token cookie)
-- **Middleware Next.js (`apps/web/src/middleware.ts`):** continua ativo para proteger rotas de UI (`/dashboard/*`) usando Supabase Auth — não é responsável por autenticar chamadas à API Fastify
-- **Route Handlers existentes:** continuam usando `requireAuth()` com Supabase Admin client até serem migrados
-
-A partir da Fase 2, todos os novos logins usam JWT próprio. Na Fase 3, o Supabase Auth é desativado e o Middleware é atualizado para validar o JWT próprio em vez de usar `supabase.auth.getUser()`.
+**Decisão de escopo:** `logout` chama `revokeAllUserTokens(userId)`, que revoga **todos** os refresh tokens do usuário no banco — não apenas o token atual. Isso garante que um logout em qualquer dispositivo invalida todas as sessões ativas. Se no futuro for necessário logout apenas do dispositivo atual, substituir por `revokeRefreshToken(tokenId)`.
 
 ## Variáveis de Ambiente Obrigatórias
 
@@ -120,22 +111,25 @@ A API Fastify falha no startup se qualquer variável obrigatória estiver ausent
 # Banco de dados
 DATABASE_URL=          # connection string direta ao PostgreSQL do Supabase
 
-# JWT
-JWT_SECRET=            # segredo para access tokens (mínimo 256 bits)
-JWT_REFRESH_SECRET=    # segredo separado para refresh tokens (mínimo 256 bits)
+# JWT (mínimo 32 caracteres / 256 bits cada)
+JWT_SECRET=            # segredo para access tokens
+JWT_REFRESH_SECRET=    # segredo separado para refresh tokens
 
 # CORS
 ALLOWED_ORIGINS=       # origens permitidas separadas por vírgula (ex: http://localhost:3000)
 
 # Storage
 STORAGE_BUCKET=        # nome do bucket no Supabase Storage
+SUPABASE_URL=          # URL do projeto Supabase (para Storage)
+SUPABASE_SERVICE_ROLE_KEY= # chave de serviço do Supabase (para Storage)
+
+# Servidor
+PORT=3333              # porta da API (padrão: 3333)
 ```
 
-Variáveis adicionais necessárias no `apps/web` durante a Fase 1:
+Variável necessária no `apps/web`:
 ```env
-NEXT_PUBLIC_SUPABASE_URL=       # necessário para o Middleware (Fase 1 e 2)
-NEXT_PUBLIC_SUPABASE_ANON_KEY=  # necessário para o Middleware (Fase 1 e 2) — removido na Fase 3
-NEXT_PUBLIC_API_URL=            # URL da API Fastify
+NEXT_PUBLIC_API_URL=   # URL da API Fastify (ex: http://localhost:3333)
 ```
 
 ## OWASP Top 10 — Checklist por Feature
@@ -163,7 +157,13 @@ Toda feature desenvolvida deve ser revisada contra os itens abaixo antes de merg
 - [ ] Parâmetros de rota e query sanitizados pelo Fastify
 
 ### A04 — Insecure Design
-- [ ] Rate limiting em endpoints de autenticação (`/auth/*`): 10 req/min via `@fastify/rate-limit`
+- [ ] Rate limiting por grupo de rotas via `@fastify/rate-limit` (`resolveLimit(url, method)`):
+  - `POST /auth/login` → 5 req/min (endpoint de credenciais — mais restrito)
+  - `POST /auth/refresh` → 10 req/min
+  - demais `/auth/*` → 20 req/min
+  - `/dashboard/*` → 100 req/min
+  - `/upload` → 20 req/min
+  - demais → 60 req/min
 - [ ] Limite de tamanho em uploads: áudio máx 50 MB, imagem máx 5 MB
 - [ ] Paginação obrigatória em listagens
 - [ ] Rollback de upload: se insert em `media_assets` falhar após upload no Storage, o arquivo é removido do Storage
