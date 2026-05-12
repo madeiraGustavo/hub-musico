@@ -50,7 +50,7 @@ const MOCK_PROJECT = {
   status:    'active' as const,
   sortOrder: 0,
   createdAt: new Date('2024-01-01T00:00:00Z'),
-}
+} as any
 
 const VALID_CREATE_BODY = {
   title:    'Álbum Noturno',

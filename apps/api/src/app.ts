@@ -8,8 +8,11 @@ import { authRoutes }     from './modules/auth/auth.routes.js'
 import { profileRoutes }  from './modules/profile/profile.routes.js'
 import { tracksRoutes }   from './modules/tracks/tracks.routes.js'
 import { projectsRoutes } from './modules/projects/projects.routes.js'
-import { servicesRoutes } from './modules/services/services.routes.js'
-import { uploadRoutes }   from './modules/upload/upload.routes.js'
+import { servicesRoutes }         from './modules/services/services.routes.js'
+import { uploadRoutes }           from './modules/upload/upload.routes.js'
+import { availabilityRoutes }     from './modules/availability/availability.routes.js'
+import { appointmentsRoutes }     from './modules/appointments/appointments.routes.js'
+import { publicSchedulingRoutes } from './modules/public-scheduling/public-scheduling.routes.js'
 
 export async function buildApp(): Promise<FastifyInstance> {
   const fastify = Fastify({ logger: true })
@@ -28,6 +31,9 @@ export async function buildApp(): Promise<FastifyInstance> {
   await fastify.register(projectsRoutes)
   await fastify.register(servicesRoutes)
   await fastify.register(uploadRoutes)
+  await fastify.register(availabilityRoutes)
+  await fastify.register(appointmentsRoutes)
+  await fastify.register(publicSchedulingRoutes)
 
   return fastify
 }

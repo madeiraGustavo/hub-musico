@@ -4,11 +4,12 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 const NAV_ITEMS = [
-  { href: '/dashboard',          label: 'Início',   icon: '⊞' },
-  { href: '/dashboard/tracks',   label: 'Faixas',   icon: '♪' },
-  { href: '/dashboard/projects', label: 'Projetos', icon: '▶' },
-  { href: '/dashboard/services', label: 'Serviços', icon: '💼' },
-  { href: '/dashboard/profile',  label: 'Perfil',   icon: '◉' },
+  { href: '/dashboard',          label: 'Início',     icon: '⊞' },
+  { href: '/dashboard/calendar', label: 'Calendário', icon: '📅' },
+  { href: '/dashboard/tracks',   label: 'Faixas',     icon: '♪' },
+  { href: '/dashboard/projects', label: 'Projetos',   icon: '▶' },
+  { href: '/dashboard/services', label: 'Serviços',   icon: '💼' },
+  { href: '/dashboard/profile',  label: 'Perfil',     icon: '◉' },
 ]
 
 export function DashboardNav() {

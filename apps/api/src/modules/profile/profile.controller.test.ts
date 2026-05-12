@@ -115,7 +115,7 @@ describe('updateProfileHandler', () => {
     name:      'João Silva Atualizado',
     tagline:   'Nova tagline',
     updatedAt: new Date('2024-06-01T00:00:00Z'),
-  }
+  } as any
 
   // ── Campos não-sensíveis ──────────────────────────────────────────────────
 

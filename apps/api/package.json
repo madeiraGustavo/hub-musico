@@ -10,6 +10,7 @@
     "test": "vitest --run"
   },
   "dependencies": {
+    "date-fns-tz": "3.2.0",
     "@fastify/cookie": "9.3.1",
     "@fastify/multipart": "8.3.0",
     "@supabase/supabase-js": "2.43.4",

@@ -59,7 +59,7 @@ const MOCK_SERVICE = {
   sortOrder:   0,
   active:      true,
   createdAt:   new Date('2024-01-01T00:00:00Z'),
-}
+} as any
 
 const MOCK_SERVICE_OWNERSHIP = {
   id:       'service-001',

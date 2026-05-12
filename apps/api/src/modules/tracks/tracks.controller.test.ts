@@ -58,7 +58,7 @@ const MOCK_TRACK = {
   isPublic:   true,
   sortOrder:  0,
   createdAt:  new Date('2024-01-01T00:00:00Z'),
-}
+} as any
 
 const MOCK_TRACK_OWNERSHIP = {
   id:       'track-001',

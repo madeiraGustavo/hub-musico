@@ -1,6 +1,7 @@
 import { notFound }         from 'next/navigation'
 import { MusicianLayout }   from '@/components/musician/MusicianLayout'
 import { TattooLayout }     from '@/components/tattoo/TattooLayout'
+import { SchedulingSection } from '@/components/scheduling/SchedulingSection'
 import { getArtistBySlug }  from '@/services/artistService'
 import { getTracks }        from '@/services/trackService'
 import { getProjects }      from '@/services/projectService'
@@ -36,6 +37,7 @@ export default async function ProfilePage({ params }: Props) {
       {artist.profileType === 'tattoo' && (
         <TattooLayout artist={artist} tracks={tracks} projects={projects} />
       )}
+      <SchedulingSection artistId={artist.id} />
     </main>
   )
 }
