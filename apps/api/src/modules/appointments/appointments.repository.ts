@@ -14,8 +14,8 @@ export async function findByArtistAndPeriod(artistId: string, from: Date, to: Da
   return prisma.appointment.findMany({
     where: {
       artistId,
-      startAt: { gte: from },
-      endAt:   { lte: to },
+      startAt: { lt: to },
+      endAt:   { gt: from },
     },
     orderBy: { startAt: 'asc' },
     select: {

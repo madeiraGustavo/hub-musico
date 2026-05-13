@@ -418,6 +418,7 @@ describe('Property 9: Idempotência na criação de Appointment', () => {
             // Mock artist lookup
             vi.mocked(prisma.artist.findUnique).mockResolvedValue({
               id: artistId,
+              timezone: 'America/Sao_Paulo',
             } as unknown as Awaited<ReturnType<typeof prisma.artist.findUnique>>)
 
             // Mock idempotency check — returns existing appointment with same email
@@ -491,10 +492,14 @@ describe('Property 10: Status inicial de Appointment é sempre PENDING', () => {
             // Mock artist lookup
             vi.mocked(prisma.artist.findUnique).mockResolvedValue({
               id: artistId,
+              timezone: 'America/Sao_Paulo',
             } as unknown as Awaited<ReturnType<typeof prisma.artist.findUnique>>)
 
             // Mock idempotency check — no existing appointment
             vi.mocked(prisma.appointment.findFirst).mockResolvedValue(null)
+
+            // Mock availabilityRule — empty (skip slot validation)
+            vi.mocked(prisma.availabilityRule.findMany).mockResolvedValue([])
 
             // Mock transaction — simulates successful creation
             vi.mocked(prisma.$transaction).mockImplementation(async (fn: unknown) => {

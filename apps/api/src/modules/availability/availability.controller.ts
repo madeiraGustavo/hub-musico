@@ -92,6 +92,23 @@ export async function updateRuleHandler(
     })
   }
 
+  // Validar estado final: se apenas startTime ou endTime foi enviado,
+  // buscar o valor atual e verificar que startTime < endTime no resultado final
+  if (parsed.data.startTime !== undefined || parsed.data.endTime !== undefined) {
+    const currentRule = await findRulesByArtist(artistId).then(
+      (rules) => rules.find((r) => r.id === id),
+    )
+    if (currentRule) {
+      const finalStartTime = parsed.data.startTime ?? currentRule.startTime
+      const finalEndTime   = parsed.data.endTime ?? currentRule.endTime
+      if (finalStartTime >= finalEndTime) {
+        return reply.code(422).send({
+          error: 'startTime deve ser anterior a endTime',
+        })
+      }
+    }
+  }
+
   const updated = await updateRule(id, artistId, parsed.data)
 
   return reply.code(200).send({ data: updated })
@@ -196,6 +213,23 @@ export async function updateBlockHandler(
       error:   'Dados inválidos',
       details: parsed.error.flatten(),
     })
+  }
+
+  // Validar estado final: se apenas startAt ou endAt foi enviado,
+  // buscar o valor atual e verificar que startAt < endAt no resultado final
+  if (parsed.data.startAt !== undefined || parsed.data.endAt !== undefined) {
+    const currentBlock = await findBlocksByArtist(artistId).then(
+      (blocks) => blocks.find((b) => b.id === id),
+    )
+    if (currentBlock) {
+      const finalStartAt = parsed.data.startAt ? new Date(parsed.data.startAt) : currentBlock.startAt
+      const finalEndAt   = parsed.data.endAt ? new Date(parsed.data.endAt) : currentBlock.endAt
+      if (finalStartAt >= finalEndAt) {
+        return reply.code(422).send({
+          error: 'startAt deve ser anterior a endAt',
+        })
+      }
+    }
   }
 
   const updated = await updateBlock(id, artistId, parsed.data)

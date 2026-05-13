@@ -206,10 +206,10 @@ export async function createPublicAppointment(
     )
   }
 
-  // Verificar que o artista existe
+  // Verificar que o artista existe e buscar timezone + regras
   const artist = await prisma.artist.findUnique({
     where:  { id: artistId },
-    select: { id: true },
+    select: { id: true, timezone: true },
   })
 
   if (!artist) {
@@ -217,6 +217,7 @@ export async function createPublicAppointment(
   }
 
   // 2. Verificar idempotência por (artistId, startAt, requesterEmail)
+  // Feito antes da validação de slot para evitar reprocessamento desnecessário
   const existing = await prisma.appointment.findFirst({
     where: {
       artistId,
@@ -244,9 +245,39 @@ export async function createPublicAppointment(
     }
   }
 
+  // Validar que o horário solicitado pertence a um slot disponível
+  const rules = await prisma.availabilityRule.findMany({
+    where:  { artistId, active: true },
+    select: { weekday: true, startTime: true, endTime: true, slotMinutes: true, active: true },
+  })
+  if (rules.length > 0) {
+    const possibleSlots = generateSlots(rules, startAt, startAt, artist.timezone)
+    const slotExists = possibleSlots.some(
+      (s) => s.startAt.getTime() === startAt.getTime() && s.endAt.getTime() === endAt.getTime(),
+    )
+    if (!slotExists) {
+      throw new PublicSchedulingError(
+        'CONFLICT',
+        'O horário solicitado não corresponde a um slot disponível do artista',
+      )
+    }
+  }
+
+  // Validar ownership do serviceId (se fornecido)
+  if (data.serviceId) {
+    const service = await prisma.service.findFirst({
+      where: { id: data.serviceId, artistId, active: true },
+      select: { id: true },
+    })
+    if (!service) {
+      throw new PublicSchedulingError('NOT_FOUND', 'Serviço não encontrado para este artista')
+    }
+  }
+
   // 3. Executar transaction com revalidação de conflito antes do INSERT
+  // Usa isolationLevel Serializable para prevenir race conditions
   const created = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    // Revalidar conflito dentro da transaction usando findConflicts (lock pessimista via SELECT)
+    // Revalidar conflito dentro da transaction
     const conflicts = await findConflicts(artistId, startAt, endAt, tx)
 
     if (conflicts.length > 0) {
@@ -293,7 +324,7 @@ export async function createPublicAppointment(
         endAt:       true,
       },
     })
-  })
+  }, { isolationLevel: 'Serializable' })
 
   // 4. Retornar Appointment com requestCode
   return {
