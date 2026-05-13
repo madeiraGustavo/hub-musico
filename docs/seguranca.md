@@ -209,3 +209,35 @@ Toda feature desenvolvida deve ser revisada contra os itens abaixo antes de merg
 - Arquivos armazenados no Supabase Storage com `service_role` key
 - `storage_key` nunca exposto diretamente — apenas URLs assinadas
 - Rollback: se o insert em `media_assets` falhar após upload bem-sucedido no Storage, o arquivo é removido do Storage antes de retornar 500
+
+## Segurança do Sistema de Agendamento
+
+### Isolamento de Dados Públicos
+
+- Endpoints públicos de disponibilidade retornam **apenas slots livres** — nunca dados de Appointments existentes
+- Endpoint público de status (`GET /public/appointments/:requestCode`) retorna **apenas** `requestCode`, `status`, `startAt`, `endAt` — nunca `requesterName`, `requesterEmail`, `requesterPhone`, `artistId` ou `notes`
+- Nenhum endpoint público expõe informações pessoais de terceiros
+
+### Controle de Acesso Privado
+
+- `artistId` em rotas privadas vem **sempre** de `request.user` (AuthContext extraído do JWT + banco) — nunca do body, query string ou params
+- Operações de escrita/leitura em regras, bloqueios e appointments verificam ownership antes de aplicar
+- Tentativa de acessar recurso de outro artista → HTTP 403
+
+### Proteção contra Concorrência
+
+- Criação de appointment usa `prisma.$transaction` com revalidação de conflito imediatamente antes do INSERT
+- Slots com status `PENDING` ou `CONFIRMED` são considerados ocupados
+- Se conflito detectado dentro da transaction → abort → HTTP 409
+- Chave de idempotência `(artistId, startAt, requesterEmail)` implementada como constraint UNIQUE no banco
+
+### Rate Limiting
+
+- `POST /public/artists/:artistId/appointments` → **5 req/min** por IP (mais restritivo que o padrão de 60 req/min)
+- Demais endpoints públicos de agendamento → rate limit padrão (60 req/min)
+
+### Validação de Antecedência
+
+- `startAt < now + 24h` → HTTP 422 (antecedência mínima)
+- `startAt > now + 60 dias` → HTTP 422 (antecedência máxima)
+- Período de consulta `from–to > 60 dias` → HTTP 422

@@ -13,6 +13,7 @@ Schema derivado das migrations `apps/api/migrations/001–009`. O Prisma conecta
 | `project_status`  | `draft`, `active`, `archived`                                  | 004       |
 | `service_icon`    | `drum`, `mic`, `music`, `compose`, `needle`, `camera`, `calendar`, `star` | 009 |
 | `media_type`      | `audio`, `image`                                               | 005       |
+| `appointment_status` | `PENDING`, `CONFIRMED`, `CANCELLED`, `REJECTED`            | 010       |
 
 ## Entidades
 
@@ -161,6 +162,68 @@ created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 
 `storage_key` nunca é exposto diretamente ao cliente — apenas URLs assinadas geradas pelo Supabase Storage.
 
+### AvailabilityRule
+Regra recorrente semanal que define os horários de trabalho do artista.
+
+```
+id           UUID        PK DEFAULT gen_random_uuid()
+artist_id    UUID        NOT NULL FK → artists(id) ON DELETE CASCADE
+weekday      INTEGER     NOT NULL — 0=domingo, 6=sábado
+start_time   VARCHAR(5)  NOT NULL — "HH:MM" em horário local do artista
+end_time     VARCHAR(5)  NOT NULL — "HH:MM" em horário local do artista
+slot_minutes INTEGER     NOT NULL DEFAULT 60 — duração de cada slot em minutos
+active       BOOLEAN     NOT NULL DEFAULT TRUE
+created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+```
+
+### AvailabilityBlock
+Bloqueio pontual de um intervalo de tempo na agenda do artista.
+
+```
+id         UUID        PK DEFAULT gen_random_uuid()
+artist_id  UUID        NOT NULL FK → artists(id) ON DELETE CASCADE
+start_at   TIMESTAMPTZ NOT NULL
+end_at     TIMESTAMPTZ NOT NULL
+reason     TEXT        nullable
+created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+```
+
+### Appointment
+Solicitação de atendimento criada por um usuário público.
+
+```
+id              UUID               PK DEFAULT gen_random_uuid()
+artist_id       UUID               NOT NULL FK → artists(id) ON DELETE CASCADE
+requester_name  VARCHAR(100)       NOT NULL
+requester_email VARCHAR(255)       NOT NULL
+requester_phone VARCHAR(20)        nullable
+service_id      UUID               nullable FK → services(id) ON DELETE SET NULL
+start_at        TIMESTAMPTZ        NOT NULL
+end_at          TIMESTAMPTZ        NOT NULL
+status          appointment_status NOT NULL DEFAULT 'PENDING'
+notes           TEXT               nullable
+request_code    UUID               UNIQUE NOT NULL DEFAULT gen_random_uuid()
+created_at      TIMESTAMPTZ        NOT NULL DEFAULT NOW()
+updated_at      TIMESTAMPTZ        NOT NULL DEFAULT NOW()
+```
+
+**Chave de idempotência:** `UNIQUE(artist_id, start_at, requester_email)` — impede duplicação de solicitações.
+
+**Transições de status válidas:**
+- `PENDING → CONFIRMED`
+- `PENDING → REJECTED`
+- `PENDING → CANCELLED`
+- `CONFIRMED → CANCELLED`
+
+### Campo `timezone` em Artist
+
+Adicionado na migration 010:
+```
+timezone  VARCHAR(50)  NOT NULL DEFAULT 'America/Sao_Paulo' — timezone IANA do artista
+```
+
 ## Relacionamentos
 
 ```
@@ -170,6 +233,10 @@ Artist   1──N  Track
 Artist   1──N  Project
 Artist   1──N  Service
 Artist   1──N  MediaAsset
+Artist   1──N  AvailabilityRule
+Artist   1──N  AvailabilityBlock
+Artist   1──N  Appointment
+Service  1──N  Appointment (opcional)
 ```
 
 ## Índices

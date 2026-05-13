@@ -177,3 +177,50 @@ await fetch(`${API_URL}/dashboard/tracks`, {
 - **Validação em camadas:** entrada validada no controller (Zod), regras de negócio no service
 - **Autenticação obrigatória:** todo endpoint privado passa pelo hook `authenticate` antes do controller
 - **`artist_id` sempre do banco:** nunca extraído do token JWT ou de parâmetros do cliente
+
+## Módulo de Agendamento
+
+### Rotas Públicas (sem autenticação)
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/public/artists/:artistId/availability?from=&to=` | Consulta slots livres |
+| POST | `/public/artists/:artistId/appointments` | Solicita agendamento (rate limit: 5 req/min) |
+| GET | `/public/appointments/:requestCode` | Consulta status da solicitação |
+
+### Rotas Privadas (com `authenticate`)
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/availability-rules` | Lista regras de disponibilidade |
+| POST | `/availability-rules` | Cria regra |
+| PATCH | `/availability-rules/:id` | Atualiza regra |
+| DELETE | `/availability-rules/:id` | Remove regra |
+| GET | `/availability-blocks` | Lista bloqueios |
+| POST | `/availability-blocks` | Cria bloqueio |
+| PATCH | `/availability-blocks/:id` | Atualiza bloqueio |
+| DELETE | `/availability-blocks/:id` | Remove bloqueio |
+| GET | `/appointments?from=&to=` | Calendário completo do artista |
+| PATCH | `/appointments/:id/status` | Atualiza status (confirmar/rejeitar/cancelar) |
+| DELETE | `/appointments/:id` | Remove appointment |
+
+### Arquitetura do Cálculo de Disponibilidade
+
+```
+AvailabilityRules (ativas) → generateSlots(rules, from, to, timezone) → Slot[]
+                                                                           ↓
+Appointments (PENDING/CONFIRMED) + AvailabilityBlocks → filterConflicts(slots, occupied) → Slot[] (livres)
+```
+
+As funções `generateSlots` e `filterConflicts` são **puras** (sem I/O) — facilitam testes de propriedade.
+
+### Concorrência na Criação de Appointments
+
+```
+1. Validar antecedência (24h mín, 60 dias máx)
+2. Verificar idempotência (artistId + startAt + requesterEmail)
+3. prisma.$transaction:
+   a. findConflicts(artistId, startAt, endAt) — revalidação dentro da tx
+   b. Se conflito → abort → HTTP 409
+   c. Se livre → INSERT appointment com status PENDING
+```
