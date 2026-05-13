@@ -505,6 +505,9 @@ describe('Property 10: Status inicial de Appointment é sempre PENDING', () => {
             vi.mocked(prisma.$transaction).mockImplementation(async (fn: unknown) => {
               if (typeof fn === 'function') {
                 const txMock = {
+                  availabilityRule: {
+                    findMany: vi.fn().mockResolvedValue([]),
+                  },
                   appointment: {
                     findMany: vi.fn().mockResolvedValue([]),
                     create:   vi.fn().mockResolvedValue({

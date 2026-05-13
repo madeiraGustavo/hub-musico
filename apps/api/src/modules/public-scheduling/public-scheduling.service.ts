@@ -245,24 +245,6 @@ export async function createPublicAppointment(
     }
   }
 
-  // Validar que o horário solicitado pertence a um slot disponível
-  const rules = await prisma.availabilityRule.findMany({
-    where:  { artistId, active: true },
-    select: { weekday: true, startTime: true, endTime: true, slotMinutes: true, active: true },
-  })
-  if (rules.length > 0) {
-    const possibleSlots = generateSlots(rules, startAt, startAt, artist.timezone)
-    const slotExists = possibleSlots.some(
-      (s) => s.startAt.getTime() === startAt.getTime() && s.endAt.getTime() === endAt.getTime(),
-    )
-    if (!slotExists) {
-      throw new PublicSchedulingError(
-        'CONFLICT',
-        'O horário solicitado não corresponde a um slot disponível do artista',
-      )
-    }
-  }
-
   // Validar ownership do serviceId (se fornecido)
   if (data.serviceId) {
     const service = await prisma.service.findFirst({
@@ -274,68 +256,108 @@ export async function createPublicAppointment(
     }
   }
 
-  // 3. Executar transaction com revalidação de conflito antes do INSERT
-  // Usa isolationLevel Serializable para prevenir race conditions
-  const created = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    // Revalidar conflito dentro da transaction
-    const conflicts = await findConflicts(artistId, startAt, endAt, tx)
+  // 3. Executar transaction Serializable com retry para serialization failures
+  const MAX_RETRIES = 3
+  let attempt = 0
 
-    if (conflicts.length > 0) {
-      throw new PublicSchedulingError(
-        'CONFLICT',
-        'O horário solicitado não está mais disponível',
-      )
+  while (attempt < MAX_RETRIES) {
+    attempt++
+    try {
+      const created = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+        // Validar slot disponível dentro da transaction (leitura consistente)
+        const txRules = await tx.availabilityRule.findMany({
+          where:  { artistId, active: true },
+          select: { weekday: true, startTime: true, endTime: true, slotMinutes: true, active: true },
+        })
+        if (txRules.length > 0) {
+          const possibleSlots = generateSlots(txRules, startAt, startAt, artist.timezone)
+          const slotExists = possibleSlots.some(
+            (s) => s.startAt.getTime() === startAt.getTime() && s.endAt.getTime() === endAt.getTime(),
+          )
+          if (!slotExists) {
+            throw new PublicSchedulingError(
+              'CONFLICT',
+              'O horário solicitado não corresponde a um slot disponível do artista',
+            )
+          }
+        }
+
+        // Revalidar conflito com appointments dentro da transaction
+        const conflicts = await findConflicts(artistId, startAt, endAt, tx)
+        if (conflicts.length > 0) {
+          throw new PublicSchedulingError(
+            'CONFLICT',
+            'O horário solicitado não está mais disponível',
+          )
+        }
+
+        // Verificar conflito com AvailabilityBlocks dentro da transaction
+        const blockConflicts = await tx.availabilityBlock.findMany({
+          where: {
+            artistId,
+            startAt: { lt: endAt },
+            endAt:   { gt: startAt },
+          },
+          select: { id: true },
+        })
+        if (blockConflicts.length > 0) {
+          throw new PublicSchedulingError(
+            'CONFLICT',
+            'O horário solicitado está bloqueado pelo artista',
+          )
+        }
+
+        // INSERT do Appointment
+        return tx.appointment.create({
+          data: {
+            artistId,
+            requesterName:  data.requesterName,
+            requesterEmail: data.requesterEmail,
+            requesterPhone: data.requesterPhone,
+            serviceId:      data.serviceId,
+            startAt,
+            endAt,
+            notes:          data.notes,
+            status:         'PENDING',
+          },
+          select: {
+            requestCode: true,
+            status:      true,
+            startAt:     true,
+            endAt:       true,
+          },
+        })
+      }, { isolationLevel: 'Serializable' })
+
+      // 4. Retornar Appointment com requestCode
+      return {
+        appointment: {
+          requestCode: created.requestCode,
+          status:      created.status as PublicAppointmentStatusResult['status'],
+          startAt:     created.startAt,
+          endAt:       created.endAt,
+        },
+        isIdempotent: false,
+      }
+    } catch (err) {
+      // P2034 = Prisma serialization failure (transaction conflict)
+      if (
+        err instanceof Error &&
+        'code' in err &&
+        (err as { code: string }).code === 'P2034' &&
+        attempt < MAX_RETRIES
+      ) {
+        // Retry after short delay
+        await new Promise((resolve) => setTimeout(resolve, 50 * attempt))
+        continue
+      }
+      // Re-throw PublicSchedulingError and other errors
+      throw err
     }
-
-    // Verificar conflito com AvailabilityBlocks dentro da transaction
-    const blockConflicts = await tx.availabilityBlock.findMany({
-      where: {
-        artistId,
-        startAt: { lt: endAt },
-        endAt:   { gt: startAt },
-      },
-      select: { id: true },
-    })
-
-    if (blockConflicts.length > 0) {
-      throw new PublicSchedulingError(
-        'CONFLICT',
-        'O horário solicitado está bloqueado pelo artista',
-      )
-    }
-
-    // INSERT do Appointment
-    return tx.appointment.create({
-      data: {
-        artistId,
-        requesterName:  data.requesterName,
-        requesterEmail: data.requesterEmail,
-        requesterPhone: data.requesterPhone,
-        serviceId:      data.serviceId,
-        startAt,
-        endAt,
-        notes:          data.notes,
-        status:         'PENDING',
-      },
-      select: {
-        requestCode: true,
-        status:      true,
-        startAt:     true,
-        endAt:       true,
-      },
-    })
-  }, { isolationLevel: 'Serializable' })
-
-  // 4. Retornar Appointment com requestCode
-  return {
-    appointment: {
-      requestCode: created.requestCode,
-      status:      created.status as PublicAppointmentStatusResult['status'],
-      startAt:     created.startAt,
-      endAt:       created.endAt,
-    },
-    isIdempotent: false,
   }
+
+  // Should never reach here, but TypeScript needs it
+  throw new PublicSchedulingError('CONFLICT', 'Não foi possível completar a operação após múltiplas tentativas')
 }
 
 // ── getAppointmentByRequestCode ───────────────────────────────────────────────
