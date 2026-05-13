@@ -357,7 +357,7 @@ export async function createPublicAppointment(
   }
 
   // Should never reach here, but TypeScript needs it
-  throw new PublicSchedulingError('CONFLICT', 'Não foi possível completar a operação após múltiplas tentativas')
+  throw new PublicSchedulingError('CONFLICT', 'Agenda concorrida — tente novamente em alguns segundos')
 }
 
 // ── getAppointmentByRequestCode ───────────────────────────────────────────────
