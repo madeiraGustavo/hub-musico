@@ -13,6 +13,10 @@ import { uploadRoutes }           from './modules/upload/upload.routes.js'
 import { availabilityRoutes }     from './modules/availability/availability.routes.js'
 import { appointmentsRoutes }     from './modules/appointments/appointments.routes.js'
 import { publicSchedulingRoutes } from './modules/public-scheduling/public-scheduling.routes.js'
+import { marketplaceCategoriesRoutes } from './modules/marketplace-categories/marketplace-categories.routes.js'
+import { marketplaceProductsRoutes } from './modules/marketplace-products/marketplace-products.routes.js'
+import { marketplaceQuotesRoutes } from './modules/marketplace-quotes/marketplace-quotes.routes.js'
+import { marketplaceOrdersRoutes } from './modules/marketplace-orders/marketplace-orders.routes.js'
 
 export async function buildApp(): Promise<FastifyInstance> {
   const fastify = Fastify({ logger: true })
@@ -34,6 +38,10 @@ export async function buildApp(): Promise<FastifyInstance> {
   await fastify.register(availabilityRoutes)
   await fastify.register(appointmentsRoutes)
   await fastify.register(publicSchedulingRoutes)
+  await fastify.register(marketplaceCategoriesRoutes)
+  await fastify.register(marketplaceProductsRoutes)
+  await fastify.register(marketplaceQuotesRoutes)
+  await fastify.register(marketplaceOrdersRoutes)
 
   return fastify
 }
