@@ -17,8 +17,8 @@ importers:
         specifier: 9.0.1
         version: 9.0.1
       '@fastify/jwt':
-        specifier: 9.0.0
-        version: 9.0.0
+        specifier: 8.0.1
+        version: 8.0.1
       '@fastify/multipart':
         specifier: 8.3.0
         version: 8.3.0
@@ -626,14 +626,11 @@ packages:
   '@fastify/error@3.4.1':
     resolution: {integrity: sha512-wWSvph+29GR783IhmvdwWnN4bUxTD01Vm5Xad4i7i1VuAOItLvbPAb69sb0IQ2N57yprvhNIwAP5B6xfKTmjmQ==}
 
-  '@fastify/error@4.2.0':
-    resolution: {integrity: sha512-RSo3sVDXfHskiBZKBPRgnQTtIqpi/7zhJOEmAxCiBcM7d0uwdGdxLlsCaLzGs8v8NnxIRlfG0N51p5yFaOentQ==}
-
   '@fastify/fast-json-stringify-compiler@4.3.0':
     resolution: {integrity: sha512-aZAXGYo6m22Fk1zZzEUKBvut/CIIQe/BapEORnxiD5Qr0kPHqqI69NtEMCme74h+at72sPhbkb4ZrLd1W3KRLA==}
 
-  '@fastify/jwt@9.0.0':
-    resolution: {integrity: sha512-3XKFgpK/D/6vGY6gqy9Fe8TvUEk+UYBkFcIHvTvwLhe4wmmlNCE1si16wUdCZmeHRajjZKxfdBwRUklK8cHGIA==}
+  '@fastify/jwt@8.0.1':
+    resolution: {integrity: sha512-295bd7V6bDCnZOu8MAQgM6r7V1KILB+kdEq1q6nbHfXCnML569n7NSo3WzeLDG6IAqDl+Rhzi1vjxwaNHhRCBA==}
 
   '@fastify/merge-json-schemas@0.1.1':
     resolution: {integrity: sha512-fERDVz7topgNjtXsJTTW1JKLy0rhuLRcquYqNR9rF7OcVpCa2OVW49ZPDIhaRRCaUuvVxI+N416xUoF76HNSXA==}
@@ -3890,18 +3887,16 @@ snapshots:
 
   '@fastify/error@3.4.1': {}
 
-  '@fastify/error@4.2.0': {}
-
   '@fastify/fast-json-stringify-compiler@4.3.0':
     dependencies:
       fast-json-stringify: 5.16.1
 
-  '@fastify/jwt@9.0.0':
+  '@fastify/jwt@8.0.1':
     dependencies:
-      '@fastify/error': 4.2.0
+      '@fastify/error': 3.4.1
       '@lukeed/ms': 2.0.2
       fast-jwt: 4.0.5
-      fastify-plugin: 5.1.0
+      fastify-plugin: 4.5.1
       steed: 1.1.3
 
   '@fastify/merge-json-schemas@0.1.1':
