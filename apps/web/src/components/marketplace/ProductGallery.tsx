@@ -30,8 +30,8 @@ export function ProductGallery({ images, title }: ProductGalleryProps) {
       {/* Main image */}
       <div className="aspect-square bg-bg-muted rounded-lg overflow-hidden">
         <img
-          src={images[activeIndex].url}
-          alt={images[activeIndex].alt ?? title}
+          src={images[activeIndex]?.url}
+          alt={images[activeIndex]?.alt ?? title}
           className="w-full h-full object-cover"
         />
       </div>
