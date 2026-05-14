@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { MarketplaceHeader } from '@/components/marketplace/MarketplaceHeader'
 
 export const metadata: Metadata = {
   title: 'Marketplace de Lonas | Arte Hub',
@@ -12,24 +13,7 @@ export default function MarketplaceLayout({
 }) {
   return (
     <div className="min-h-screen bg-bg-base">
-      <header className="border-b border-border-default bg-bg-surface sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <a href="/marketplace" className="text-lg font-semibold text-text-default">
-            Marketplace
-          </a>
-          <nav className="flex items-center gap-4">
-            <a href="/marketplace/cart" className="text-sm text-text-muted hover:text-text-default transition-colors">
-              Carrinho
-            </a>
-            <a href="/dashboard/marketplace" className="text-sm text-text-muted hover:text-text-default transition-colors">
-              Dashboard
-            </a>
-            <a href="/login" className="text-sm px-3 py-1.5 rounded bg-bg-accent text-text-on-accent hover:opacity-90 transition-opacity">
-              Login
-            </a>
-          </nav>
-        </div>
-      </header>
+      <MarketplaceHeader />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children}
       </main>
