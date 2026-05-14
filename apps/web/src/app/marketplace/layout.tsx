@@ -21,6 +21,12 @@ export default function MarketplaceLayout({
             <a href="/marketplace/cart" className="text-sm text-text-muted hover:text-text-default transition-colors">
               Carrinho
             </a>
+            <a href="/dashboard/marketplace" className="text-sm text-text-muted hover:text-text-default transition-colors">
+              Dashboard
+            </a>
+            <a href="/login" className="text-sm px-3 py-1.5 rounded bg-bg-accent text-text-on-accent hover:opacity-90 transition-opacity">
+              Login
+            </a>
           </nav>
         </div>
       </header>
