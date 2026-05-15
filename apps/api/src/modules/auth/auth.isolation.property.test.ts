@@ -65,7 +65,7 @@ const arbUserId = fc.uuid()
 // ─── Property 1: Same email, different sites → independent accounts ──────────
 
 describe('Property: Tenant Isolation — same email, different sites', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => { vi.clearAllMocks() })
 
   it(
     'login with same email on different sites returns different user IDs (100 iterations)',
@@ -120,7 +120,7 @@ describe('Property: Tenant Isolation — same email, different sites', () => {
 // ─── Property 2: Cross-tenant login is impossible ────────────────────────────
 
 describe('Property: Tenant Isolation — cross-tenant login fails', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => { vi.clearAllMocks() })
 
   it(
     'login always fails when user exists on site A but login attempts site B (100 iterations)',
@@ -156,7 +156,7 @@ describe('Property: Tenant Isolation — cross-tenant login fails', () => {
 // ─── Property 3: JWT always contains correct siteId ──────────────────────────
 
 describe('Property: JWT siteId correctness', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => { vi.clearAllMocks() })
 
   it(
     'accessToken siteId always matches the site used for login (100 iterations)',
@@ -193,7 +193,7 @@ describe('Property: JWT siteId correctness', () => {
 // ─── Property 4: Session always returns correct siteId ───────────────────────
 
 describe('Property: Session siteId correctness', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => { vi.clearAllMocks() })
 
   it(
     'getSession always returns the siteId stored in the user record (100 iterations)',
@@ -208,7 +208,7 @@ describe('Property: Session siteId correctness', () => {
             vi.clearAllMocks()
 
             vi.mocked(findUserById).mockResolvedValue({
-              id: userId, siteId, email, password: '$2a$12$hash', role, artistId: null,
+              id: userId, siteId, email, password: '$2a$12$hash', role: role as 'admin' | 'artist' | 'editor' | 'client', artistId: null,
             })
 
             const session = await getSession(userId)
@@ -229,7 +229,7 @@ describe('Property: Session siteId correctness', () => {
 // ─── Property 5: Register isolation ─────────────────────────────────────────
 
 describe('Property: Register isolation', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => { vi.clearAllMocks() })
 
   it(
     'register on site A does not affect site B (100 iterations)',
