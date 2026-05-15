@@ -1,39 +1,39 @@
-/* Marketplace Design Tokens — Scoped under .marketplace wrapper */
-/* These CSS custom properties override the dark theme tokens from tailwind.config.ts */
-/* so that semantic utility classes (text-text-primary, bg-bg-surface, etc.) resolve */
-/* to the marketplace's light/premium palette when inside .marketplace */
+/* Marketplace Design Tokens — Toldos Colibri Identity */
+/* Industrial/professional palette: gold, black, graphite */
+/* Scoped under .marketplace wrapper */
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 .marketplace {
   /* === Background Tokens === */
   --mp-bg-base: #FFFFFF;
-  --mp-bg-surface: #F9FAFB;
+  --mp-bg-surface: #F8F6F0;
   --mp-bg-elevated: #FFFFFF;
-  --mp-bg-muted: #F3F4F6;
-  --mp-bg-dark: #1F2937;
-  --mp-bg-accent: #E85D2C;
+  --mp-bg-muted: #F0EDE5;
+  --mp-bg-dark: #1A1A1A;
+  --mp-bg-accent: #D4A017;
+  --mp-bg-hero: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 50%, #1A1A1A 100%);
 
   /* === Text Tokens === */
-  --mp-text-default: #111827;
-  --mp-text-secondary: #4B5563;
-  --mp-text-muted: #9CA3AF;
-  --mp-text-accent: #E85D2C;
+  --mp-text-default: #1A1A1A;
+  --mp-text-secondary: #4A4A4A;
+  --mp-text-muted: #8A8A8A;
+  --mp-text-accent: #D4A017;
   --mp-text-on-dark: #FFFFFF;
-  --mp-text-on-accent: #FFFFFF;
+  --mp-text-on-accent: #1A1A1A;
 
   /* === Border Tokens === */
-  --mp-border-default: #E5E7EB;
-  --mp-border-hover: #D1D5DB;
-  --mp-border-accent: #E85D2C;
+  --mp-border-default: #E5E0D5;
+  --mp-border-hover: #D4A017;
+  --mp-border-accent: #D4A017;
 
-  /* === Accent === */
-  --mp-accent: #E85D2C;
-  --mp-accent-hover: #D4522A;
-  --mp-accent-active: #C04A26;
+  /* === Accent (Dourado Industrial) === */
+  --mp-accent: #D4A017;
+  --mp-accent-hover: #B8860B;
+  --mp-accent-active: #9A7209;
 
   /* === Typography === */
-  --mp-font-heading: 'Playfair Display', Georgia, serif;
+  --mp-font-heading: 'Oswald', 'Arial Narrow', sans-serif;
   --mp-font-body: 'Inter', system-ui, sans-serif;
 
   /* === Spacing (section gaps) === */
@@ -42,17 +42,17 @@
   --mp-content-padding: 24px;
 
   /* === Shadows === */
-  --mp-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --mp-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-  --mp-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
-  --mp-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
-  --mp-shadow-card-hover: 0 12px 24px -4px rgba(0, 0, 0, 0.1), 0 4px 8px -2px rgba(0, 0, 0, 0.06);
+  --mp-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --mp-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --mp-shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.12);
+  --mp-shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.15);
+  --mp-shadow-card-hover: 0 8px 24px rgba(212, 160, 23, 0.15), 0 4px 8px rgba(0, 0, 0, 0.08);
 
   /* === Border Radius === */
-  --mp-radius-sm: 6px;
-  --mp-radius-md: 12px;
-  --mp-radius-lg: 16px;
-  --mp-radius-xl: 24px;
+  --mp-radius-sm: 4px;
+  --mp-radius-md: 8px;
+  --mp-radius-lg: 12px;
+  --mp-radius-xl: 16px;
   --mp-radius-full: 9999px;
 
   /* === Apply base styles === */
@@ -81,31 +81,38 @@
   font-family: var(--mp-font-heading);
   font-weight: 700;
   color: var(--mp-text-default);
-  line-height: 1.2;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
 }
 
 .marketplace .mp-heading-1 {
   font-family: var(--mp-font-heading);
   font-weight: 700;
   font-size: 3rem;
-  line-height: 1.1;
+  line-height: 1.05;
   color: var(--mp-text-default);
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
 }
 
 .marketplace .mp-heading-2 {
   font-family: var(--mp-font-heading);
-  font-weight: 700;
+  font-weight: 600;
   font-size: 2.25rem;
-  line-height: 1.2;
+  line-height: 1.1;
   color: var(--mp-text-default);
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
 }
 
 .marketplace .mp-heading-3 {
   font-family: var(--mp-font-heading);
-  font-weight: 600;
+  font-weight: 500;
   font-size: 1.5rem;
-  line-height: 1.3;
+  line-height: 1.2;
   color: var(--mp-text-default);
+  text-transform: uppercase;
 }
 
 /* === Button Variants === */
@@ -117,9 +124,11 @@
   background-color: var(--mp-accent);
   color: var(--mp-text-on-accent);
   font-family: var(--mp-font-body);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.9375rem;
-  border-radius: var(--mp-radius-full);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  border-radius: var(--mp-radius-sm);
   border: none;
   cursor: pointer;
   transition: background-color 200ms ease, transform 150ms ease, box-shadow 200ms ease;
@@ -157,9 +166,11 @@
   background-color: transparent;
   color: var(--mp-text-default);
   font-family: var(--mp-font-body);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.9375rem;
-  border-radius: var(--mp-radius-full);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  border-radius: var(--mp-radius-sm);
   border: 2px solid var(--mp-text-default);
   cursor: pointer;
   transition: background-color 200ms ease, border-color 200ms ease, transform 150ms ease;

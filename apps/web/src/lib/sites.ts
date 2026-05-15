@@ -44,10 +44,10 @@ export const SITES: Record<string, SiteConfig> = {
   marketplace: {
     id: 'marketplace',
     slug: 'marketplace',
-    displayName: 'Arte Hub Marketplace',
+    displayName: 'Toldos Colibri',
     theme: {
-      primaryColor: '#F97316',
-      backgroundColor: '#0F0F0F',
+      primaryColor: '#D4A017',
+      backgroundColor: '#1A1A1A',
     },
     authEnabled: true,
     cookieName: 'ah_marketplace_refresh',

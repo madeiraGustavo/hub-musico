@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { HeroSearchBar } from './HeroSearchBar'
 
 export interface HeroSectionProps {
   title: string
@@ -18,138 +17,155 @@ export function HeroSection({
   ctaPrimary,
   ctaSecondary,
   socialProof,
-  categories,
 }: HeroSectionProps) {
   return (
     <section
-      className="mp-section mp-hero-section"
+      className="relative overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, var(--mp-bg-base) 0%, var(--mp-bg-surface) 100%)',
+        background: 'var(--mp-bg-hero)',
+        minHeight: '600px',
+        display: 'flex',
+        alignItems: 'center',
       }}
     >
+      {/* Geometric industrial pattern overlay */}
+      <div className="absolute inset-0 opacity-[0.04]" aria-hidden="true">
+        <div className="absolute top-0 left-0 w-full h-full"
+          style={{
+            backgroundImage: `
+              repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(212,160,23,0.3) 60px, rgba(212,160,23,0.3) 61px),
+              repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(212,160,23,0.3) 60px, rgba(212,160,23,0.3) 61px)
+            `,
+          }}
+        />
+      </div>
+
+      {/* Gold accent line at top */}
       <div
-        style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          padding: '0 var(--mp-content-padding)',
-          textAlign: 'center',
-          width: '100%',
-        }}
-      >
-        {/* Title */}
-        <h1
-          className="mp-heading-1 mp-fade-in"
-          style={{
-            marginBottom: '16px',
-          }}
-        >
-          {title}
-        </h1>
+        className="absolute top-0 left-0 right-0 h-1"
+        style={{ backgroundColor: 'var(--mp-accent)' }}
+        aria-hidden="true"
+      />
 
-        {/* Subtitle */}
-        <p
-          className="mp-fade-in-delay-1"
-          style={{
-            fontFamily: 'var(--mp-font-body)',
-            fontSize: '1.125rem',
-            color: 'var(--mp-text-secondary)',
-            maxWidth: '600px',
-            margin: '0 auto 32px',
-            lineHeight: '1.6',
-          }}
-        >
-          {subtitle}
-        </p>
-
-        {/* CTA Buttons */}
-        <div
-          className="mp-fade-in-delay-2 mp-hero-ctas"
-          style={{
-            display: 'flex',
-            gap: '16px',
-            justifyContent: 'center',
-            marginBottom: '32px',
-          }}
-        >
-          <Link href={ctaPrimary.href} className="mp-btn-primary">
-            {ctaPrimary.label}
-          </Link>
-          <Link href={ctaSecondary.href} className="mp-btn-secondary">
-            {ctaSecondary.label}
-          </Link>
-        </div>
-
-        {/* Social Proof */}
-        {socialProof && (
-          <div
-            className="mp-fade-in-delay-3 mp-hero-social-proof"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '12px',
-              marginBottom: '40px',
-            }}
-          >
-            {/* Overlapping SVG Avatars */}
-            <div
-              style={{ display: 'flex', marginRight: '-4px' }}
-              aria-hidden="true"
-            >
-              <svg
-                width="32"
-                height="32"
-                viewBox="0 0 32 32"
-                style={{ marginRight: '-8px', position: 'relative', zIndex: 3 }}
-              >
-                <circle cx="16" cy="16" r="15" fill="#E5E7EB" stroke="#FFFFFF" strokeWidth="2" />
-                <circle cx="16" cy="12" r="5" fill="#9CA3AF" />
-                <path d="M6 28c0-5.5 4.5-10 10-10s10 4.5 10 10" fill="#9CA3AF" />
-              </svg>
-              <svg
-                width="32"
-                height="32"
-                viewBox="0 0 32 32"
-                style={{ marginRight: '-8px', position: 'relative', zIndex: 2 }}
-              >
-                <circle cx="16" cy="16" r="15" fill="#D1D5DB" stroke="#FFFFFF" strokeWidth="2" />
-                <circle cx="16" cy="12" r="5" fill="#6B7280" />
-                <path d="M6 28c0-5.5 4.5-10 10-10s10 4.5 10 10" fill="#6B7280" />
-              </svg>
-              <svg
-                width="32"
-                height="32"
-                viewBox="0 0 32 32"
-                style={{ position: 'relative', zIndex: 1 }}
-              >
-                <circle cx="16" cy="16" r="15" fill="#F3F4F6" stroke="#FFFFFF" strokeWidth="2" />
-                <circle cx="16" cy="12" r="5" fill="#4B5563" />
-                <path d="M6 28c0-5.5 4.5-10 10-10s10 4.5 10 10" fill="#4B5563" />
-              </svg>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-16 lg:py-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Left: Content */}
+          <div>
+            {/* Badge */}
+            <div className="mp-fade-in inline-flex items-center gap-2 px-3 py-1.5 rounded-sm mb-6"
+              style={{ backgroundColor: 'rgba(212, 160, 23, 0.15)', border: '1px solid rgba(212, 160, 23, 0.3)' }}>
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--mp-accent)' }} />
+              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--mp-accent)' }}>
+                Fabricação Própria
+              </span>
             </div>
 
-            <span
+            {/* Title */}
+            <h1
+              className="mp-fade-in"
               style={{
-                fontFamily: 'var(--mp-font-body)',
-                fontSize: '0.875rem',
-                fontWeight: 500,
-                color: 'var(--mp-text-secondary)',
+                fontFamily: 'var(--mp-font-heading)',
+                fontSize: 'clamp(2.5rem, 5vw, 4.5rem)',
+                fontWeight: 700,
+                lineHeight: 1.05,
+                color: '#FFFFFF',
+                textTransform: 'uppercase',
+                letterSpacing: '-0.02em',
+                marginBottom: '20px',
               }}
             >
-              {socialProof.count}+ {socialProof.label}
-            </span>
-          </div>
-        )}
+              {title}
+            </h1>
 
-        {/* Integrated Search/Filter Bar */}
-        {categories && categories.length > 0 && (
-          <div
-            className="mp-fade-in-delay-3"
-            style={{ maxWidth: '500px', margin: '0 auto' }}
-          >
-            <HeroSearchBar categories={categories} />
+            {/* Subtitle */}
+            <p
+              className="mp-fade-in-delay-1"
+              style={{
+                fontSize: '1.125rem',
+                color: 'rgba(255, 255, 255, 0.7)',
+                maxWidth: '500px',
+                lineHeight: '1.7',
+                marginBottom: '32px',
+              }}
+            >
+              {subtitle}
+            </p>
+
+            {/* CTAs */}
+            <div className="mp-fade-in-delay-2 flex flex-wrap gap-4 mb-8">
+              <Link
+                href={ctaPrimary.href}
+                className="inline-flex items-center justify-center px-8 py-4 font-bold text-sm uppercase tracking-wider transition-all duration-200 hover:translate-y-[-2px]"
+                style={{
+                  backgroundColor: 'var(--mp-accent)',
+                  color: 'var(--mp-text-on-accent)',
+                  borderRadius: 'var(--mp-radius-sm)',
+                }}
+              >
+                {ctaPrimary.label}
+              </Link>
+              <Link
+                href={ctaSecondary.href}
+                className="inline-flex items-center justify-center px-8 py-4 font-bold text-sm uppercase tracking-wider border-2 transition-all duration-200 hover:bg-white/10"
+                style={{
+                  color: '#FFFFFF',
+                  borderColor: 'rgba(255, 255, 255, 0.3)',
+                  borderRadius: 'var(--mp-radius-sm)',
+                }}
+              >
+                {ctaSecondary.label}
+              </Link>
+            </div>
+
+            {/* Social Proof / Trust */}
+            {socialProof && (
+              <div className="mp-fade-in-delay-3 flex items-center gap-6 pt-6 border-t" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
+                <div className="text-center">
+                  <div className="text-2xl font-bold" style={{ color: 'var(--mp-accent)' }}>{socialProof.count}+</div>
+                  <div className="text-xs uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>{socialProof.label}</div>
+                </div>
+                <div className="w-px h-10" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                <div className="text-center">
+                  <div className="text-2xl font-bold" style={{ color: 'var(--mp-accent)' }}>15+</div>
+                  <div className="text-xs uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>anos no mercado</div>
+                </div>
+                <div className="w-px h-10 hidden sm:block" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                <div className="text-center hidden sm:block">
+                  <div className="text-2xl font-bold" style={{ color: 'var(--mp-accent)' }}>100%</div>
+                  <div className="text-xs uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>sob medida</div>
+                </div>
+              </div>
+            )}
           </div>
-        )}
+
+          {/* Right: Visual placeholder (industrial awning illustration) */}
+          <div className="hidden lg:flex items-center justify-center">
+            <div
+              className="relative w-full max-w-md aspect-square rounded-lg overflow-hidden"
+              style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+            >
+              {/* Stylized toldo SVG placeholder */}
+              <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full" aria-hidden="true">
+                {/* Structure lines */}
+                <line x1="80" y1="350" x2="80" y2="180" stroke="rgba(212,160,23,0.4)" strokeWidth="3" />
+                <line x1="320" y1="350" x2="320" y2="180" stroke="rgba(212,160,23,0.4)" strokeWidth="3" />
+                {/* Canopy */}
+                <path d="M60 180 Q200 120 340 180 L340 200 Q200 160 60 200 Z" fill="rgba(212,160,23,0.2)" stroke="rgba(212,160,23,0.5)" strokeWidth="2" />
+                {/* Second layer */}
+                <path d="M60 200 Q200 160 340 200 L340 220 Q200 180 60 220 Z" fill="rgba(212,160,23,0.1)" stroke="rgba(212,160,23,0.3)" strokeWidth="1" />
+                {/* Ground line */}
+                <line x1="40" y1="350" x2="360" y2="350" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+                {/* Measurement arrows */}
+                <line x1="80" y1="370" x2="320" y2="370" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeDasharray="4 4" />
+                <text x="200" y="388" textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="12" fontFamily="var(--mp-font-body)">sob medida</text>
+              </svg>
+
+              {/* Corner accents */}
+              <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2" style={{ borderColor: 'var(--mp-accent)' }} />
+              <div className="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2" style={{ borderColor: 'var(--mp-accent)' }} />
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   )

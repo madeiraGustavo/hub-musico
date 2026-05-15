@@ -126,11 +126,11 @@ describe('Branding: each site has correct display data', () => {
     expect(site.theme.gradientMain).toBeDefined()
   })
 
-  it('marketplace has Arte Hub Marketplace branding', () => {
+  it('marketplace has Toldos Colibri branding', () => {
     const site = SITES.marketplace!
-    expect(site.displayName).toBe('Arte Hub Marketplace')
-    expect(site.theme.primaryColor).toBe('#F97316')
-    expect(site.theme.backgroundColor).toBe('#0F0F0F')
+    expect(site.displayName).toBe('Toldos Colibri')
+    expect(site.theme.primaryColor).toBe('#D4A017')
+    expect(site.theme.backgroundColor).toBe('#1A1A1A')
   })
 
   it('tattoo has Studio Tattoo branding', () => {

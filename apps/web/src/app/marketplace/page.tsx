@@ -6,6 +6,7 @@ import { HeroSection } from '@/components/marketplace/HeroSection'
 import { ProductCard } from '@/components/marketplace/ProductCard'
 import { SocialProofSection } from '@/components/marketplace/SocialProofSection'
 import { ProjectsSection } from '@/components/marketplace/ProjectsSection'
+import { TrustBadges } from '@/components/marketplace/TrustBadges'
 import { EmptyState } from '@/components/marketplace/EmptyState'
 import { SkeletonCard } from '@/components/marketplace/SkeletonCard'
 import { LocalBusinessJsonLd, BreadcrumbJsonLd } from '@/components/marketplace/JsonLd'
@@ -27,26 +28,29 @@ export default async function MarketplacePage() {
     <>
       {/* Structured Data */}
       <LocalBusinessJsonLd
-        name="Lonas SP"
+        name="Toldos Colibri"
         address="São Paulo, SP — Brasil"
         telephone="(11) 9999-0000"
         openingHours={['Mo-Fr 08:00-18:00', 'Sa 08:00-12:00']}
       />
       <BreadcrumbJsonLd
         items={[
-          { name: 'Marketplace', url: 'https://lonassp.com.br/marketplace' },
+          { name: 'Toldos Colibri', url: 'https://toldoscolibri.com.br/marketplace' },
         ]}
       />
 
       {/* Hero Section */}
       <HeroSection
-        title="Lonas & Coberturas Sob Medida"
-        subtitle="Toldos, capotas e coberturas com qualidade premium. Solicite seu orçamento personalizado ou compre diretamente do catálogo."
+        title="Toldos & Coberturas Sob Medida"
+        subtitle="Fabricação e instalação de toldos, coberturas de policarbonato, lonas e estruturas metálicas. Qualidade industrial com atendimento personalizado."
         ctaPrimary={{ label: 'Ver Catálogo', href: '#catalogo' }}
         ctaSecondary={{ label: 'Solicitar Orçamento', href: '#orcamento' }}
-        socialProof={{ count: 120, label: 'clientes atendidos' }}
+        socialProof={{ count: 500, label: 'projetos entregues' }}
         categories={categories}
       />
+
+      {/* Trust Badges */}
+      <TrustBadges />
 
       {/* Catalog Section (Client Component for search/filter interactivity) */}
       <section id="catalogo" className="mp-section">

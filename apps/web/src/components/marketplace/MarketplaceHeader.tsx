@@ -59,10 +59,21 @@ export function MarketplaceHeader() {
         {/* Logo */}
         <a
           href="/marketplace"
-          className="text-xl font-bold"
-          style={{ fontFamily: 'var(--mp-font-heading)', color: 'var(--mp-text-default)' }}
+          className="flex items-center gap-2"
         >
-          Lonas SP
+          <div className="w-8 h-8 flex items-center justify-center rounded-sm" style={{ backgroundColor: 'var(--mp-accent)' }}>
+            <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5" aria-hidden="true">
+              <path d="M4 12 Q12 6 20 12 L20 14 Q12 8 4 14 Z" fill="var(--mp-text-on-accent)" />
+              <line x1="6" y1="14" x2="6" y2="20" stroke="var(--mp-text-on-accent)" strokeWidth="1.5" />
+              <line x1="18" y1="14" x2="18" y2="20" stroke="var(--mp-text-on-accent)" strokeWidth="1.5" />
+            </svg>
+          </div>
+          <span
+            className="text-lg font-bold uppercase tracking-tight"
+            style={{ fontFamily: 'var(--mp-font-heading)', color: 'var(--mp-text-default)' }}
+          >
+            Toldos Colibri
+          </span>
         </a>
 
         {/* Desktop Navigation */}
