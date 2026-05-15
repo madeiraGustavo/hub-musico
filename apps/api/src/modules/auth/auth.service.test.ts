@@ -45,6 +45,7 @@ import jwt from 'jsonwebtoken'
 
 const MOCK_USER = {
   id:       'user-uuid-001',
+  siteId:   'platform',
   email:    'artist@example.com',
   password: '$2a$12$hashedpassword',
   role:     'artist' as const,

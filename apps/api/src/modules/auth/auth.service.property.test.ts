@@ -146,6 +146,7 @@ describe('Property 2: Refresh token invalida após uso (rotação)', () => {
 
             const mockUser: import('./auth.repository.js').UserWithAuth = {
               id:       userId,
+              siteId:   'platform',
               email:    `${userId}@example.com`,
               password: '$2a$12$hashedpassword',
               role:     'artist',
@@ -267,6 +268,7 @@ describe('Property 3: Estrutura completa da resposta de sessão', () => {
 
             const mockUser: import('./auth.repository.js').UserWithAuth = {
               id:       userId,
+              siteId:   'platform',
               email,
               password: '$2a$12$hashedpassword',
               role:     role as 'admin' | 'artist' | 'editor',

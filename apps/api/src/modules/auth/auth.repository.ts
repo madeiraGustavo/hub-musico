@@ -1,9 +1,9 @@
 import { prisma } from '../../lib/prisma.js'
-// Tipo local para o UserRole (Prisma client ainda não gerado)
-type UserRole = 'admin' | 'artist' | 'editor'
+import type { UserRole } from '@prisma/client'
 
 export interface UserWithAuth {
   id:       string
+  siteId:   string
   email:    string
   password: string | null
   role:     UserRole
@@ -20,17 +20,22 @@ export interface RefreshTokenRow {
 
 // ── User ──────────────────────────────────────────────────────────────────────
 
+/**
+ * @deprecated Use findUserByEmailAndSite() para queries multi-tenant.
+ * Mantido temporariamente para backward compatibility durante Wave 1.
+ * Busca no site 'platform' como fallback.
+ */
 export async function findUserByEmail(email: string): Promise<UserWithAuth | null> {
   return prisma.user.findUnique({
-    where:  { email: email.toLowerCase().trim() },
-    select: { id: true, email: true, password: true, role: true, artistId: true },
+    where:  { siteId_email: { siteId: 'platform', email: email.toLowerCase().trim() } },
+    select: { id: true, siteId: true, email: true, password: true, role: true, artistId: true },
   })
 }
 
 export async function findUserById(id: string): Promise<UserWithAuth | null> {
   return prisma.user.findUnique({
     where:  { id },
-    select: { id: true, email: true, password: true, role: true, artistId: true },
+    select: { id: true, siteId: true, email: true, password: true, role: true, artistId: true },
   })
 }
 

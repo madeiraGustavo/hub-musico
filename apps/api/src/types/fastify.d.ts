@@ -1,9 +1,10 @@
 import '@fastify/jwt'
+import type { UserRole } from '@prisma/client'
 
 export interface AuthContext {
   userId:   string
   artistId: string
-  role:     'admin' | 'artist' | 'editor'
+  role:     UserRole
 }
 
 declare module '@fastify/jwt' {

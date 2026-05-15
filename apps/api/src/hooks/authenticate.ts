@@ -12,13 +12,7 @@
 
 import type { FastifyRequest, FastifyReply } from 'fastify'
 import { prisma } from '../lib/prisma.js'
-
-type UserRole = 'admin' | 'artist' | 'editor'
-
-interface UserRow {
-  role:      UserRole
-  artist_id: string | null
-}
+import type { UserRole } from '@prisma/client'
 
 /**
  * Hook de autenticação padrão — aceita qualquer role válido.
@@ -59,7 +53,7 @@ export function authenticateRoles(allowedRoles: UserRole[]) {
     }
 
     // 3. Verifica role
-    if (!allowedRoles.includes(userData.role as UserRole)) {
+    if (!allowedRoles.includes(userData.role)) {
       return reply.code(403).send({ error: 'Permissão insuficiente' })
     }
 
@@ -72,7 +66,7 @@ export function authenticateRoles(allowedRoles: UserRole[]) {
     request.user = {
       userId:   payload.sub,
       artistId: userData.artistId ?? '',
-      role:     userData.role as UserRole,
+      role:     userData.role,
     }
   }
 }

@@ -13,6 +13,7 @@ enum UserRole {
   admin
   artist
   editor
+  client
 
   @@map("user_role")
 }
@@ -112,9 +113,11 @@ enum MediaType {
 // ── Models ───────────────────────────────────────────────────────────────────
 
 /// Usuário autônomo — autenticação gerenciada pela API Fastify via JWT próprio
+/// Multi-tenant: identidade é (siteId + email), não apenas email.
 model User {
   id        String   @id @db.Uuid
-  email     String   @unique
+  siteId    String   @default("platform") @map("site_id") @db.VarChar(50)
+  email     String
   /// Hash bcrypt gerenciado pela API Fastify. Null para usuários migrados sem senha definida.
   password  String?
   role      UserRole @default(artist)
@@ -125,6 +128,8 @@ model User {
   artist        Artist?
   refreshTokens RefreshToken[]
 
+  @@unique([siteId, email])
+  @@index([siteId])
   @@index([role])
   @@index([artistId])
   @@map("users")

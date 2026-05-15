@@ -31,9 +31,10 @@ export interface TokenPair {
 export interface SessionData {
   authenticated: true
   user: {
-    id:    string
-    email: string
-    role:  string
+    id:     string
+    email:  string
+    role:   string
+    siteId: string
   }
   artist: {
     id:   string
@@ -44,10 +45,11 @@ export interface SessionData {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function signAccessToken(user: UserWithAuth): string {
-  // Payload mínimo: apenas sub (userId). role e artistId são sempre buscados
-  // no banco pelo hook authenticate — nunca extraídos do token.
+  // Payload inclui sub, role e siteId para conveniência de leitura.
+  // Nota: o hook authenticate SEMPRE busca role e siteId do banco —
+  // os valores do token são informativos, não autoritativos.
   return jwt.sign(
-    { sub: user.id },
+    { sub: user.id, role: user.role, siteId: user.siteId },
     env.JWT_SECRET,
     { expiresIn: '15m' },
   )
@@ -143,9 +145,10 @@ export async function getSession(userId: string): Promise<SessionData> {
   return {
     authenticated: true,
     user: {
-      id:    user.id,
-      email: user.email,
-      role:  user.role,
+      id:     user.id,
+      email:  user.email,
+      role:   user.role,
+      siteId: user.siteId,
     },
     artist,
   }
