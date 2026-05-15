@@ -2,9 +2,7 @@
  * POST /api/auth/logout
  * Proxy para POST ${API_URL}/auth/logout na API Fastify
  *
- * Repassa o cookie `refreshToken` via header Cookie para que a API revogue a sessão.
- * Repassa o header `Authorization` se disponível (opcional — compatibilidade).
- * Repassa cookies Set-Cookie da resposta (limpeza do refreshToken HttpOnly) para o browser.
+ * Multi-tenant: repassa X-Site-Id para que o backend limpe o cookie correto.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -20,11 +18,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     headers['cookie'] = cookie
   }
 
-  // Repassa Authorization se disponível (opcional — para compatibilidade)
+  // Repassa Authorization se disponível
   const authorization = req.headers.get('authorization')
   if (authorization) {
     headers['authorization'] = authorization
   }
+
+  // Repassa X-Site-Id para resolução de tenant
+  const siteId = req.headers.get('x-site-id') ?? 'platform'
+  headers['x-site-id'] = siteId
 
   let apiRes: Response
   try {
@@ -36,19 +38,18 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: 'Serviço indisponível' }, { status: 503 })
   }
 
-  // Para respostas 204 (sem corpo), retornar resposta vazia com status correto
   let data: Record<string, unknown> = {}
   if (apiRes.status !== 204) {
     try {
       data = await apiRes.json() as Record<string, unknown>
     } catch {
-      // corpo vazio ou não-JSON — manter objeto vazio
+      // corpo vazio ou não-JSON
     }
   }
 
   const res = NextResponse.json(data, { status: apiRes.status })
 
-  // Repassa cookies Set-Cookie da API (limpeza do refreshToken HttpOnly) para o browser
+  // Repassa cookies Set-Cookie da API (limpeza do refreshToken) para o browser
   const setCookie = apiRes.headers.get('set-cookie')
   if (setCookie) {
     res.headers.set('set-cookie', setCookie)

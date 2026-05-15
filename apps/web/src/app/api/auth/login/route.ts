@@ -2,8 +2,8 @@
  * POST /api/auth/login
  * Proxy para POST ${API_URL}/auth/login na API Fastify
  *
- * Mantido como proxy durante a Fase 2 para não quebrar o Middleware do Next.js.
- * Repassa o body e os cookies de resposta (refreshToken HttpOnly) para o browser.
+ * Multi-tenant: repassa header X-Site-Id para que o backend resolva o tenant.
+ * O header vem do frontend (LoginForm) — o backend valida contra config estática.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -18,12 +18,18 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: 'Corpo da requisição inválido' }, { status: 400 })
   }
 
+  // Repassa X-Site-Id do frontend para o backend
+  const siteId = req.headers.get('x-site-id') ?? 'platform'
+
   let apiRes: Response
   try {
     apiRes = await fetch(`${API_URL}/auth/login`, {
       method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Site-Id':    siteId,
+      },
+      body: JSON.stringify(body),
     })
   } catch {
     return NextResponse.json({ error: 'Serviço indisponível' }, { status: 503 })

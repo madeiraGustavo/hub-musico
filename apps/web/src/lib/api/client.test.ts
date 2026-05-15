@@ -171,15 +171,15 @@ describe('Interceptor de 401 — refresh automático', () => {
 
     vi.stubGlobal('fetch', mockFetch)
 
-    const windowMock = { location: { href: '' } }
+    const windowMock = { location: { href: '', pathname: '/dashboard/tracks' } }
     vi.stubGlobal('window', windowMock)
 
     await expect(apiGet('/dashboard/tracks')).rejects.toThrow('Sessão expirada')
 
     // Token deve ter sido limpo
     expect(getAccessToken()).toBeNull()
-    // Deve ter redirecionado para login
-    expect(windowMock.location.href).toBe('/login')
+    // Deve ter redirecionado para login do tenant correto
+    expect(windowMock.location.href).toBe('/platform/login')
   })
 
   it('não faz loop infinito de refresh (tenta apenas uma vez)', async () => {
@@ -194,6 +194,7 @@ describe('Interceptor de 401 — refresh automático', () => {
       .mockResolvedValueOnce(makeResponse({ error: 'Não autorizado' }, 401))
 
     vi.stubGlobal('fetch', mockFetch)
+    vi.stubGlobal('window', { location: { href: '', pathname: '/dashboard/tracks' } })
 
     await expect(apiGet('/dashboard/tracks')).rejects.toThrow('Sessão expirada')
 

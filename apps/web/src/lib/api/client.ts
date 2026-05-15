@@ -53,7 +53,12 @@ function redirectToLogin(): void {
   // Limpa o token em memória antes de redirecionar
   accessToken = null
   if (typeof window !== 'undefined') {
-    window.location.href = '/login'
+    // Resolve o tenant atual pelo pathname para redirecionar ao login correto
+    const pathname = window.location.pathname
+    const segments = pathname.split('/').filter(Boolean)
+    const knownSites = ['platform', 'marketplace', 'tattoo', 'music']
+    const siteSlug = knownSites.includes(segments[0] ?? '') ? segments[0] : 'platform'
+    window.location.href = `/${siteSlug}/login`
   }
 }
 
