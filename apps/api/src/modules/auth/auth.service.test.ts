@@ -17,22 +17,26 @@ vi.mock('../../env.js', () => ({
 
 // ── Mock repository ───────────────────────────────────────────────────────────
 vi.mock('./auth.repository.js', () => ({
-  findUserByEmail:    vi.fn(),
-  findUserById:       vi.fn(),
-  createRefreshToken: vi.fn(),
-  findRefreshToken:   vi.fn(),
-  revokeRefreshToken: vi.fn(),
-  revokeAllUserTokens: vi.fn(),
+  findUserByEmail:        vi.fn(),
+  findUserByEmailAndSite: vi.fn(),
+  findUserById:           vi.fn(),
+  createRefreshToken:     vi.fn(),
+  createUser:             vi.fn(),
+  findRefreshToken:       vi.fn(),
+  revokeRefreshToken:     vi.fn(),
+  revokeAllUserTokens:    vi.fn(),
 }))
 
 // ── Mock password lib ─────────────────────────────────────────────────────────
 vi.mock('../../lib/password.js', () => ({
   verifyPassword: vi.fn(),
+  hashPassword:   vi.fn(),
 }))
 
 import { login, refresh } from './auth.service.js'
 import {
   findUserByEmail,
+  findUserByEmailAndSite,
   findUserById,
   createRefreshToken,
   findRefreshToken,
@@ -62,7 +66,7 @@ describe('auth.service — login', () => {
   // ── 1. Login com credenciais corretas ─────────────────────────────────────
 
   it('retorna accessToken e refreshToken quando as credenciais são válidas', async () => {
-    vi.mocked(findUserByEmail).mockResolvedValue(MOCK_USER)
+    vi.mocked(findUserByEmailAndSite).mockResolvedValue(MOCK_USER)
     vi.mocked(verifyPassword).mockResolvedValue(true)
     vi.mocked(createRefreshToken).mockResolvedValue(undefined)
 
@@ -94,7 +98,7 @@ describe('auth.service — login', () => {
   // ── 2. Login com senha errada ─────────────────────────────────────────────
 
   it('lança erro quando a senha está errada', async () => {
-    vi.mocked(findUserByEmail).mockResolvedValue(MOCK_USER)
+    vi.mocked(findUserByEmailAndSite).mockResolvedValue(MOCK_USER)
     vi.mocked(verifyPassword).mockResolvedValue(false)
 
     await expect(login('artist@example.com', 'wrong-password')).rejects.toThrow('Credenciais inválidas')
@@ -105,7 +109,7 @@ describe('auth.service — login', () => {
   // ── 3. Login com email inexistente ────────────────────────────────────────
 
   it('lança erro quando o email não existe no banco', async () => {
-    vi.mocked(findUserByEmail).mockResolvedValue(null)
+    vi.mocked(findUserByEmailAndSite).mockResolvedValue(null)
 
     await expect(login('nonexistent@example.com', 'any-password')).rejects.toThrow('Credenciais inválidas')
 
@@ -116,7 +120,7 @@ describe('auth.service — login', () => {
   // ── 4. Login com usuário sem senha (Supabase legacy) ──────────────────────
 
   it('lança erro quando o usuário existe mas não tem senha cadastrada (password = null)', async () => {
-    vi.mocked(findUserByEmail).mockResolvedValue({ ...MOCK_USER, password: null })
+    vi.mocked(findUserByEmailAndSite).mockResolvedValue({ ...MOCK_USER, password: null })
 
     await expect(login('artist@example.com', 'any-password')).rejects.toThrow('Credenciais inválidas')
 

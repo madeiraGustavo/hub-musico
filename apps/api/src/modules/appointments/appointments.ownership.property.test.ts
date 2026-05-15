@@ -49,6 +49,7 @@ interface AuthContext {
   userId:   string
   artistId: string
   role:     'admin' | 'artist' | 'editor'
+  siteId:   string
 }
 
 // ── Ownership check logic (mirrors appointments.controller.ts) ────────────────
@@ -223,6 +224,7 @@ describe('Property 2: Ownership enforcement — artista não acessa recursos de 
               userId:   authenticatedArtistId,
               artistId: authenticatedArtistId,
               role:     'artist',
+            siteId:   'platform',
             }
 
             const result = assertOwnership(auth, resourceArtistId)
@@ -244,7 +246,7 @@ describe('Property 2: Ownership enforcement — artista não acessa recursos de 
           fc.uuid(), // userId
           fc.uuid(), // artistId (mesmo que resourceArtistId)
           async (userId, artistId) => {
-            const auth: AuthContext = { userId, artistId, role: 'artist' }
+            const auth: AuthContext = { userId, artistId, role: 'artist', siteId: 'platform' }
 
             const result = assertOwnership(auth, artistId)
 
@@ -281,7 +283,7 @@ describe('Property 2: Ownership enforcement — artista não acessa recursos de 
             } as unknown as Awaited<ReturnType<typeof prisma.appointment.findUnique>>)
 
             const request = makeRequest({
-              user:   { userId: authenticatedArtistId, artistId: authenticatedArtistId, role: 'artist' } as AuthContext,
+              user:   { userId: authenticatedArtistId, artistId: authenticatedArtistId, role: 'artist', siteId: 'platform' } as AuthContext,
               params: { id: appointmentId },
               body:   { status: newStatus },
             }) as FastifyRequest & {
@@ -324,6 +326,7 @@ describe('Property 2: Ownership enforcement — artista não acessa recursos de 
               userId:   adminUserId,
               artistId: adminArtistId,
               role:     'admin',
+            siteId:   'platform',
             }
 
             const result = assertOwnership(adminContext, resourceArtistId)
@@ -353,6 +356,7 @@ describe('Property 2: Ownership enforcement — artista não acessa recursos de 
               userId:   authenticatedArtistId,
               artistId: authenticatedArtistId,
               role:     'artist',
+            siteId:   'platform',
             }
 
             const result = assertOwnership(auth, resourceArtistId)
@@ -507,7 +511,7 @@ describe('Property 11: Transições de status válidas', () => {
             } as unknown as Awaited<ReturnType<typeof prisma.appointment.findUnique>>)
 
             const request = makeRequest({
-              user:   { userId: artistId, artistId, role: 'artist' } as AuthContext,
+              user:   { userId: artistId, artistId, role: 'artist', siteId: 'platform' } as AuthContext,
               params: { id: appointmentId },
               body:   { status: newStatus },
             }) as FastifyRequest & {
@@ -563,7 +567,7 @@ describe('Property 11: Transições de status válidas', () => {
             } as unknown as Awaited<ReturnType<typeof prisma.appointment.update>>)
 
             const request = makeRequest({
-              user:   { userId: artistId, artistId, role: 'artist' } as AuthContext,
+              user:   { userId: artistId, artistId, role: 'artist', siteId: 'platform' } as AuthContext,
               params: { id: appointmentId },
               body:   { status: newStatus },
             }) as FastifyRequest & {
@@ -628,7 +632,7 @@ describe('Property 12: Calendário privado retorna apenas Appointments do artist
             const to   = '2025-01-31'
 
             const request = makeRequest({
-              user:  { userId: authenticatedArtistId, artistId: authenticatedArtistId, role: 'artist' } as AuthContext,
+              user:  { userId: authenticatedArtistId, artistId: authenticatedArtistId, role: 'artist', siteId: 'platform' } as AuthContext,
               query: { from, to },
             }) as FastifyRequest & {
               user:  AuthContext
@@ -688,7 +692,7 @@ describe('Property 12: Calendário privado retorna apenas Appointments do artist
             )
 
             const request = makeRequest({
-              user:  { userId: authenticatedArtistId, artistId: authenticatedArtistId, role: 'artist' } as AuthContext,
+              user:  { userId: authenticatedArtistId, artistId: authenticatedArtistId, role: 'artist', siteId: 'platform' } as AuthContext,
               query: { from: '2025-01-01', to: '2025-01-31' },
             }) as FastifyRequest & {
               user:  AuthContext
@@ -736,7 +740,7 @@ describe('Property 12: Calendário privado retorna apenas Appointments do artist
 
             // Request with different artistIds in query and body — they must be ignored
             const request = makeRequest({
-              user:  { userId: tokenArtistId, artistId: tokenArtistId, role: 'artist' } as AuthContext,
+              user:  { userId: tokenArtistId, artistId: tokenArtistId, role: 'artist', siteId: 'platform' } as AuthContext,
               query: { from: '2025-01-01', to: '2025-01-31', artistId: queryArtistId },
               body:  { artistId: bodyArtistId },
             }) as FastifyRequest & {

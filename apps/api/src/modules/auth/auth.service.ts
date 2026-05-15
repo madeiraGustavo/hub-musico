@@ -9,10 +9,12 @@
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
 import { env } from '../../env.js'
-import { verifyPassword } from '../../lib/password.js'
+import { verifyPassword, hashPassword } from '../../lib/password.js'
 import {
   findUserByEmail,
+  findUserByEmailAndSite,
   findUserById,
+  createUser,
   createRefreshToken,
   findRefreshToken,
   revokeRefreshToken,
@@ -75,8 +77,12 @@ function refreshExpiresAt(): Date {
 
 // ── Service methods ───────────────────────────────────────────────────────────
 
-export async function login(email: string, password: string): Promise<TokenPair> {
-  const user = await findUserByEmail(email)
+/**
+ * Autentica usuário por siteId + email + password.
+ * Se siteId não for fornecido, usa 'platform' como fallback (backward compat).
+ */
+export async function login(email: string, password: string, siteId: string = 'platform'): Promise<TokenPair> {
+  const user = await findUserByEmailAndSite(email, siteId)
 
   if (!user || !user.password) {
     throw new Error('Credenciais inválidas')
@@ -86,6 +92,33 @@ export async function login(email: string, password: string): Promise<TokenPair>
   if (!valid) {
     throw new Error('Credenciais inválidas')
   }
+
+  const accessToken  = signAccessToken(user)
+  const refreshToken = signRefreshToken(user.id)
+
+  await createRefreshToken(user.id, hashToken(refreshToken), refreshExpiresAt())
+
+  return { accessToken, refreshToken }
+}
+
+/**
+ * Registra novo usuário no site especificado.
+ * Retorna par de tokens (login automático após registro).
+ */
+export async function register(
+  email:    string,
+  password: string,
+  siteId:   string,
+  name?:    string,
+): Promise<TokenPair> {
+  // Verifica se já existe no site
+  const existing = await findUserByEmailAndSite(email, siteId)
+  if (existing) {
+    throw new Error('Email já cadastrado neste site')
+  }
+
+  const passwordHash = await hashPassword(password)
+  const user = await createUser(siteId, email, passwordHash, 'client', name)
 
   const accessToken  = signAccessToken(user)
   const refreshToken = signRefreshToken(user.id)

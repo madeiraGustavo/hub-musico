@@ -1,5 +1,6 @@
 import { prisma } from '../../lib/prisma.js'
 import type { UserRole } from '@prisma/client'
+import crypto from 'crypto'
 
 export interface UserWithAuth {
   id:       string
@@ -21,15 +22,23 @@ export interface RefreshTokenRow {
 // ── User ──────────────────────────────────────────────────────────────────────
 
 /**
+ * Busca usuário por email E siteId — query multi-tenant correta.
+ * Usa o unique composto @@unique([siteId, email]).
+ */
+export async function findUserByEmailAndSite(email: string, siteId: string): Promise<UserWithAuth | null> {
+  return prisma.user.findUnique({
+    where:  { siteId_email: { siteId, email: email.toLowerCase().trim() } },
+    select: { id: true, siteId: true, email: true, password: true, role: true, artistId: true },
+  })
+}
+
+/**
  * @deprecated Use findUserByEmailAndSite() para queries multi-tenant.
- * Mantido temporariamente para backward compatibility durante Wave 1.
+ * Mantido temporariamente para backward compatibility.
  * Busca no site 'platform' como fallback.
  */
 export async function findUserByEmail(email: string): Promise<UserWithAuth | null> {
-  return prisma.user.findUnique({
-    where:  { siteId_email: { siteId: 'platform', email: email.toLowerCase().trim() } },
-    select: { id: true, siteId: true, email: true, password: true, role: true, artistId: true },
-  })
+  return findUserByEmailAndSite(email, 'platform')
 }
 
 export async function findUserById(id: string): Promise<UserWithAuth | null> {
@@ -37,6 +46,30 @@ export async function findUserById(id: string): Promise<UserWithAuth | null> {
     where:  { id },
     select: { id: true, siteId: true, email: true, password: true, role: true, artistId: true },
   })
+}
+
+/**
+ * Cria um novo usuário no site especificado.
+ * Usado pelo signup/register multi-tenant.
+ */
+export async function createUser(
+  siteId:       string,
+  email:        string,
+  passwordHash: string,
+  role:         UserRole = 'client',
+  name?:        string,
+): Promise<UserWithAuth> {
+  const user = await prisma.user.create({
+    data: {
+      id: crypto.randomUUID(),
+      siteId,
+      email: email.toLowerCase().trim(),
+      password: passwordHash,
+      role,
+    },
+    select: { id: true, siteId: true, email: true, password: true, role: true, artistId: true },
+  })
+  return user
 }
 
 // ── Refresh tokens ────────────────────────────────────────────────────────────

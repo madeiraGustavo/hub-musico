@@ -56,6 +56,7 @@ interface AuthContext {
   userId:   string
   artistId: string
   role:     'admin' | 'artist' | 'editor'
+  siteId:   string
 }
 
 // ── Ownership check logic (mirrors availability.controller.ts) ────────────────
@@ -286,7 +287,7 @@ describe('Property 1: Ownership invariant — criação sempre associa ao artist
             )
 
             const request = makeRequest({
-              user: { userId: authenticatedArtistId, artistId: authenticatedArtistId, role: 'artist' } as AuthContext,
+              user: { userId: authenticatedArtistId, artistId: authenticatedArtistId, role: 'artist', siteId: 'platform' } as AuthContext,
               // Body includes a different artistId — it must be ignored
               body: { ...ruleBody, artistId: bodyArtistId },
             }) as FastifyRequest & { user: AuthContext; body: Record<string, unknown> }
@@ -341,7 +342,7 @@ describe('Property 1: Ownership invariant — criação sempre associa ao artist
             )
 
             const request = makeRequest({
-              user: { userId: authenticatedArtistId, artistId: authenticatedArtistId, role: 'artist' } as AuthContext,
+              user: { userId: authenticatedArtistId, artistId: authenticatedArtistId, role: 'artist', siteId: 'platform' } as AuthContext,
               // Body includes a different artistId — it must be ignored
               body: { startAt, endAt, artistId: bodyArtistId },
             }) as FastifyRequest & { user: AuthContext; body: Record<string, unknown> }
@@ -394,6 +395,7 @@ describe('Property 2: Ownership enforcement — artista não acessa recursos de 
               userId:   authenticatedArtistId,
               artistId: authenticatedArtistId,
               role:     'artist',
+            siteId:   'platform',
             }
 
             const result = assertOwnership(auth, resourceArtistId)
@@ -415,7 +417,7 @@ describe('Property 2: Ownership enforcement — artista não acessa recursos de 
           fc.uuid(), // userId
           fc.uuid(), // artistId (mesmo que resourceArtistId)
           async (userId, artistId) => {
-            const auth: AuthContext = { userId, artistId, role: 'artist' }
+            const auth: AuthContext = { userId, artistId, role: 'artist', siteId: 'platform' }
 
             const result = assertOwnership(auth, artistId)
 
@@ -449,7 +451,7 @@ describe('Property 2: Ownership enforcement — artista não acessa recursos de 
             } as unknown as Awaited<ReturnType<typeof prisma.availabilityRule.findUnique>>)
 
             const request = makeRequest({
-              user:   { userId: authenticatedArtistId, artistId: authenticatedArtistId, role: 'artist' } as AuthContext,
+              user:   { userId: authenticatedArtistId, artistId: authenticatedArtistId, role: 'artist', siteId: 'platform' } as AuthContext,
               params: { id: ruleId },
               body:   {},
             }) as FastifyRequest & { user: AuthContext; params: { id: string }; body: Record<string, unknown> }
@@ -494,7 +496,7 @@ describe('Property 2: Ownership enforcement — artista não acessa recursos de 
             } as unknown as Awaited<ReturnType<typeof prisma.availabilityBlock.findUnique>>)
 
             const request = makeRequest({
-              user:   { userId: authenticatedArtistId, artistId: authenticatedArtistId, role: 'artist' } as AuthContext,
+              user:   { userId: authenticatedArtistId, artistId: authenticatedArtistId, role: 'artist', siteId: 'platform' } as AuthContext,
               params: { id: blockId },
               body:   {},
             }) as FastifyRequest & { user: AuthContext; params: { id: string }; body: Record<string, unknown> }
@@ -533,6 +535,7 @@ describe('Property 2: Ownership enforcement — artista não acessa recursos de 
               userId:   adminUserId,
               artistId: adminArtistId,
               role:     'admin',
+            siteId:   'platform',
             }
 
             const result = assertOwnership(adminContext, resourceArtistId)
@@ -562,6 +565,7 @@ describe('Property 2: Ownership enforcement — artista não acessa recursos de 
               userId:   authenticatedArtistId,
               artistId: authenticatedArtistId,
               role:     'artist',
+            siteId:   'platform',
             }
 
             const result = assertOwnership(auth, resourceArtistId)

@@ -23,18 +23,21 @@ vi.mock('../../env.js', () => ({
 
 // ── Mock repository (not needed for JWT round-trip, but required by module) ───
 vi.mock('./auth.repository.js', () => ({
-  findUserByEmail:     vi.fn(),
-  findUserById:        vi.fn(),
-  createRefreshToken:  vi.fn(),
-  findRefreshToken:    vi.fn(),
-  revokeRefreshToken:  vi.fn(),
-  revokeAllUserTokens: vi.fn(),
-  findArtistById:      vi.fn(),
+  findUserByEmail:        vi.fn(),
+  findUserByEmailAndSite: vi.fn(),
+  findUserById:           vi.fn(),
+  createUser:             vi.fn(),
+  createRefreshToken:     vi.fn(),
+  findRefreshToken:       vi.fn(),
+  revokeRefreshToken:     vi.fn(),
+  revokeAllUserTokens:    vi.fn(),
+  findArtistById:         vi.fn(),
 }))
 
 // ── Mock password lib ─────────────────────────────────────────────────────────
 vi.mock('../../lib/password.js', () => ({
   verifyPassword: vi.fn(),
+  hashPassword:   vi.fn(),
 }))
 
 import jwt from 'jsonwebtoken'

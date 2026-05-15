@@ -48,6 +48,7 @@ interface AuthContext {
   userId:   string
   artistId: string
   role:     'admin' | 'artist' | 'editor'
+  siteId:   string
 }
 
 interface OwnershipCheckResult {
@@ -208,6 +209,7 @@ describe('Property 5: Ownership check para operações de escrita em projetos', 
               userId:   userIdA,
               artistId: userIdA, // artistId de A é diferente de resourceArtistId
               role:     'artist',
+            siteId:   'platform',
             }
 
             const result = assertOwnership(authContextA, resourceArtistId)
@@ -234,7 +236,8 @@ describe('Property 5: Ownership check para operações de escrita em projetos', 
             const authContext: AuthContext = {
               userId,
               artistId,
-              role: 'artist',
+              role:     'artist',
+            siteId:   'platform',
             }
 
             // Recurso pertence ao próprio artista autenticado
@@ -274,7 +277,7 @@ describe('Property 5: Ownership check para operações de escrita em projetos', 
             } as unknown as Awaited<ReturnType<typeof prisma.project.findUnique>>)
 
             const request = makeRequest({
-              user:   { userId: userIdA, artistId: userIdA, role: 'artist' } as AuthContext,
+              user:   { userId: userIdA, artistId: userIdA, role: 'artist', siteId: 'platform' } as AuthContext,
               params: { id: projectId },
             }) as FastifyRequest & { user: AuthContext; params: { id: string } }
 
@@ -322,7 +325,7 @@ describe('Property 5: Ownership check para operações de escrita em projetos', 
             } as unknown as Awaited<ReturnType<typeof prisma.project.findUnique>>)
 
             const request = makeRequest({
-              user:   { userId: userIdA, artistId: userIdA, role: 'artist' } as AuthContext,
+              user:   { userId: userIdA, artistId: userIdA, role: 'artist', siteId: 'platform' } as AuthContext,
               params: { id: projectId },
             }) as FastifyRequest & { user: AuthContext; params: { id: string } }
 
@@ -361,6 +364,7 @@ describe('Property 5: Ownership check para operações de escrita em projetos', 
               userId:   adminUserId,
               artistId: adminArtistId,
               role:     'admin',
+            siteId:   'platform',
             }
 
             // Admin deve sempre ter acesso, independente do resourceArtistId
@@ -392,6 +396,7 @@ describe('Property 5: Ownership check para operações de escrita em projetos', 
               userId:   userIdA,
               artistId: userIdA,
               role:     'artist',
+            siteId:   'platform',
             }
 
             const result = assertOwnership(authContextA, resourceArtistId)

@@ -19,6 +19,11 @@ vi.mock('../lib/prisma.js', () => ({
   },
 }))
 
+// Mock sites module
+vi.mock('../lib/sites.js', () => ({
+  resolveSiteFromRequest: vi.fn().mockReturnValue({ id: 'platform', slug: 'platform', cookieName: 'ah_platform_refresh' }),
+}))
+
 // Import the mocked prisma after vi.mock is hoisted
 import { prisma } from '../lib/prisma.js'
 
@@ -34,7 +39,7 @@ function makeRequest(overrides: Partial<FastifyRequest> = {}): FastifyRequest {
   return {
     jwtVerify: vi.fn(),
     user: undefined,
-    headers: {},
+    headers: { 'x-site-id': 'platform' },
     ...overrides,
   } as unknown as FastifyRequest
 }
@@ -121,7 +126,6 @@ describe('authenticate hook', () => {
   it('returns 403 when token is valid but user has no artist profile (artistId is null)', async () => {
     const request = makeRequest({
       jwtVerify: vi.fn().mockImplementation(async function (this: FastifyRequest) {
-        // Simulate @fastify/jwt setting request.user after verification
         ;(this as unknown as Record<string, unknown>).user = { sub: 'user-123', role: 'artist' }
       }),
     })
@@ -129,6 +133,7 @@ describe('authenticate hook', () => {
 
     vi.mocked(prisma.user.findUnique).mockResolvedValue({
       role: 'artist',
+      siteId: 'platform',
       artistId: null,
     } as unknown as Awaited<ReturnType<typeof prisma.user.findUnique>>)
 
@@ -152,6 +157,7 @@ describe('authenticate hook', () => {
 
     vi.mocked(prisma.user.findUnique).mockResolvedValue({
       role: 'artist',
+      siteId: 'platform',
       artistId: 'artist-789',
     } as unknown as Awaited<ReturnType<typeof prisma.user.findUnique>>)
 
@@ -162,6 +168,7 @@ describe('authenticate hook', () => {
       userId:   'user-456',
       artistId: 'artist-789',
       role:     'artist',
+      siteId:   'platform',
     })
   })
 })
@@ -183,6 +190,7 @@ describe('authenticateRoles factory', () => {
 
     vi.mocked(prisma.user.findUnique).mockResolvedValue({
       role: 'editor',
+      siteId: 'platform',
       artistId: 'artist-001',
     } as unknown as Awaited<ReturnType<typeof prisma.user.findUnique>>)
 
@@ -205,6 +213,7 @@ describe('authenticateRoles factory', () => {
 
     vi.mocked(prisma.user.findUnique).mockResolvedValue({
       role: 'admin',
+      siteId: 'platform',
       artistId: null,
     } as unknown as Awaited<ReturnType<typeof prisma.user.findUnique>>)
 
@@ -216,21 +225,13 @@ describe('authenticateRoles factory', () => {
       userId:   'admin-001',
       artistId: '',
       role:     'admin',
+      siteId:   'platform',
     })
   })
 })
 
 // ─── Property Tests ───────────────────────────────────────────────────────────
 
-/**
- * Property 3: `artist_id` nunca vem do token
- *
- * Para qualquer request autenticado, o `artist_id` injetado em `request.user`
- * deve ser igual ao valor retornado pela query no banco — nunca igual a um
- * valor arbitrário passado no body ou query string.
- *
- * Validates: Requirements 3.5
- */
 describe('Property 3: artist_id nunca vem do token', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -241,51 +242,39 @@ describe('Property 3: artist_id nunca vem do token', () => {
     async () => {
       await fc.assert(
         fc.asyncProperty(
-          fc.uuid(),  // userId legítimo no token
-          fc.uuid(),  // artistId real retornado pelo banco
-          fc.uuid(),  // artistId arbitrário passado no body/query (deve ser ignorado)
+          fc.uuid(),
+          fc.uuid(),
+          fc.uuid(),
           async (userId, dbArtistId, bodyArtistId) => {
-            // Pré-condição: o artistId do body é diferente do que está no banco,
-            // para que o teste seja significativo
             fc.pre(dbArtistId !== bodyArtistId)
 
-            // Simula token verificado com sucesso — o payload do token NÃO contém artist_id
             const request = makeRequest({
               jwtVerify: vi.fn().mockImplementation(async function (this: FastifyRequest) {
                 ;(this as unknown as Record<string, unknown>).user = {
                   sub:  userId,
                   role: 'artist',
-                  // Mesmo que um atacante injete artist_id no payload do token,
-                  // o hook deve ignorá-lo e usar o valor do banco
                   artist_id: bodyArtistId,
                   artistId:  bodyArtistId,
                 }
               }),
-              // Simula body e query string com artistId arbitrário
               body:  { artistId: bodyArtistId, artist_id: bodyArtistId },
               query: { artistId: bodyArtistId, artist_id: bodyArtistId },
             })
             const reply = makeReply()
 
-            // O banco retorna o artistId real — diferente do que está no body/token
             vi.mocked(prisma.user.findUnique).mockResolvedValue({
               role:     'artist',
+              siteId:   'platform',
               artistId: dbArtistId,
             } as unknown as Awaited<ReturnType<typeof prisma.user.findUnique>>)
 
             await authenticate(request, reply)
 
-            // O hook não deve ter retornado erro
             expect(reply.code).not.toHaveBeenCalled()
 
-            // O artistId injetado deve ser exatamente o do banco
-            const ctx = request.user as { userId: string; artistId: string; role: string }
+            const ctx = request.user as { userId: string; artistId: string; role: string; siteId: string }
             expect(ctx.artistId).toBe(dbArtistId)
-
-            // E nunca deve ser o valor arbitrário do body/query/token
             expect(ctx.artistId).not.toBe(bodyArtistId)
-
-            // O userId também deve vir do sub do token (não de outro campo)
             expect(ctx.userId).toBe(userId)
           },
         ),
@@ -299,15 +288,14 @@ describe('Property 3: artist_id nunca vem do token', () => {
     async () => {
       await fc.assert(
         fc.asyncProperty(
-          fc.uuid(),  // userId
-          fc.uuid(),  // artistId real no banco
-          fc.uuid(),  // artistId forjado no payload do token
+          fc.uuid(),
+          fc.uuid(),
+          fc.uuid(),
           async (userId, dbArtistId, tokenArtistId) => {
             fc.pre(dbArtistId !== tokenArtistId)
 
             const request = makeRequest({
               jwtVerify: vi.fn().mockImplementation(async function (this: FastifyRequest) {
-                // Token contém um artist_id forjado — deve ser completamente ignorado
                 ;(this as unknown as Record<string, unknown>).user = {
                   sub:       userId,
                   role:      'artist',
@@ -320,6 +308,7 @@ describe('Property 3: artist_id nunca vem do token', () => {
 
             vi.mocked(prisma.user.findUnique).mockResolvedValue({
               role:     'artist',
+              siteId:   'platform',
               artistId: dbArtistId,
             } as unknown as Awaited<ReturnType<typeof prisma.user.findUnique>>)
 
@@ -327,9 +316,7 @@ describe('Property 3: artist_id nunca vem do token', () => {
 
             expect(reply.code).not.toHaveBeenCalled()
 
-            const ctx = request.user as { userId: string; artistId: string; role: string }
-
-            // Invariante central: artistId vem do banco, nunca do token
+            const ctx = request.user as { userId: string; artistId: string; role: string; siteId: string }
             expect(ctx.artistId).toBe(dbArtistId)
             expect(ctx.artistId).not.toBe(tokenArtistId)
           },
@@ -344,9 +331,9 @@ describe('Property 3: artist_id nunca vem do token', () => {
     async () => {
       await fc.assert(
         fc.asyncProperty(
-          fc.uuid(),  // userId legítimo (sub do token)
-          fc.uuid(),  // userId arbitrário no body (deve ser ignorado)
-          fc.uuid(),  // artistId retornado pelo banco
+          fc.uuid(),
+          fc.uuid(),
+          fc.uuid(),
           async (tokenUserId, bodyUserId, dbArtistId) => {
             fc.pre(tokenUserId !== bodyUserId)
 
@@ -363,6 +350,7 @@ describe('Property 3: artist_id nunca vem do token', () => {
 
             vi.mocked(prisma.user.findUnique).mockResolvedValue({
               role:     'artist',
+              siteId:   'platform',
               artistId: dbArtistId,
             } as unknown as Awaited<ReturnType<typeof prisma.user.findUnique>>)
 
@@ -370,11 +358,9 @@ describe('Property 3: artist_id nunca vem do token', () => {
 
             expect(reply.code).not.toHaveBeenCalled()
 
-            // Verifica que o Prisma foi chamado com o userId do token (sub),
-            // não com o userId do body
             expect(prisma.user.findUnique).toHaveBeenCalledWith({
               where:  { id: tokenUserId },
-              select: { role: true, artistId: true },
+              select: { role: true, siteId: true, artistId: true },
             })
             expect(prisma.user.findUnique).not.toHaveBeenCalledWith(
               expect.objectContaining({ where: { id: bodyUserId } }),
@@ -387,14 +373,6 @@ describe('Property 3: artist_id nunca vem do token', () => {
   )
 })
 
-/**
- * Property 5: Token expirado é rejeitado
- *
- * Para qualquer access token com `exp` no passado, qualquer endpoint protegido
- * deve retornar HTTP 401 com `{ "error": "Não autorizado" }`.
- *
- * Validates: Requirements 3.7
- */
 describe('Property 5: Token expirado é rejeitado', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -407,11 +385,8 @@ describe('Property 5: Token expirado é rejeitado', () => {
 
       await fc.assert(
         fc.asyncProperty(
-          // Gera timestamps no passado: de 1 segundo atrás até ~68 anos atrás
           fc.integer({ min: 1, max: nowInSeconds - 1 }),
           async (pastExp) => {
-            // Simula o que @fastify/jwt faz ao verificar um token com exp expirado:
-            // lança um erro com name 'TokenExpiredError'
             const expiredError = new Error(`jwt expired at ${new Date(pastExp * 1000).toISOString()}`)
             expiredError.name = 'TokenExpiredError'
 
@@ -422,7 +397,6 @@ describe('Property 5: Token expirado é rejeitado', () => {
 
             await authenticate(request, reply)
 
-            // O hook deve retornar 401 com a mensagem padrão
             expect(reply.code).toHaveBeenCalledWith(401)
             expect(
               (reply.code(401) as unknown as { send: ReturnType<typeof vi.fn> }).send,
