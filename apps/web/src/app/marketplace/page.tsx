@@ -1,182 +1,87 @@
-'use client'
-
-import { useEffect, useState } from 'react'
+import { Suspense } from 'react'
+import type { Metadata } from 'next'
+import { fetchProducts, fetchCategories } from '@/lib/marketplace/api'
+import { generateHomeMetadata } from '@/lib/marketplace/metadata'
+import { HeroSection } from '@/components/marketplace/HeroSection'
 import { ProductCard } from '@/components/marketplace/ProductCard'
-import { CategoryNav } from '@/components/marketplace/CategoryNav'
+import { SocialProofSection } from '@/components/marketplace/SocialProofSection'
+import { ProjectsSection } from '@/components/marketplace/ProjectsSection'
+import { EmptyState } from '@/components/marketplace/EmptyState'
+import { SkeletonCard } from '@/components/marketplace/SkeletonCard'
+import { LocalBusinessJsonLd, BreadcrumbJsonLd } from '@/components/marketplace/JsonLd'
+import { CatalogSection } from './CatalogSection'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? ''
-
-interface Product {
-  id: string
-  slug: string
-  title: string
-  description: string | null
-  price: number | null
-  categoryId: string
-  featured: boolean
-  sortOrder: number
-  thumbnailUrl: string | null
-  createdAt: string
+export function generateMetadata(): Metadata {
+  return generateHomeMetadata()
 }
 
-interface Category {
-  id: string
-  name: string
-  slug: string
-  icon: string | null
-  sortOrder: number
-}
+export default async function MarketplacePage() {
+  const [productsRes, categories] = await Promise.all([
+    fetchProducts({ pageSize: 12 }),
+    fetchCategories(),
+  ])
 
-export default function MarketplacePage() {
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([])
-  const [allProducts, setAllProducts] = useState<Product[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(true)
-  const [activeCategory, setActiveCategory] = useState<string | null>(null)
-
-  useEffect(() => {
-    Promise.all([
-      fetch(`${API_URL}/marketplace/products?featured=true&pageSize=8`).then(r => r.json()),
-      fetch(`${API_URL}/marketplace/products?pageSize=20`).then(r => r.json()),
-      fetch(`${API_URL}/marketplace/categories`).then(r => r.json()),
-    ])
-      .then(([featuredRes, allRes, categoriesRes]) => {
-        setFeaturedProducts(featuredRes.data ?? [])
-        setAllProducts(allRes.data ?? [])
-        setCategories(categoriesRes.data ?? [])
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [])
-
-  useEffect(() => {
-    if (activeCategory) {
-      fetch(`${API_URL}/marketplace/products?categoryId=${activeCategory}&pageSize=20`)
-        .then(r => r.json())
-        .then(res => setAllProducts(res.data ?? []))
-        .catch(() => {})
-    }
-  }, [activeCategory])
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <span className="text-gray-400 text-sm">Carregando...</span>
-      </div>
-    )
-  }
+  const products = productsRes.data
 
   return (
-    <div>
+    <>
+      {/* Structured Data */}
+      <LocalBusinessJsonLd
+        name="Lonas SP"
+        address="São Paulo, SP — Brasil"
+        telephone="(11) 9999-0000"
+        openingHours={['Mo-Fr 08:00-18:00', 'Sa 08:00-12:00']}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Marketplace', url: 'https://lonassp.com.br/marketplace' },
+        ]}
+      />
+
       {/* Hero Section */}
-      <section className="relative h-[500px] flex items-center justify-center bg-gray-900 -mx-4 sm:-mx-6 lg:-mx-8 -mt-8">
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-40"
-          style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1600&q=80)' }}
-        />
-        <div className="relative text-center px-4">
-          <p className="text-orange-400 text-sm font-semibold tracking-widest uppercase mb-4">
-            Catálogo Profissional
-          </p>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
-            LONAS & COBERTURAS<br />SOB MEDIDA
-          </h1>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="#catalogo"
-              className="px-8 py-3 rounded-full border-2 border-white text-white font-medium hover:bg-white hover:text-gray-900 transition-colors"
-            >
-              Ver Catálogo
-            </a>
-            <a
-              href="/marketplace/cart"
-              className="px-8 py-3 rounded-full bg-orange-500 text-white font-medium hover:bg-orange-600 transition-colors"
-            >
-              Solicitar Orçamento
-            </a>
+      <HeroSection
+        title="Lonas & Coberturas Sob Medida"
+        subtitle="Toldos, capotas e coberturas com qualidade premium. Solicite seu orçamento personalizado ou compre diretamente do catálogo."
+        ctaPrimary={{ label: 'Ver Catálogo', href: '#catalogo' }}
+        ctaSecondary={{ label: 'Solicitar Orçamento', href: '#orcamento' }}
+        socialProof={{ count: 120, label: 'clientes atendidos' }}
+        categories={categories}
+      />
+
+      {/* Catalog Section (Client Component for search/filter interactivity) */}
+      <section id="catalogo" className="mp-section">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-10">
+            <h2 className="mp-heading-2">Nossos Produtos</h2>
+            <p style={{ color: 'var(--mp-text-secondary)', marginTop: '8px', fontSize: '1.125rem' }}>
+              Encontre o produto certo para o seu próximo projeto
+            </p>
           </div>
+
+          <Suspense fallback={<CatalogSkeleton />}>
+            <CatalogSection
+              initialProducts={products}
+              categories={categories}
+            />
+          </Suspense>
         </div>
       </section>
 
-      {/* Categories + Products Section */}
-      <section id="catalogo" className="py-16 bg-white -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-10">
-            <div className="mb-6 lg:mb-0">
-              <h2 className="text-3xl font-bold text-gray-900">
-                Encontre o produto certo
-              </h2>
-              <p className="text-gray-400 text-lg">para o seu próximo projeto</p>
-            </div>
+      {/* Social Proof */}
+      <SocialProofSection />
 
-            {/* Category Tabs */}
-            <div className="flex items-center gap-6 overflow-x-auto">
-              <button
-                onClick={() => setActiveCategory(null)}
-                className={`text-sm font-medium whitespace-nowrap pb-1 border-b-2 transition-colors ${
-                  !activeCategory ? 'text-gray-900 border-gray-900' : 'text-gray-500 border-transparent hover:text-gray-700'
-                }`}
-              >
-                Todos
-              </button>
-              {categories.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
-                  className={`text-sm font-medium whitespace-nowrap pb-1 border-b-2 transition-colors ${
-                    activeCategory === cat.id ? 'text-gray-900 border-gray-900' : 'text-gray-500 border-transparent hover:text-gray-700'
-                  }`}
-                >
-                  {cat.name}
-                </button>
-              ))}
-              <a href="/marketplace/category/toldos" className="text-sm text-orange-500 font-medium whitespace-nowrap hover:text-orange-600">
-                Ver todas categorias →
-              </a>
-            </div>
-          </div>
+      {/* Projects */}
+      <ProjectsSection />
+    </>
+  )
+}
 
-          {/* Product Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {(activeCategory ? allProducts : allProducts).map((product) => (
-              <a
-                key={product.id}
-                href={`/marketplace/product/${product.slug}`}
-                className="group block"
-              >
-                <div className="aspect-[4/3] bg-gray-100 rounded-lg overflow-hidden mb-4 border border-gray-200 flex items-center justify-center">
-                  {product.thumbnailUrl ? (
-                    <img
-                      src={product.thumbnailUrl}
-                      alt={product.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : (
-                    <div className="text-gray-300 text-6xl">📦</div>
-                  )}
-                </div>
-                <p className="text-xs text-gray-400 uppercase tracking-wide font-medium">
-                  {categories.find(c => c.id === product.categoryId)?.name ?? 'Produto'}
-                </p>
-                <h3 className="text-lg font-semibold text-gray-900 mt-1 group-hover:text-orange-500 transition-colors">
-                  {product.title}
-                </h3>
-                {product.price !== null ? (
-                  <p className="text-sm text-gray-600 mt-1">
-                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}
-                  </p>
-                ) : (
-                  <p className="text-sm text-orange-500 mt-1 font-medium">Sob consulta</p>
-                )}
-              </a>
-            ))}
-          </div>
-
-          {allProducts.length === 0 && (
-            <p className="text-center text-gray-400 py-12">Nenhum produto encontrado.</p>
-          )}
-        </div>
-      </section>
+function CatalogSkeleton() {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {Array.from({ length: 6 }, (_, i) => (
+        <SkeletonCard key={i} />
+      ))}
     </div>
   )
 }

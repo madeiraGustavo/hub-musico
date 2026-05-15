@@ -130,8 +130,8 @@ describe('Property 12: Cart quantity bounds respect stock', () => {
 
             const item = useCartStore.getState().items[0]
             const maxQty = Math.min(99, stock)
-            expect(item.quantity).toBeGreaterThanOrEqual(1)
-            expect(item.quantity).toBeLessThanOrEqual(maxQty)
+            expect(item!.quantity).toBeGreaterThanOrEqual(1)
+            expect(item!.quantity).toBeLessThanOrEqual(maxQty)
           },
         ),
       )
@@ -159,8 +159,8 @@ describe('Property 12: Cart quantity bounds respect stock', () => {
             useCartStore.getState().updateQuantity('prod-1', requestedQty)
 
             const item = useCartStore.getState().items[0]
-            expect(item.quantity).toBeGreaterThanOrEqual(1)
-            expect(item.quantity).toBeLessThanOrEqual(99)
+            expect(item!.quantity).toBeGreaterThanOrEqual(1)
+            expect(item!.quantity).toBeLessThanOrEqual(99)
           },
         ),
       )

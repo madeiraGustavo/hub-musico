@@ -1,10 +1,7 @@
-import type { Metadata } from 'next'
 import { MarketplaceHeader } from '@/components/marketplace/MarketplaceHeader'
-
-export const metadata: Metadata = {
-  title: 'Marketplace de Lonas | Arte Hub',
-  description: 'Catálogo profissional de toldos, capotas, coberturas e lonas industriais.',
-}
+import { MarketplaceFooter } from '@/components/marketplace/MarketplaceFooter'
+import { ToastContainer } from '@/components/marketplace/Toast'
+import './marketplace.css'
 
 export default function MarketplaceLayout({
   children,
@@ -12,11 +9,13 @@ export default function MarketplaceLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="marketplace min-h-screen flex flex-col">
       <MarketplaceHeader />
-      <main className="pt-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex-1 w-full">
         {children}
       </main>
+      <MarketplaceFooter />
+      <ToastContainer />
     </div>
   )
 }

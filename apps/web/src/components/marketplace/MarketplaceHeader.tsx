@@ -1,11 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { getAccessToken } from '@/lib/api/client'
+import { useCartStore } from '@/stores/cartStore'
 
 export function MarketplaceHeader() {
   const [isArtist, setIsArtist] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  const items = useCartStore((state) => state.items)
+  const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0)
 
   useEffect(() => {
     const token = getAccessToken()
@@ -16,38 +22,319 @@ export function MarketplaceHeader() {
         if (payload.role === 'artist' || payload.role === 'admin') {
           setIsArtist(true)
         }
-      } catch {}
+      } catch {
+        // Invalid token payload — ignore
+      }
     }
   }, [])
 
+  useEffect(() => {
+    function handleScroll() {
+      setIsScrolled(window.scrollY > 50)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const closeMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen(false)
+  }, [])
+
+  const toggleMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen((prev) => !prev)
+  }, [])
+
   return (
-    <header className="absolute top-0 left-0 right-0 z-50">
+    <header
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? 'backdrop-blur-md bg-white/90 shadow-sm'
+          : 'bg-white'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-        <a href="/marketplace" className="text-xl font-bold text-white">
+        {/* Logo */}
+        <a
+          href="/marketplace"
+          className="text-xl font-bold"
+          style={{ fontFamily: 'var(--mp-font-heading)', color: 'var(--mp-text-default)' }}
+        >
           Lonas SP
         </a>
-        <nav className="hidden md:flex items-center gap-8">
-          <a href="/marketplace" className="text-sm text-gray-300 hover:text-white transition-colors">
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-8" aria-label="Navegação principal">
+          <a
+            href="/marketplace"
+            className="text-sm font-medium transition-colors duration-200 hover:opacity-80"
+            style={{ color: 'var(--mp-text-secondary)' }}
+          >
             Catálogo
           </a>
-          <a href="/marketplace/cart" className="text-sm text-gray-300 hover:text-white transition-colors">
-            Carrinho
+          <a
+            href="/marketplace#categorias"
+            className="text-sm font-medium transition-colors duration-200 hover:opacity-80"
+            style={{ color: 'var(--mp-text-secondary)' }}
+          >
+            Categorias
+          </a>
+          <a
+            href="/marketplace#orcamento"
+            className="text-sm font-medium transition-colors duration-200 hover:opacity-80"
+            style={{ color: 'var(--mp-text-secondary)' }}
+          >
+            Orçamento
           </a>
           {isArtist && (
-            <a href="/dashboard/marketplace" className="text-sm text-gray-300 hover:text-white transition-colors">
+            <a
+              href="/dashboard/marketplace"
+              className="text-sm font-medium transition-colors duration-200 hover:opacity-80"
+              style={{ color: 'var(--mp-text-secondary)' }}
+            >
               Dashboard
             </a>
           )}
         </nav>
-        {!isLoggedIn ? (
-          <a href="/login" className="px-5 py-2 rounded-full border border-white text-white text-sm font-medium hover:bg-white hover:text-gray-900 transition-colors">
-            Log In
+
+        {/* Desktop Actions */}
+        <div className="hidden md:flex items-center gap-4">
+          {/* Cart Icon */}
+          <a
+            href="/marketplace/cart"
+            className="relative flex items-center justify-center w-11 h-11 rounded-full transition-colors duration-200 hover:bg-gray-100"
+            aria-label={`Carrinho de compras, ${cartItemCount} ${cartItemCount === 1 ? 'item' : 'itens'}`}
+          >
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ color: 'var(--mp-text-default)' }}
+            >
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 01-8 0" />
+            </svg>
+            {cartItemCount > 0 && (
+              <span
+                className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold rounded-full"
+                style={{
+                  backgroundColor: 'var(--mp-accent)',
+                  color: 'var(--mp-text-on-accent)',
+                }}
+              >
+                {cartItemCount > 99 ? '99+' : cartItemCount}
+              </span>
+            )}
           </a>
-        ) : (
-          <a href="/dashboard/marketplace" className="px-5 py-2 rounded-full border border-white text-white text-sm font-medium hover:bg-white hover:text-gray-900 transition-colors">
-            Minha Conta
+
+          {/* Login / Account Button */}
+          {!isLoggedIn ? (
+            <a
+              href="/login"
+              className="mp-btn-primary text-sm px-5 py-2"
+              style={{ minHeight: '44px', display: 'inline-flex', alignItems: 'center' }}
+            >
+              Entrar
+            </a>
+          ) : (
+            <a
+              href="/dashboard/marketplace"
+              className="mp-btn-secondary text-sm px-5 py-2"
+              style={{ minHeight: '44px', display: 'inline-flex', alignItems: 'center' }}
+            >
+              Minha Conta
+            </a>
+          )}
+        </div>
+
+        {/* Mobile Actions */}
+        <div className="flex md:hidden items-center gap-2">
+          {/* Cart Icon (Mobile) */}
+          <a
+            href="/marketplace/cart"
+            className="relative flex items-center justify-center w-11 h-11 rounded-full transition-colors duration-200 hover:bg-gray-100"
+            aria-label={`Carrinho de compras, ${cartItemCount} ${cartItemCount === 1 ? 'item' : 'itens'}`}
+          >
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ color: 'var(--mp-text-default)' }}
+            >
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 01-8 0" />
+            </svg>
+            {cartItemCount > 0 && (
+              <span
+                className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold rounded-full"
+                style={{
+                  backgroundColor: 'var(--mp-accent)',
+                  color: 'var(--mp-text-on-accent)',
+                }}
+              >
+                {cartItemCount > 99 ? '99+' : cartItemCount}
+              </span>
+            )}
           </a>
-        )}
+
+          {/* Hamburger Button */}
+          <button
+            type="button"
+            onClick={toggleMobileMenu}
+            className="flex items-center justify-center w-11 h-11 rounded-full transition-colors duration-200 hover:bg-gray-100"
+            aria-label={isMobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}
+            aria-expanded={isMobileMenuOpen}
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ color: 'var(--mp-text-default)' }}
+            >
+              {isMobileMenuOpen ? (
+                <>
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </>
+              ) : (
+                <>
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </>
+              )}
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Slide-in Panel */}
+      {/* Overlay */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/40 transition-opacity duration-300 md:hidden ${
+          isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={closeMobileMenu}
+        aria-hidden="true"
+      />
+
+      {/* Panel */}
+      <div
+        className={`fixed top-0 right-0 z-50 h-full w-72 bg-white shadow-xl transition-transform duration-300 ease-in-out md:hidden ${
+          isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu de navegação"
+      >
+        {/* Panel Header */}
+        <div className="flex items-center justify-between h-20 px-4 border-b" style={{ borderColor: 'var(--mp-border-default)' }}>
+          <span
+            className="text-lg font-bold"
+            style={{ fontFamily: 'var(--mp-font-heading)', color: 'var(--mp-text-default)' }}
+          >
+            Menu
+          </span>
+          <button
+            type="button"
+            onClick={closeMobileMenu}
+            className="flex items-center justify-center w-11 h-11 rounded-full transition-colors duration-200 hover:bg-gray-100"
+            aria-label="Fechar menu"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ color: 'var(--mp-text-default)' }}
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Panel Navigation */}
+        <nav className="flex flex-col p-4 gap-1" aria-label="Menu mobile">
+          <a
+            href="/marketplace"
+            className="flex items-center h-11 px-3 rounded-lg text-sm font-medium transition-colors duration-200 hover:bg-gray-100"
+            style={{ color: 'var(--mp-text-default)' }}
+            onClick={closeMobileMenu}
+          >
+            Catálogo
+          </a>
+          <a
+            href="/marketplace#categorias"
+            className="flex items-center h-11 px-3 rounded-lg text-sm font-medium transition-colors duration-200 hover:bg-gray-100"
+            style={{ color: 'var(--mp-text-default)' }}
+            onClick={closeMobileMenu}
+          >
+            Categorias
+          </a>
+          <a
+            href="/marketplace#orcamento"
+            className="flex items-center h-11 px-3 rounded-lg text-sm font-medium transition-colors duration-200 hover:bg-gray-100"
+            style={{ color: 'var(--mp-text-default)' }}
+            onClick={closeMobileMenu}
+          >
+            Orçamento
+          </a>
+          {isArtist && (
+            <a
+              href="/dashboard/marketplace"
+              className="flex items-center h-11 px-3 rounded-lg text-sm font-medium transition-colors duration-200 hover:bg-gray-100"
+              style={{ color: 'var(--mp-text-default)' }}
+              onClick={closeMobileMenu}
+            >
+              Dashboard
+            </a>
+          )}
+        </nav>
+
+        {/* Panel Footer — Login/Account */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t" style={{ borderColor: 'var(--mp-border-default)' }}>
+          {!isLoggedIn ? (
+            <a
+              href="/login"
+              className="mp-btn-primary w-full text-sm text-center"
+              onClick={closeMobileMenu}
+            >
+              Entrar
+            </a>
+          ) : (
+            <a
+              href="/dashboard/marketplace"
+              className="mp-btn-secondary w-full text-sm text-center"
+              onClick={closeMobileMenu}
+            >
+              Minha Conta
+            </a>
+          )}
+        </div>
       </div>
     </header>
   )

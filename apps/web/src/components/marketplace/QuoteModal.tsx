@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? ''
 
@@ -9,6 +9,13 @@ interface QuoteModalProps {
   productTitle: string
   isOpen: boolean
   onClose: () => void
+}
+
+function getFocusableElements(container: HTMLElement): HTMLElement[] {
+  const elements = container.querySelectorAll<HTMLElement>(
+    'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+  )
+  return Array.from(elements)
 }
 
 export function QuoteModal({ productId, productTitle, isOpen, onClose }: QuoteModalProps) {
@@ -23,6 +30,78 @@ export function QuoteModal({ productId, productTitle, isOpen, onClose }: QuoteMo
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [animateIn, setAnimateIn] = useState(false)
+
+  const modalRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLElement | null>(null)
+
+  // Capture the trigger element when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      triggerRef.current = document.activeElement as HTMLElement
+      // Trigger animation on next frame
+      requestAnimationFrame(() => setAnimateIn(true))
+    } else {
+      setAnimateIn(false)
+    }
+  }, [isOpen])
+
+  // Focus trap and Escape key handler
+  useEffect(() => {
+    if (!isOpen) return
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        onClose()
+        return
+      }
+
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusable = getFocusableElements(modalRef.current)
+        if (focusable.length === 0) return
+
+        const first = focusable[0]
+        const last = focusable[focusable.length - 1]
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault()
+            last!.focus()
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault()
+            first!.focus()
+          }
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, onClose])
+
+  // Focus first focusable element on open
+  useEffect(() => {
+    if (isOpen && modalRef.current) {
+      const focusable = getFocusableElements(modalRef.current)
+      if (focusable.length > 0) {
+        focusable[0]!.focus()
+      }
+    }
+  }, [isOpen, success])
+
+  // Return focus to trigger on close
+  const handleClose = useCallback(() => {
+    onClose()
+    // Restore focus after the modal unmounts
+    setTimeout(() => {
+      if (triggerRef.current && typeof triggerRef.current.focus === 'function') {
+        triggerRef.current.focus()
+      }
+    }, 0)
+  }, [onClose])
 
   if (!isOpen) return null
 
@@ -76,13 +155,35 @@ export function QuoteModal({ productId, productTitle, isOpen, onClose }: QuoteMo
     }
   }
 
+  const modalTitleId = 'quote-modal-title'
+
   if (success) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
-        <div className="bg-bg-surface rounded-lg p-8 max-w-md w-full mx-4 text-center" onClick={e => e.stopPropagation()}>
-          <h3 className="text-lg font-semibold text-text-default mb-2">Orçamento enviado!</h3>
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center"
+        style={{
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          opacity: animateIn ? 1 : 0,
+          transition: 'opacity 150ms ease',
+        }}
+        onClick={handleClose}
+      >
+        <div
+          ref={modalRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={modalTitleId}
+          className="bg-bg-surface rounded-lg p-8 max-w-md w-full mx-4 text-center"
+          style={{
+            transform: animateIn ? 'scale(1)' : 'scale(0.95)',
+            opacity: animateIn ? 1 : 0,
+            transition: 'transform 200ms ease, opacity 200ms ease',
+          }}
+          onClick={e => e.stopPropagation()}
+        >
+          <h3 id={modalTitleId} className="text-lg font-semibold text-text-default mb-2">Orçamento enviado!</h3>
           <p className="text-text-muted text-sm mb-4">Entraremos em contato em breve.</p>
-          <button onClick={onClose} className="px-4 py-2 bg-bg-accent text-text-on-accent rounded text-sm">
+          <button onClick={handleClose} className="px-4 py-2 bg-bg-accent text-text-on-accent rounded text-sm">
             Fechar
           </button>
         </div>
@@ -91,9 +192,29 @@ export function QuoteModal({ productId, productTitle, isOpen, onClose }: QuoteMo
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
-      <div className="bg-bg-surface rounded-lg p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-        <h3 className="text-lg font-semibold text-text-default mb-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        opacity: animateIn ? 1 : 0,
+        transition: 'opacity 150ms ease',
+      }}
+      onClick={handleClose}
+    >
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={modalTitleId}
+        className="bg-bg-surface rounded-lg p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto"
+        style={{
+          transform: animateIn ? 'scale(1)' : 'scale(0.95)',
+          opacity: animateIn ? 1 : 0,
+          transition: 'transform 200ms ease, opacity 200ms ease',
+        }}
+        onClick={e => e.stopPropagation()}
+      >
+        <h3 id={modalTitleId} className="text-lg font-semibold text-text-default mb-4">
           Solicitar Orçamento — {productTitle}
         </h3>
 
@@ -175,7 +296,7 @@ export function QuoteModal({ productId, productTitle, isOpen, onClose }: QuoteMo
           <div className="flex gap-3 pt-2">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="flex-1 px-4 py-2 rounded border border-border-default text-text-default text-sm hover:bg-bg-muted transition-colors"
             >
               Cancelar
