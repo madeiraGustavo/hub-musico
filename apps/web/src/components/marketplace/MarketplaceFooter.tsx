@@ -21,7 +21,7 @@ export function MarketplaceFooter() {
               className="text-xl font-bold mb-3"
               style={{ fontFamily: 'var(--mp-font-heading)' }}
             >
-              Lonas SP
+              Toldos Colibri
             </h2>
             <p
               className="text-sm leading-relaxed"
@@ -80,7 +80,7 @@ export function MarketplaceFooter() {
               </li>
               <li className="flex items-center gap-2">
                 <EmailIcon />
-                <span>contato@lonassp.com.br</span>
+                <span>contato@toldoscolibri.com.br</span>
               </li>
               <li className="flex items-start gap-2">
                 <LocationIcon className="mt-0.5 shrink-0" />
@@ -119,7 +119,7 @@ export function MarketplaceFooter() {
             color: 'var(--mp-text-muted)',
           }}
         >
-          © 2024 Lonas SP. Todos os direitos reservados.
+          © 2024 Toldos Colibri. Todos os direitos reservados.
         </div>
       </div>
 
