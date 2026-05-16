@@ -29,8 +29,8 @@ export default async function MarketplacePage() {
       {/* Structured Data */}
       <LocalBusinessJsonLd
         name="Toldos Colibri"
-        address="São Paulo, SP — Brasil"
-        telephone="(11) 9999-0000"
+        address="Rio Pomba, MG — Brasil"
+        telephone="(32) 98432-7514"
         openingHours={['Mo-Fr 08:00-18:00', 'Sa 08:00-12:00']}
       />
       <BreadcrumbJsonLd

@@ -76,15 +76,15 @@ export function MarketplaceFooter() {
             <ul className="space-y-2 text-sm" style={{ color: 'var(--mp-text-muted)' }}>
               <li className="flex items-center gap-2">
                 <PhoneIcon />
-                <span>(11) 9999-0000</span>
+                <span>(32) 98432-7514</span>
               </li>
               <li className="flex items-center gap-2">
                 <EmailIcon />
-                <span>contato@toldoscolibri.com.br</span>
+                <span>morcorjcolibri@gmail.com</span>
               </li>
               <li className="flex items-start gap-2">
                 <LocationIcon className="mt-0.5 shrink-0" />
-                <span>São Paulo, SP — Brasil</span>
+                <span>Rio Pomba, MG — Brasil</span>
               </li>
             </ul>
           </div>

@@ -5,7 +5,7 @@
  * Fixo no canto inferior direito, sempre visível.
  */
 
-const WHATSAPP_NUMBER = '5511999990000' // Substituir pelo número real
+const WHATSAPP_NUMBER = '5532984327514' // Toldos Colibri
 const WHATSAPP_MESSAGE = encodeURIComponent('Olá! Gostaria de solicitar um orçamento para toldos/coberturas.')
 
 export function WhatsAppCTA() {
